@@ -91,6 +91,7 @@ Core flow:
 - [x] Daily-loss, strategy-loss, symbol-exposure and portfolio-exposure limits.
 - [x] Concurrent-trade and leverage limits.
 - [x] Slippage, probability and minimum-R:R gates.
+- [x] Explicit order-notional, available-liquidity and market-participation gates.
 - [x] Auditable `RiskDecision` with passed-check trace.
 - [x] Dedicated RiskEngine safety tests.
 - [x] Canonical OMS state machine with monotonic partial/full-fill rules.
@@ -101,8 +102,9 @@ Core flow:
 - [x] Broker-neutral fill and reconciliation contracts.
 - [x] Position manager with duplicate-fill protection.
 - [x] Append-only in-memory journal/audit boundary.
+- [x] Durable JSONL journal boundary for PAPER/testing.
 - [x] Position updates emit auditable lifecycle events.
-- [x] Unit tests for PAPER fills, position manager, reconciliation and journal behavior.
+- [x] Unit tests for PAPER fills, position manager, capacity gates, reconciliation and journal behavior.
 
 ## Previously prototyped — not used as the implementation branch
 A temporary `foundation/paper-vertical-slice` prototype existed before the main-only rule. Its useful ideas were reviewed and recreated deliberately on `main`; it is not the active development branch.
@@ -143,10 +145,9 @@ A temporary `foundation/paper-vertical-slice` prototype existed before the main-
 - [ ] Explanation/audit evidence persistence.
 
 ### Phase 6 — Risk / execution
-- [ ] Explicit liquidity/notional capacity checks.
 - [ ] Strategy/portfolio risk snapshot integration with live position book.
-- [ ] Durable journal persistence.
 - [ ] Broker reconciliation adapter implementation.
+- [ ] Stronger durable journal backend.
 
 ### Phase 7 — Research
 - [ ] Event-driven backtester.
@@ -200,4 +201,4 @@ Journal / Audit
 The milestone is complete only when automated tests cover the complete flow and it runs without live order execution.
 
 ## Current next task
-Implement **risk-snapshot integration from the live PositionBook, durable journal persistence boundary, and explicit liquidity/notional capacity checks** before advancing to the event-driven backtester.
+Implement **live PositionBook → RiskSnapshot integration and then start the event-driven backtester core**, preserving realistic execution semantics and zero look-ahead.
