@@ -19,11 +19,13 @@ class RiskPolicy:
     max_data_age_seconds: int = 0
     min_risk_reward: Decimal = Decimal("0")
     min_probability: Decimal = Decimal("0")
+    max_order_notional: Decimal = Decimal("0")
+    max_participation_rate: Decimal = Decimal("0")
 
     def validate(self) -> None:
         if self.max_daily_loss < 0 or self.max_strategy_loss < 0:
             raise ValueError("loss limits cannot be negative")
-        if self.max_symbol_exposure < 0 or self.max_portfolio_exposure < 0:
+        if self.max_symbol_exposure < 0 or self.max_portfolio_exposure < 0 or self.max_order_notional < 0:
             raise ValueError("exposure limits cannot be negative")
         if self.max_concurrent_trades < 0 or self.max_data_age_seconds < 0:
             raise ValueError("count and age limits cannot be negative")
@@ -33,6 +35,8 @@ class RiskPolicy:
             raise ValueError("minimum risk/reward cannot be negative")
         if not Decimal("0") <= self.min_probability <= Decimal("1"):
             raise ValueError("minimum probability must be between 0 and 1")
+        if not Decimal("0") <= self.max_participation_rate <= Decimal("1"):
+            raise ValueError("participation rate must be between 0 and 1")
 
 
 @dataclass(frozen=True, slots=True)
@@ -46,6 +50,7 @@ class RiskSnapshot:
     broker_healthy: bool = True
     kill_switch: bool = False
     circuit_breaker: bool = False
+    available_liquidity: Decimal = Decimal("0")
 
 
 @dataclass(frozen=True, slots=True)
@@ -59,6 +64,8 @@ class RiskContext:
     duplicate_opportunity: bool = False
     estimated_slippage_bps: Decimal = Decimal("0")
     probability: Decimal | None = None
+    order_notional: Decimal = Decimal("0")
+    estimated_market_volume: Decimal = Decimal("0")
 
 
 @dataclass(frozen=True, slots=True)
@@ -121,6 +128,18 @@ class RiskEngine:
         if snapshot.leverage > policy.max_leverage:
             return RiskDecision(False, "leverage limit exceeded", tuple(checks))
         checks.append("account limits")
+
+        if context.order_notional <= 0:
+            return RiskDecision(False, "order notional must be positive", tuple(checks))
+        if policy.max_order_notional and context.order_notional > policy.max_order_notional:
+            return RiskDecision(False, "order notional limit exceeded", tuple(checks))
+        if snapshot.available_liquidity < context.order_notional:
+            return RiskDecision(False, "insufficient available liquidity", tuple(checks))
+        if policy.max_participation_rate and context.estimated_market_volume <= 0:
+            return RiskDecision(False, "market volume is unavailable for participation check", tuple(checks))
+        if policy.max_participation_rate and context.order_notional > context.estimated_market_volume * policy.max_participation_rate:
+            return RiskDecision(False, "market participation limit exceeded", tuple(checks))
+        checks.append("capacity")
 
         rr = getattr(opportunity, "risk_reward", None)
         if rr is None or rr < policy.min_risk_reward:
