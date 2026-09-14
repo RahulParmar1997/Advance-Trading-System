@@ -93,10 +93,12 @@ Core flow:
 - [x] Slippage, probability and minimum-R:R gates.
 - [x] Auditable `RiskDecision` with passed-check trace.
 - [x] Dedicated RiskEngine safety tests.
-- [x] Canonical OMS state machine with fill monotonicity and terminal-state protection.
-- [x] Idempotent PAPER order gateway keyed by client order identity.
-- [x] Explicit RiskEngine → PAPER OMS execution workflow.
-- [x] PAPER workflow tests for risk rejection and idempotent approved submission.
+- [x] Canonical OMS state machine with monotonic partial/full-fill rules.
+- [x] Idempotent PAPER order gateway keyed by client identity.
+- [x] Controlled `RiskEngine → PAPER OMS` submission workflow.
+- [x] PAPER fill simulator with partial/full fill handling.
+- [x] Deterministic position book with average-price, realized-P&L and unrealized-P&L accounting.
+- [x] Unit tests for PAPER fills and position/P&L behavior.
 
 ## Previously prototyped — not used as the implementation branch
 A temporary `foundation/paper-vertical-slice` prototype existed before the main-only rule. Its useful ideas were reviewed and recreated deliberately on `main`; it is not the active development branch.
@@ -137,13 +139,11 @@ A temporary `foundation/paper-vertical-slice` prototype existed before the main-
 - [ ] Explanation/audit evidence persistence.
 
 ### Phase 6 — Risk / execution
-- [ ] Position sizing from opportunity risk and account equity.
 - [ ] Explicit liquidity/notional capacity checks.
-- [x] Canonical OMS state machine.
-- [x] Idempotent PAPER submission workflow.
-- [ ] Broker reconciliation.
-- [ ] Paper fill simulator with realistic fills/costs.
-- [ ] Position manager, realized/unrealized P&L and audit trail.
+- [ ] OMS-to-broker reconciliation model.
+- [ ] Position-manager lifecycle and audit events.
+- [ ] Strategy/portfolio risk snapshot integration with live position book.
+- [ ] Journal persistence boundary.
 
 ### Phase 7 — Research
 - [ ] Event-driven backtester.
@@ -176,6 +176,8 @@ RiskEngine
 OMS
   ↓
 Execution
+  ↓
+Position / P&L
 ```
 
 - AI never bypasses RiskEngine.
@@ -193,4 +195,4 @@ Execution
 The milestone is complete only when automated tests cover the complete flow and it runs without live order execution.
 
 ## Current next task
-Implement the **PAPER fill simulator and position/P&L accounting layer**, with deterministic fills, realized/unrealized P&L, position updates, and audit-safe tests. Broker reconciliation remains separate and follows the simulator.
+Implement **position-manager lifecycle events, broker-neutral fill/reconciliation contracts, and the journal/audit boundary**, while keeping every exposure-increasing path behind `RiskEngine → OMS`.
