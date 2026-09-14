@@ -1,0 +1,10 @@
+[project]
+name = "advance-trading-system"
+version = "0.1.0"
+description = "India-focused market intelligence and paper trading foundation"
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
