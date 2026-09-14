@@ -1,244 +1,139 @@
 # Advance Trading System — Project Work Status
 
 **Repository:** `RahulParmar1997/Advance-Trading-System`
-**Working branch policy:** `main` ONLY
+**Working branch:** `main` ONLY
 **Execution policy:** PAPER-first; no uncontrolled live execution
 **Last updated:** 2026-09-14
 
-## 1. Working Rule
+## Working rule
+All normal implementation is committed directly to `main`. Before changes: inspect current state, preserve `RiskEngine → OMS`, keep PAPER default, add/update tests, and update this file. Do not use feature branches unless the project owner explicitly changes the rule.
 
-All future implementation work for this project must be performed directly on the **`main` branch** unless the project owner explicitly changes this rule.
-
-Before changing code:
-
-1. Read this file.
-2. Read the master blueprint and engineering prompt.
-3. Inspect the existing implementation before modifying it.
-4. Preserve the Risk Engine → OMS execution gate.
-5. Keep PAPER as the default trading mode.
-6. Add or update tests with implementation changes.
-7. Update this file after meaningful work.
-
-Do not create or use feature branches for normal project implementation unless explicitly requested by the project owner.
-
-## 2. Main Product Goal
-
-Build the India-focused Market Intelligence + Quant Research + Automated Trading Platform described in the project blueprint.
+## Product goal
+Build the India-focused Market Intelligence + Quant Research + Automated Trading Platform defined by the project specifications.
 
 Core flow:
+`DATA → MARKET STATE → INTELLIGENCE → REGIME → SCANNER → TRADE TYPE → STRATEGY → OPPORTUNITY → PROBABILITY → EV → RISK → OMS → EXECUTION → POSITION → JOURNAL → PATTERN DNA → RESEARCH/ML`
 
-```text
-DATA
-→ MARKET STATE
-→ MARKET INTELLIGENCE
-→ REGIME
-→ SCANNER
-→ TRADE TYPE
-→ STRATEGY
-→ OPPORTUNITY
-→ PROBABILITY
-→ EXPECTED VALUE
-→ RISK
-→ OMS
-→ EXECUTION
-→ POSITION
-→ JOURNAL
-→ PATTERN DNA
-→ RESEARCH / ML
-```
+## Done on `main`
 
-## 3. Done on `main`
+### Repository foundation
+- [x] `PROJECT_WORK_STATUS.md` established as the implementation ledger.
+- [x] Backend Python package foundation established.
+- [x] Backend `pyproject.toml` and pytest configuration established.
+- [x] Backend test CI workflow added for pushes to `main` and pull requests.
+- [x] Domain / ingestion / market package boundaries established.
 
-### Repository / documentation
-- README exists and defines the project mission and PAPER-first execution policy.
-- Master market-intelligence/automated-trading blueprint exists.
-- Permanent AI engineering prompt exists.
-- Product blueprint exists, although its current encoding could not be decoded by the GitHub connector during the audit.
-- Intended folder structure is documented.
+### Market-data foundation
+- [x] Canonical broker-neutral `QuoteEvent` contract.
+- [x] Validation for instrument, timezone-aware timestamp, price, bid/ask and volume.
+- [x] Broker-shaped `RawQuote` normalization boundary.
+- [x] Deterministic fixed-interval candle engine.
+- [x] Per-instrument ordering protection.
+- [x] Cumulative-volume-to-candle-delta handling.
+- [x] Deterministic basic candle feature engine.
+- [x] Unit tests for normalization, validation, candle boundary behavior, volume delta, ordering and features.
 
-### Code status
-- The production implementation is **not yet present on main** at the time this status file was created.
-- The root repository currently contains the documented specifications rather than the full backend/frontend implementation.
+## Previously prototyped — not used as the implementation branch
+A temporary `foundation/paper-vertical-slice` prototype existed before the main-only rule. Its useful ideas were reviewed and recreated deliberately on `main`; it is not the active development branch.
 
-## 4. Previously Prototyped — NOT YET ON MAIN
-
-A first PAPER vertical slice was prototyped on a temporary branch named `foundation/paper-vertical-slice`.
-
-It contains an initial implementation of:
-
-- canonical `QuoteEvent`
-- canonical `Order`
-- PAPER trading mode
-- centralized RiskEngine gate
-- Paper OMS
-- raw quote normalization
-- candle engine
-- basic candle features
-- unit tests for the above
-
-**Important:** this prototype is not considered completed project work because the project policy is now **main-only**. Any useful code from that prototype must be reviewed, tested, and recreated or merged into `main` deliberately. Do not assume the prototype is production-ready.
-
-## 5. Current Pending Work
+## Pending work
 
 ### Phase 1 — Engineering foundation
-- [ ] Establish production backend package structure on `main`.
-- [ ] Establish configuration and environment handling.
-- [ ] Establish domain contracts and versioning.
-- [ ] Establish test conventions and CI.
-- [ ] Establish structured logging and health checks.
+- [ ] Configuration/environment handling.
+- [ ] Domain contract versioning.
+- [ ] Structured logging.
+- [ ] Health/readiness checks.
+- [ ] Broader CI quality gates.
 
 ### Phase 2 — Market data
 - [ ] Upstox adapter interfaces.
-- [ ] Authentication/token handling.
-- [ ] WebSocket market-data ingestion.
-- [ ] Reconnect and heartbeat handling.
-- [ ] Canonical event normalization.
-- [ ] Data-quality validation.
-- [ ] Staleness, gaps, ordering and duplicate detection.
-- [ ] Instrument master handling.
+- [ ] Authentication/token lifecycle.
+- [ ] WebSocket ingestion.
+- [ ] Reconnect/heartbeat handling.
+- [ ] Data-quality service: stale, gap, duplicate and sequence detection.
+- [ ] Instrument master.
 
-### Phase 3 — Market state and analytics
-- [ ] Candle engine.
-- [ ] Feature engine.
-- [ ] Market structure.
-- [ ] Liquidity detection.
-- [ ] Volume profile.
-- [ ] Order-flow analytics where feed data supports them.
-- [ ] Futures analytics.
-- [ ] Options analytics.
-- [ ] Breadth and sector intelligence.
+### Phase 3 — Market state / analytics
+- [ ] Multi-timeframe candle/session engine.
+- [ ] Expanded feature engine.
+- [ ] Market structure: swings, HH/HL/LH/LL, BOS, CHoCH, MSS, displacement.
+- [ ] Liquidity, FVG, order blocks and supply/demand.
+- [ ] Volume profile/order flow where feed data supports it.
+- [ ] Futures/options analytics.
+- [ ] Breadth, sector rotation and institutional-flow intelligence.
 - [ ] Market-regime engine.
 
-### Phase 4 — Intelligence and scanning
-- [ ] BOS / CHoCH / MSS.
-- [ ] Displacement.
-- [ ] Liquidity sweeps.
-- [ ] Equal highs/lows.
-- [ ] FVG / order blocks / supply-demand.
-- [ ] Wyckoff features.
+### Phase 4 — Intelligence / scanning
 - [ ] Typed scanner DSL / AST.
 - [ ] Cheap-to-expensive scanner pipeline.
+- [ ] Wyckoff features.
+- [ ] Scanner result contracts and explanations.
 
 ### Phase 5 — Trading decision engine
 - [ ] Trade Type framework.
-- [ ] Versioned Strategy interface.
+- [ ] Versioned deterministic Strategy interface.
 - [ ] Strategy registry.
 - [ ] Opportunity engine.
 - [ ] Evidence-based scoring.
-- [ ] Probability model.
+- [ ] Probability and calibration layer.
 - [ ] Expected-value calculation.
-- [ ] Explanation engine.
+- [ ] Explanation/audit evidence.
 
-### Phase 6 — Risk and execution
-- [ ] Full RiskEngine limits.
-- [ ] Position sizing.
-- [ ] Exposure controls.
-- [ ] Slippage/liquidity checks.
-- [ ] Kill switch.
-- [ ] OMS state machine.
-- [ ] Idempotency.
-- [ ] Broker/application reconciliation.
+### Phase 6 — Risk / execution
+- [ ] Full RiskEngine limits and position sizing.
+- [ ] Exposure, leverage, liquidity and slippage controls.
+- [ ] Kill switch and circuit breakers.
+- [ ] Canonical OMS state machine.
+- [ ] Idempotency and reconciliation.
 - [ ] Paper execution.
-- [ ] Position manager.
-- [ ] P&L.
-- [ ] Audit trail.
+- [ ] Position manager, P&L and audit trail.
 
 ### Phase 7 — Research
 - [ ] Event-driven backtester.
-- [ ] Realistic fill model.
-- [ ] Brokerage/taxes/fees.
-- [ ] Slippage and latency.
-- [ ] Partial fills and rejected orders.
-- [ ] Walk-forward validation.
-- [ ] Monte Carlo analysis.
-- [ ] Regime and cost sensitivity.
-- [ ] Pattern DNA.
-- [ ] Similarity search.
+- [ ] Realistic costs/fills/slippage/latency/partial fills/rejections.
+- [ ] Walk-forward/OOS validation.
+- [ ] Monte Carlo and regime/cost/capacity sensitivity.
+- [ ] Pattern DNA and similarity search.
 - [ ] ML datasets and calibration.
 
 ### Phase 8 — Frontend
-- [ ] Next.js / React / TypeScript foundation.
-- [ ] Trading-terminal layout.
-- [ ] Market dashboard.
-- [ ] Charts.
-- [ ] Scanner UI.
-- [ ] Futures/options views.
-- [ ] Trading/PAPER UI.
-- [ ] Portfolio.
-- [ ] Journal.
-- [ ] Backtesting.
-- [ ] Research UI.
+- [ ] Next.js/React/TypeScript foundation.
+- [ ] Trading terminal, market dashboard and charts.
+- [ ] Scanner, futures/options and PAPER trading views.
+- [ ] Portfolio, journal, backtest and research UI.
 
 ### Phase 9 — Infrastructure
-- [ ] PostgreSQL.
-- [ ] ClickHouse.
-- [ ] Redis.
-- [ ] Parquet/object storage.
-- [ ] Docker configuration.
-- [ ] Monitoring.
-- [ ] Reverse proxy.
-- [ ] Migrations.
-- [ ] Production deployment and operational runbooks.
+- [ ] PostgreSQL, ClickHouse, Redis and Parquet/object storage.
+- [ ] Docker/deployment configuration.
+- [ ] Monitoring and operational runbooks.
+- [ ] Migrations and reverse proxy.
 
-## 6. Critical Architecture Rules
-
-These are non-negotiable unless the project owner explicitly changes them:
-
+## Non-negotiable architecture rules
 ```text
 Strategy
-   ↓
+  ↓
 Probability / Expected Value
-   ↓
+  ↓
 RiskEngine
-   ↓
+  ↓
 OMS
-   ↓
+  ↓
 Execution
 ```
 
-- AI must never bypass RiskEngine.
-- AI must never place uncontrolled orders.
-- Charting is visualization, never the source of truth for orders/positions.
-- Strategy calculations must remain deterministic, testable, network-independent and database-independent.
-- Broker-specific code belongs behind adapter interfaces.
-- Observed market data must be distinguished from model-derived estimates.
-- No look-ahead bias in research/backtesting.
-- PAPER remains the default until live trading has explicit safety validation.
+- AI never bypasses RiskEngine.
+- AI never places uncontrolled orders.
+- Charting is not the source of truth for orders/positions.
+- Strategy calculations stay deterministic, testable, network-independent and database-independent.
+- Broker-specific code stays behind adapter interfaces.
+- Observed data and model-derived estimates remain explicitly distinguishable.
+- Backtests contain no look-ahead bias.
+- PAPER remains the default.
 
-## 7. Definition of the First Production Milestone
+## First production milestone
+`Market Event → Normalization → Validation → Candle → Features → Market State → Strategy → Opportunity → Probability/EV → RiskEngine → OMS → Paper Fill → Position → P&L → Journal`
 
-The first major milestone is a complete, testable PAPER vertical slice:
+The milestone is complete only when automated tests cover the complete flow and it runs without live order execution.
 
-```text
-Market Event
-→ Normalization
-→ Validation
-→ Candle
-→ Features
-→ Market State
-→ Strategy
-→ Opportunity
-→ Probability / EV
-→ RiskEngine
-→ OMS
-→ Paper Fill
-→ Position
-→ P&L
-→ Journal
-```
-
-The milestone is complete only when it is covered by automated tests and can run without live order execution.
-
-## 8. How This File Must Be Maintained
-
-After every meaningful implementation session:
-
-- move completed items from **Pending** to **Done**;
-- record important architectural decisions;
-- record known blockers/issues;
-- record the next concrete task;
-- keep this file on `main`.
-
-### Next concrete task
-
-Build the production **market-data foundation on `main`**: canonical event contracts → normalization → validation → deterministic candle/feature pipeline, with tests, while keeping all broker-specific integration behind interfaces.
+## Current next task
+Build the next market-data production layer on `main`: **data-quality contracts and validation (staleness, duplicates, ordering, gaps) plus broker adapter interfaces**, with deterministic unit tests. Then proceed to Upstox connectivity behind those interfaces.
