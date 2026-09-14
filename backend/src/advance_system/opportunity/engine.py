@@ -3,6 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from decimal import Decimal
 
+from advance_system.domain.versioning import ContractName, validate_contract_version
+
 
 @dataclass(frozen=True, slots=True)
 class Opportunity:
@@ -17,8 +19,10 @@ class Opportunity:
     target: Decimal
     risk_reward: Decimal
     explanation: tuple[str, ...]
+    contract_version: int = 1
 
     def validate(self) -> None:
+        validate_contract_version(ContractName.OPPORTUNITY, self.contract_version)
         if not self.opportunity_id or not self.instrument:
             raise ValueError("opportunity_id and instrument are required")
         if self.entry <= 0 or self.stop <= 0 or self.target <= 0:
@@ -49,6 +53,7 @@ class OpportunityEngine:
         stop: Decimal,
         target: Decimal,
         explanation: tuple[str, ...] = (),
+        contract_version: int = 1,
     ) -> Opportunity:
         if direction == "UP":
             risk = entry - stop
@@ -72,6 +77,7 @@ class OpportunityEngine:
             target=target,
             risk_reward=reward / risk,
             explanation=explanation,
+            contract_version=contract_version,
         )
         opportunity.validate()
         return opportunity
