@@ -18,10 +18,11 @@ def events(count: int) -> list[BacktestEvent]:
 
 
 def test_windows_are_strictly_chronological_and_disjoint() -> None:
-    result = WalkForwardValidator().windows(events(6), train_size=3, test_size=2)
+    source = events(6)
+    result = WalkForwardValidator().windows(source, train_size=3, test_size=2)
     assert len(result) == 1
-    assert result[0].train == tuple(events(3))
-    assert result[0].test == tuple(events(3)[0:0]) if False else result[0].test
+    assert result[0].train == tuple(source[:3])
+    assert result[0].test == tuple(source[3:5])
     assert result[0].train[-1].timestamp < result[0].test[0].timestamp
 
 
