@@ -52,8 +52,47 @@ Core flow:
 - [x] No credentials or secrets committed.
 - [x] Injectable Upstox V3 protobuf decoder boundary.
 - [x] Deterministic V3 feed mapper for LTPC/full-feed structures.
-- [x] PAPER market-data vertical smoke test through normalization, quality, candle, RiskEngine and PaperOMS.
+- [x] PAPER market-data vertical smoke-test foundation.
 - [x] V3 mapper tests for LTPC, bid/ask, volume and invalid payload fields.
+
+### Market state / analytics
+- [x] Instrument-master identity/active-state validation foundation.
+- [x] India market-session gate foundation with injectable holiday policy.
+- [x] Market-structure swings and HH/HL/LH/LL classification.
+- [x] BOS / CHoCH / MSS structure observations.
+- [x] Liquidity equal-high/equal-low detection.
+- [x] Fair-value-gap observations.
+- [x] Order-block observations.
+- [x] Unified `MarketState` construction.
+- [x] Deterministic market-regime classifier: trend up/down, range, transition and insufficient-data states.
+- [x] Unit tests for structure, liquidity, unified state and regime behavior.
+
+### Intelligence / scanning
+- [x] Typed scanner DSL / AST with deterministic condition evaluation.
+- [x] Cheap-first scanner pipeline and deterministic candidate identity.
+- [x] Scanner unit tests.
+
+### Trading decision engine
+- [x] Trade Type framework and registry.
+- [x] Versioned deterministic Strategy interface and registry.
+- [x] Breakout-continuation strategy foundation.
+- [x] Canonical Opportunity contract with entry, stop, target, direction and R:R.
+- [x] Deterministic opportunity identity and auditable explanation.
+- [x] Probability baseline estimator with explicit estimate-vs-observation semantics.
+- [x] Expected-value calculation in R-multiples.
+- [x] Probability/EV unit tests.
+
+### Risk / execution safety
+- [x] Production-oriented pre-trade `RiskPolicy` contract.
+- [x] `RiskSnapshot` for P&L, exposure, leverage, concurrency and broker health.
+- [x] Hard kill-switch and circuit-breaker gates.
+- [x] Market-session and stale-data hard stops.
+- [x] Strategy validity, Trade Type enablement and duplicate-opportunity gates.
+- [x] Daily-loss, strategy-loss, symbol-exposure and portfolio-exposure limits.
+- [x] Concurrent-trade and leverage limits.
+- [x] Slippage, probability and minimum-R:R gates.
+- [x] Auditable `RiskDecision` with passed-check trace.
+- [x] Dedicated RiskEngine safety tests.
 
 ## Previously prototyped — not used as the implementation branch
 A temporary `foundation/paper-vertical-slice` prototype existed before the main-only rule. Its useful ideas were reviewed and recreated deliberately on `main`; it is not the active development branch.
@@ -70,43 +109,36 @@ A temporary `foundation/paper-vertical-slice` prototype existed before the main-
 - [ ] Production secret-backed token store.
 - [ ] Real WebSocket library transport implementation.
 - [ ] Generated Upstox V3 protobuf package/version pinning.
-- [ ] Instrument master.
-- [ ] Production market-session/status handling.
+- [ ] Production instrument-master ingestion/update process.
+- [ ] Production market-session/status integration.
 
 ### Phase 3 — Market state / analytics
 - [ ] Multi-timeframe candle/session engine.
 - [ ] Expanded feature engine.
-- [ ] Market structure: swings, HH/HL/LH/LL, BOS, CHoCH, MSS, displacement.
-- [ ] Liquidity, FVG, order blocks and supply/demand.
+- [ ] Displacement and richer structure confirmation.
 - [ ] Volume profile/order flow where feed data supports it.
 - [ ] Futures/options analytics.
 - [ ] Breadth, sector rotation and institutional-flow intelligence.
-- [ ] Market-regime engine.
+- [ ] Richer regime/session context integration into `MarketState`.
 
 ### Phase 4 — Intelligence / scanning
-- [ ] Typed scanner DSL / AST.
-- [ ] Cheap-to-expensive scanner pipeline.
 - [ ] Wyckoff features.
-- [ ] Scanner result contracts and explanations.
+- [ ] Scanner result contracts and richer explanations.
+- [ ] Multi-symbol / multi-timeframe scanner orchestration.
 
 ### Phase 5 — Trading decision engine
-- [ ] Trade Type framework.
-- [ ] Versioned deterministic Strategy interface.
-- [ ] Strategy registry.
-- [ ] Opportunity engine.
-- [ ] Evidence-based scoring.
-- [ ] Probability and calibration layer.
-- [ ] Expected-value calculation.
-- [ ] Explanation/audit evidence.
+- [ ] Evidence-based scoring layer.
+- [ ] Historical probability calibration.
+- [ ] Out-of-sample probability validation.
+- [ ] Explanation/audit evidence persistence.
 
 ### Phase 6 — Risk / execution
-- [ ] Full RiskEngine limits and position sizing.
-- [ ] Exposure, leverage, liquidity and slippage controls.
-- [ ] Kill switch and circuit breakers.
+- [ ] Position sizing from opportunity risk and account equity.
+- [ ] Explicit liquidity/notional capacity checks.
 - [ ] Canonical OMS state machine.
-- [ ] Idempotency and reconciliation.
-- [ ] Paper execution.
-- [ ] Position manager, P&L and audit trail.
+- [ ] Idempotency and broker reconciliation.
+- [ ] Paper execution adapter/fill simulator.
+- [ ] Position manager, realized/unrealized P&L and audit trail.
 
 ### Phase 7 — Research
 - [ ] Event-driven backtester.
@@ -156,4 +188,4 @@ Execution
 The milestone is complete only when automated tests cover the complete flow and it runs without live order execution.
 
 ## Current next task
-Implement the **production WebSocket transport using a pinned client/runtime, generated Upstox V3 protobuf package integration, instrument-master ingestion, and market-session/status gate** while keeping all order execution PAPER-only.
+Implement the **canonical OMS state machine and idempotent PAPER order lifecycle**, keeping RiskEngine as the mandatory gate before every order transition that can create or increase exposure.
