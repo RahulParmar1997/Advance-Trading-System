@@ -123,7 +123,12 @@ Core flow:
 - [x] Risk-rejected opportunities are recorded as rejected and never reach simulated execution.
 - [x] Walk-forward train/test window contracts with chronological, disjoint OOS boundaries.
 - [x] Walk-forward runner keeps training data separate from the backtest test window.
-- [x] Unit tests for walk-forward chronology, rolling windows, invalid sizes and OOS execution isolation.
+- [x] Deterministic Monte Carlo trade-P&L resampling with seeded simulations.
+- [x] Monte Carlo summary includes mean, median, worst, best and loss probability.
+- [x] Fee/cost sensitivity across explicit fee assumptions.
+- [x] Capacity sensitivity across explicit market-participation limits.
+- [x] Regime sensitivity aggregates observed trade P&L by caller-supplied regime labels without inferring regimes from outcomes.
+- [x] Unit tests for walk-forward and sensitivity analysis.
 
 ## Previously prototyped — not used as the implementation branch
 A temporary `foundation/paper-vertical-slice` prototype existed before the main-only rule. Its useful ideas were reviewed and recreated deliberately on `main`; it is not the active development branch.
@@ -169,7 +174,7 @@ A temporary `foundation/paper-vertical-slice` prototype existed before the main-
 
 ### Phase 7 — Research
 - [x] Walk-forward/OOS split foundation.
-- [ ] Monte Carlo and regime/cost/capacity sensitivity.
+- [x] Monte Carlo and regime/cost/capacity sensitivity foundation.
 - [ ] Pattern DNA and similarity search.
 - [ ] ML datasets and calibration.
 - [ ] More realistic historical liquidity/rejection modeling.
@@ -218,4 +223,4 @@ Journal / Audit
 The milestone is complete only when automated tests cover the complete flow and it runs without live order execution.
 
 ## Current next task
-Implement **Monte Carlo and regime/cost/capacity sensitivity** for backtest results, keeping simulations deterministic and isolated from live execution.
+Implement **Pattern DNA / trade similarity infrastructure** using deterministic feature vectors and distance/search contracts, isolated from live execution and suitable for later ML datasets.
