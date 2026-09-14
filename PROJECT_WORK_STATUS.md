@@ -98,7 +98,11 @@ Core flow:
 - [x] Controlled `RiskEngine → PAPER OMS` submission workflow.
 - [x] PAPER fill simulator with partial/full fill handling.
 - [x] Deterministic position book with average-price, realized-P&L and unrealized-P&L accounting.
-- [x] Unit tests for PAPER fills and position/P&L behavior.
+- [x] Broker-neutral fill and reconciliation contracts.
+- [x] Position manager with duplicate-fill protection.
+- [x] Append-only in-memory journal/audit boundary.
+- [x] Position updates emit auditable lifecycle events.
+- [x] Unit tests for PAPER fills, position manager, reconciliation and journal behavior.
 
 ## Previously prototyped — not used as the implementation branch
 A temporary `foundation/paper-vertical-slice` prototype existed before the main-only rule. Its useful ideas were reviewed and recreated deliberately on `main`; it is not the active development branch.
@@ -140,10 +144,9 @@ A temporary `foundation/paper-vertical-slice` prototype existed before the main-
 
 ### Phase 6 — Risk / execution
 - [ ] Explicit liquidity/notional capacity checks.
-- [ ] OMS-to-broker reconciliation model.
-- [ ] Position-manager lifecycle and audit events.
 - [ ] Strategy/portfolio risk snapshot integration with live position book.
-- [ ] Journal persistence boundary.
+- [ ] Durable journal persistence.
+- [ ] Broker reconciliation adapter implementation.
 
 ### Phase 7 — Research
 - [ ] Event-driven backtester.
@@ -178,6 +181,8 @@ OMS
 Execution
   ↓
 Position / P&L
+  ↓
+Journal / Audit
 ```
 
 - AI never bypasses RiskEngine.
@@ -195,4 +200,4 @@ Position / P&L
 The milestone is complete only when automated tests cover the complete flow and it runs without live order execution.
 
 ## Current next task
-Implement **position-manager lifecycle events, broker-neutral fill/reconciliation contracts, and the journal/audit boundary**, while keeping every exposure-increasing path behind `RiskEngine → OMS`.
+Implement **risk-snapshot integration from the live PositionBook, durable journal persistence boundary, and explicit liquidity/notional capacity checks** before advancing to the event-driven backtester.
