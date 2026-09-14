@@ -68,6 +68,9 @@ Core flow:
 - [x] Bounded exponential reconnect policy.
 - [x] Heartbeat/ping loop abstraction.
 - [x] Sequence-aware feed validation.
+- [x] Concrete `websockets`-backed transport with injectable connector and protobuf decoder boundary.
+- [x] WebSocket authentication, subscription, receive/decode, ping and close behavior covered by deterministic tests.
+- [x] Optional `websockets` dependency isolated behind the live transport extra.
 - [x] Deterministic OAuth, token-store, sequence and transport tests.
 - [x] No credentials or secrets committed.
 - [x] Injectable Upstox V3 protobuf decoder boundary.
@@ -176,7 +179,7 @@ A temporary `foundation/paper-vertical-slice` prototype existed before the main-
 
 ### Phase 2 — Market data
 - [x] Production-safe secret-backed token store abstraction.
-- [ ] Real WebSocket library transport implementation.
+- [x] Real WebSocket library transport implementation.
 - [ ] Generated Upstox V3 protobuf package/version pinning.
 - [ ] Production instrument-master ingestion/update process.
 - [ ] Production market-session/status integration.
@@ -256,4 +259,4 @@ Journal / Audit
 The milestone is complete only when automated tests cover the complete flow and it runs without live order execution.
 
 ## Current next task
-Implement the **real WebSocket library transport** behind the existing injectable Upstox transport boundary, with bounded reconnects, heartbeat behavior, cancellation safety and deterministic tests; keep live credentials/order execution out of tests and preserve PAPER-first behavior.
+Implement **generated Upstox V3 protobuf package/version pinning** and wire the generated decoder into the existing injectable feed-decoder boundary without committing broker credentials or live-order behavior.
