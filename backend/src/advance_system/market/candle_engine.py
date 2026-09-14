@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
+from typing import Iterable
 
 from advance_system.domain.market_events import QuoteEvent
 
@@ -89,3 +92,33 @@ class CandleEngine:
         if event.volume < previous:
             raise ValueError("cumulative volume moved backwards")
         return event.volume - previous
+
+
+class MultiTimeframeCandleEngine:
+    """Maintain independent fixed-time candle streams for multiple intervals."""
+
+    def __init__(self, intervals_seconds: Iterable[int]) -> None:
+        intervals = tuple(dict.fromkeys(intervals_seconds))
+        if not intervals:
+            raise ValueError("at least one candle interval is required")
+        if any(interval <= 0 for interval in intervals):
+            raise ValueError("candle intervals must be positive")
+        self.intervals_seconds = intervals
+        self._engines = {interval: CandleEngine(interval) for interval in intervals}
+
+    def update(self, event: QuoteEvent) -> dict[int, Candle]:
+        """Return only candles completed by this event, keyed by interval."""
+        completed: dict[int, Candle] = {}
+        for interval, engine in self._engines.items():
+            candle = engine.update(event)
+            if candle is not None:
+                completed[interval] = candle
+        return completed
+
+    def flush(self) -> dict[int, Candle]:
+        """Return current in-progress candles without mutating engine state."""
+        result: dict[int, Candle] = {}
+        for interval, engine in self._engines.items():
+            for candle in engine._current.values():
+                result[interval] = candle
+        return result
