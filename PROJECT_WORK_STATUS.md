@@ -22,6 +22,11 @@ Core flow:
 - [x] Backend `pyproject.toml` and pytest configuration established.
 - [x] Backend test CI workflow added for pushes to `main` and pull requests.
 - [x] Domain / ingestion / market package boundaries established.
+- [x] Core domain contract version registry established with explicit supported versions.
+- [x] QuoteEvent, Opportunity, OMS Order and BacktestEvent contracts carry explicit schema versions.
+- [x] Contract versions are validated at domain boundaries and remain distinct from strategy versions and OMS lifecycle transition counters.
+- [x] Existing positional constructors remain backward-compatible through version-1 defaults.
+- [x] Contract-version compatibility and rejection tests added.
 
 ### Market-data foundation
 - [x] Canonical broker-neutral `QuoteEvent` contract.
@@ -149,7 +154,7 @@ A temporary `foundation/paper-vertical-slice` prototype existed before the main-
 ## Pending work
 
 ### Phase 1 — Engineering foundation
-- [ ] Domain contract versioning.
+- [x] Domain contract versioning.
 - [ ] Structured logging.
 - [ ] Health/readiness checks.
 - [ ] Broader CI quality gates.
@@ -236,4 +241,4 @@ Journal / Audit
 The milestone is complete only when automated tests cover the complete flow and it runs without live order execution.
 
 ## Current next task
-Implement **domain contract versioning** across the core contracts, beginning with market events, opportunities, orders, and backtest observations, while keeping version changes explicit and backward-compatible where practical.
+Implement **structured logging** across the backend foundation, with consistent event fields, safe handling of sensitive values, deterministic test coverage, and no broker/order side effects.
