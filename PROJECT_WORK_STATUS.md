@@ -6,13 +6,14 @@
 **Last updated:** 2026-09-14
 
 ## Current status
-The repository has a substantial deterministic PAPER/research foundation. Upstox transport/protobuf boundaries remain isolated behind adapters. Instrument-master ingestion now has a concrete Upstox BOD JSON source with strict parsing and broker-neutral mapping.
+The repository has a substantial deterministic PAPER/research foundation. Upstox transport/protobuf boundaries remain isolated behind adapters. Instrument-master ingestion has a concrete Upstox BOD JSON source, and authoritative exchange status is now enforced by the RiskEngine with freshness and fail-closed safety gates.
 
 ## Latest completed work
-- [x] Upstox BOD instrument-master JSON source implemented with an injected HTTP boundary.
-- [x] Upstox instrument records mapped to the broker-neutral instrument-master contract.
-- [x] Parser fails closed on empty, malformed, non-array and incomplete payloads.
-- [x] Unit coverage added for equity, index, future and option mappings.
+- [x] Broker-neutral authoritative `MarketStatus` contract added.
+- [x] RiskEngine now requires fresh authoritative market status by default.
+- [x] Only `NORMAL_OPEN` can pass the market-status gate; close/pre-open/CAS states fail closed.
+- [x] Market-status timestamp, exchange identity and timezone validity are enforced.
+- [x] Unit coverage added for fresh open, missing, stale, non-open, CAS, exchange mismatch and conservative boolean-gate cases.
 - [x] Changes committed directly to `main`.
 
 ## Done on `main`
@@ -39,6 +40,9 @@ The repository has a substantial deterministic PAPER/research foundation. Upstox
 
 ### Market state / analytics
 - [x] India market-session calendar/gate foundation.
+- [x] Broker-neutral authoritative market-status contract.
+- [x] Upstox exchange market-status source.
+- [x] RiskEngine market-status freshness and fail-closed gate.
 - [x] Market structure, liquidity, FVG, order-block and regime primitives.
 - [x] Unified `MarketState` foundation.
 
@@ -63,8 +67,8 @@ The repository has a substantial deterministic PAPER/research foundation. Upstox
 - [x] Instrument-master ingestion/update foundation.
 - [x] Concrete Upstox BOD JSON instrument-master source.
 - [x] Production Upstox exchange market-status source.
-- [ ] Wire authoritative Upstox status into the RiskEngine market-open gate.
-- [ ] Add market-status freshness/staleness protection and fail-closed behavior.
+- [x] Wire authoritative Upstox status into the RiskEngine market-open gate.
+- [x] Add market-status freshness/staleness protection and fail-closed behavior.
 - [ ] Vendor/pin actual generated Upstox V3 protobuf module artifact.
 
 ### Phase 3 — Market state / analytics
@@ -116,4 +120,4 @@ The repository has a substantial deterministic PAPER/research foundation. Upstox
 `Market Event → Normalization → Validation → Candle → Features → Market State → Strategy → Opportunity → Probability/EV → RiskEngine → OMS → Paper Fill → Position → P&L → Journal`
 
 ## Current next task
-Wire the authoritative Upstox exchange-status source into the existing market-session/RiskEngine gate, with freshness limits and fail-closed semantics. Keep all work directly on `main`.
+Vendor/pin the actual generated Upstox V3 protobuf module artifact behind the existing decoder package boundary. Keep all work directly on `main`.
