@@ -6,15 +6,14 @@
 **Last updated:** 2026-09-14
 
 ## Current status
-The repository has a substantial deterministic PAPER/research foundation. Upstox transport/protobuf boundaries remain isolated behind adapters. Instrument-master ingestion has a broker-neutral snapshot contract, and Upstox exchange-status integration now has an authenticated, HTTPS-only, injectable source boundary.
+The repository has a substantial deterministic PAPER/research foundation. Upstox transport/protobuf boundaries remain isolated behind adapters. Instrument-master ingestion now has a concrete Upstox BOD JSON source with strict parsing and broker-neutral mapping.
 
 ## Latest completed work
-- [x] Upstox Exchange Status API source implemented at `GET /v2/market/status/{exchange}`.
-- [x] Bearer-token authentication remains inside the adapter boundary.
-- [x] HTTPS-only endpoint validation and injectable HTTP client.
-- [x] Strict response validation for success state, exchange identity, timestamp and CAS status.
-- [x] Unit tests for normal status, CAS status, malformed/error response and exchange mismatch.
-- [x] All changes committed directly to `main`.
+- [x] Upstox BOD instrument-master JSON source implemented with an injected HTTP boundary.
+- [x] Upstox instrument records mapped to the broker-neutral instrument-master contract.
+- [x] Parser fails closed on empty, malformed, non-array and incomplete payloads.
+- [x] Unit coverage added for equity, index, future and option mappings.
+- [x] Changes committed directly to `main`.
 
 ## Done on `main`
 
@@ -34,6 +33,7 @@ The repository has a substantial deterministic PAPER/research foundation. Upstox
 - [x] Versioned, sorted, content-addressed instrument-master snapshots.
 - [x] Monotonic atomic instrument-master publication.
 - [x] Upstox instrument-master adapter boundary.
+- [x] Concrete Upstox BOD JSON instrument-master source and parser.
 - [x] Upstox V3 protobuf decoder boundary and deterministic feed mapper.
 - [x] Real `websockets` transport with injectable connector/decoder.
 
@@ -61,6 +61,7 @@ The repository has a substantial deterministic PAPER/research foundation. Upstox
 - [x] Real WebSocket transport.
 - [x] Upstox V3 protobuf decoder boundary.
 - [x] Instrument-master ingestion/update foundation.
+- [x] Concrete Upstox BOD JSON instrument-master source.
 - [x] Production Upstox exchange market-status source.
 - [ ] Wire authoritative Upstox status into the RiskEngine market-open gate.
 - [ ] Add market-status freshness/staleness protection and fail-closed behavior.
