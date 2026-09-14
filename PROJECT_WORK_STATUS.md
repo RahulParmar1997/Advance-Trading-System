@@ -93,6 +93,10 @@ Core flow:
 - [x] Slippage, probability and minimum-R:R gates.
 - [x] Auditable `RiskDecision` with passed-check trace.
 - [x] Dedicated RiskEngine safety tests.
+- [x] Canonical OMS state machine with fill monotonicity and terminal-state protection.
+- [x] Idempotent PAPER order gateway keyed by client order identity.
+- [x] Explicit RiskEngine → PAPER OMS execution workflow.
+- [x] PAPER workflow tests for risk rejection and idempotent approved submission.
 
 ## Previously prototyped — not used as the implementation branch
 A temporary `foundation/paper-vertical-slice` prototype existed before the main-only rule. Its useful ideas were reviewed and recreated deliberately on `main`; it is not the active development branch.
@@ -135,9 +139,10 @@ A temporary `foundation/paper-vertical-slice` prototype existed before the main-
 ### Phase 6 — Risk / execution
 - [ ] Position sizing from opportunity risk and account equity.
 - [ ] Explicit liquidity/notional capacity checks.
-- [ ] Canonical OMS state machine.
-- [ ] Idempotency and broker reconciliation.
-- [ ] Paper execution adapter/fill simulator.
+- [x] Canonical OMS state machine.
+- [x] Idempotent PAPER submission workflow.
+- [ ] Broker reconciliation.
+- [ ] Paper fill simulator with realistic fills/costs.
 - [ ] Position manager, realized/unrealized P&L and audit trail.
 
 ### Phase 7 — Research
@@ -188,4 +193,4 @@ Execution
 The milestone is complete only when automated tests cover the complete flow and it runs without live order execution.
 
 ## Current next task
-Implement the **canonical OMS state machine and idempotent PAPER order lifecycle**, keeping RiskEngine as the mandatory gate before every order transition that can create or increase exposure.
+Implement the **PAPER fill simulator and position/P&L accounting layer**, with deterministic fills, realized/unrealized P&L, position updates, and audit-safe tests. Broker reconciliation remains separate and follows the simulator.
