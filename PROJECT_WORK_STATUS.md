@@ -129,6 +129,10 @@ Core flow:
 - [x] Capacity sensitivity across explicit market-participation limits.
 - [x] Regime sensitivity aggregates observed trade P&L by caller-supplied regime labels without inferring regimes from outcomes.
 - [x] Unit tests for walk-forward and sensitivity analysis.
+- [x] Deterministic Pattern DNA feature-vector contract.
+- [x] Pattern similarity distance/search with deterministic tie-breaking.
+- [x] Outcome summaries use only explicitly observed outcomes and never infer missing labels.
+- [x] Pattern DNA unit tests.
 
 ## Previously prototyped — not used as the implementation branch
 A temporary `foundation/paper-vertical-slice` prototype existed before the main-only rule. Its useful ideas were reviewed and recreated deliberately on `main`; it is not the active development branch.
@@ -175,7 +179,7 @@ A temporary `foundation/paper-vertical-slice` prototype existed before the main-
 ### Phase 7 — Research
 - [x] Walk-forward/OOS split foundation.
 - [x] Monte Carlo and regime/cost/capacity sensitivity foundation.
-- [ ] Pattern DNA and similarity search.
+- [x] Pattern DNA / similarity search foundation.
 - [ ] ML datasets and calibration.
 - [ ] More realistic historical liquidity/rejection modeling.
 
@@ -223,4 +227,4 @@ Journal / Audit
 The milestone is complete only when automated tests cover the complete flow and it runs without live order execution.
 
 ## Current next task
-Implement **Pattern DNA / trade similarity infrastructure** using deterministic feature vectors and distance/search contracts, isolated from live execution and suitable for later ML datasets.
+Implement **ML dataset generation and calibration primitives** from explicit backtest/PATTERN-DNA observations, with strict train/OOS separation and no outcome leakage.
