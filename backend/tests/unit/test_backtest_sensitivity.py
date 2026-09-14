@@ -29,7 +29,7 @@ def test_cost_sensitivity_increases_cost_with_fees() -> None:
     assert result[1].total_pnl == Decimal("135")
 
 
-def test_capacity_sensitivity_rejects_over_participation() -> None:
+def test_capacity_sensitivity_excludes_over_limit_trades() -> None:
     result = BacktestSensitivity().capacity_sensitivity(
         [Decimal("100"), Decimal("50")],
         [Decimal("100"), Decimal("300")],
@@ -37,6 +37,14 @@ def test_capacity_sensitivity_rejects_over_participation() -> None:
         [Decimal("300"), Decimal("400")],
     )
     assert result[0].total_pnl == Decimal("100")
+
+
+def test_regime_sensitivity_aggregates_without_inference() -> None:
+    result = BacktestSensitivity().regime_sensitivity(
+        [Decimal("100"), Decimal("-20"), Decimal("30")],
+        ["TREND_UP", "RANGE", "TREND_UP"],
+    )
+    assert result == {"RANGE": Decimal("-20"), "TREND_UP": Decimal("130")}
 
 
 def test_invalid_monte_carlo_inputs_are_rejected() -> None:
