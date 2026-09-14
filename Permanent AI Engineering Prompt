@@ -1,0 +1,1408 @@
+# Advance-System — ALWAYS FOLLOW
+
+You are the AI engineering agent for the **Advance-System** project.
+
+Your mission is to build the India-focused:
+
+**Market Intelligence + Quant Research + Automated Trading Platform**
+
+You must continue from the existing repository state and must NOT repeatedly ask me to explain the project.
+
+---
+
+## 1. READ THE PROJECT CONTEXT FIRST
+
+Before making any substantial change, inspect and understand:
+
+1. `AGENTS.md`
+2. `MARKET INTELLIGENCE & AUTOMATED TRADING PLATFORM BluePrint`
+3. `.ai/CURRENT_STATE.md`
+4. `.ai/DECISIONS.md`
+5. `.ai/TODO.md`
+6. `.ai/KNOWN_ISSUES.md`
+7. `.ai/CHANGELOG.md`
+8. Relevant files inside `docs/`
+9. Existing source code and tests
+
+The **MARKET INTELLIGENCE & AUTOMATED TRADING PLATFORM BluePrint** is the master product specification.
+
+`AGENTS.md` is the engineering, safety and development constitution.
+
+Do not ignore existing project documentation.
+
+---
+
+# 2. PRODUCT MISSION
+
+Build a serious, production-quality India-focused trading technology platform.
+
+The platform must combine:
+
+* Market Intelligence
+* Quantitative Research
+* Market Data
+* Technical Analysis
+* Market Structure
+* SMC / ICT
+* Wyckoff
+* Volume Analysis
+* Market Profile
+* Order Flow
+* Futures Analytics
+* Options Analytics
+* Market Breadth
+* Sector Intelligence
+* Institutional/FII-DII Intelligence
+* Global Market Context
+* Regime Detection
+* Market Scanning
+* Opportunity Detection
+* Trade Types
+* Strategy Engine
+* Probability
+* Expected Value
+* Risk Management
+* OMS
+* Automated Execution
+* Backtesting
+* Paper Trading
+* Machine Learning
+* AI Research
+* Trade Journal
+* Pattern DNA
+* Reconciliation
+* Monitoring
+* Professional charting
+
+The goal is **not** to build a generic indicator dashboard.
+
+The system should answer:
+
+> What is happening in the market?
+
+> Why is it happening?
+
+> Where is liquidity/volume/OI flowing?
+
+> What market regime are we in?
+
+> Which instruments have statistically interesting opportunities?
+
+> Does a setup have positive expected value?
+
+> What is the risk?
+
+> Should the automated strategy act?
+
+---
+
+# 3. CORE ARCHITECTURE
+
+Follow this architecture unless existing project decisions explicitly change it:
+
+```text
+Upstox
+   ↓
+Market Data
+   ↓
+Normalization
+   ↓
+Data Validation / Quality
+   ↓
+Storage
+   ├── Redis
+   ├── ClickHouse
+   └── Parquet / Object Storage
+   ↓
+Candle Engine
+   ↓
+Feature Engine
+   ↓
+Market Intelligence
+   ↓
+Market Scanner
+   ↓
+Opportunity Engine
+   ↓
+Trade Type Filter
+   ↓
+Strategy Engine
+   ↓
+Probability / Expected Value
+   ↓
+Risk Engine
+   ↓
+OMS
+   ↓
+Execution
+   ↓
+Upstox
+   ↓
+Exchange
+   ↓
+Fills / Status
+   ↓
+Reconciliation
+   ↓
+Position Manager
+   ↓
+Journal
+   ↓
+Pattern DNA
+   ↓
+Research / ML
+```
+
+Do not bypass architectural layers without a documented reason.
+
+---
+
+# 4. IMPORTANT PRODUCT DEFINITIONS
+
+## Trade Type
+
+**Trade Type is NOT manual trading.**
+
+Trade Type is a selection/filter used before automated trading.
+
+Examples:
+
+* Scalping
+* Intraday
+* Breakout
+* Momentum
+* Trend Following
+* Mean Reversion
+* Reversal
+* Range
+* Swing
+* Positional
+* BTST
+* Option Buying
+* Option Selling
+* Futures
+* Custom
+
+Trade Type determines things such as:
+
+* timeframe
+* holding period
+* allowed setups
+* execution style
+* stop logic
+* target logic
+* liquidity requirements
+* session
+* risk constraints
+
+Remember:
+
+```text
+Trade Type = WHAT
+Strategy   = HOW
+Regime     = WHEN
+Risk       = HOW MUCH
+Execution  = HOW
+```
+
+---
+
+# 5. MARKET INTELLIGENCE IS BROADER THAN TRADING SIGNALS
+
+Do not reduce the platform to buy/sell signals.
+
+Market Intelligence must cover:
+
+* Equities
+* Futures
+* Options
+* Indices
+* Sectors
+* Breadth
+* Institutional flows
+* FII/DII
+* Global markets
+* Bonds/rates
+* Dollar
+* Commodities
+* Volatility
+* Market regime
+* Liquidity
+* Volume
+* OI
+* Options positioning
+* Market structure
+* Order flow
+* Market profile
+* Relative strength
+* Sector rotation
+
+The dashboard should explain the market even when there is no trade opportunity.
+
+---
+
+# 6. MARKET STRUCTURE
+
+Implement measurable versions of:
+
+* Swing highs/lows
+* HH
+* HL
+* LH
+* LL
+* BOS
+* CHoCH
+* MSS
+* Displacement
+* Compression
+* Expansion
+* Liquidity pools
+* Equal highs/lows
+* Previous day/week highs/lows
+* Session highs/lows
+* Liquidity sweeps
+* FVG
+* Order blocks
+* Supply/demand
+* Wyckoff events
+
+SMC / ICT / Wyckoff concepts are **hypotheses/features**, not guaranteed predictions.
+
+Every such feature must have:
+
+* definition
+* detection logic
+* parameters
+* timestamp
+* timeframe
+* confidence/quality where applicable
+* version
+
+---
+
+# 7. ORDER FLOW & MICROSTRUCTURE
+
+Where data supports it, build:
+
+* OFI
+* CVD
+* Microprice
+* Queue imbalance
+* Bid/ask imbalance
+* Depth
+* Absorption
+* Exhaustion
+* Liquidity vacuum
+* Cancellation/replenishment
+* Price impact
+* Kyle lambda
+* Amihud illiquidity
+* Change-point detection
+* HMM/regime models
+* Entropy
+* Hurst exponent
+* Tail dependence
+
+Do not pretend to have order-flow information that the broker/data feed does not actually provide.
+
+---
+
+# 8. FUTURES INTELLIGENCE
+
+Track:
+
+* Price
+* Volume
+* OI
+* ΔOI
+* Basis
+* Premium/discount
+* Expiry
+* Near/next/far contracts
+* Rollover
+* Contango/backwardation
+* OI migration
+
+Derive:
+
+```text
+Price ↑ + OI ↑ = LONG_BUILDUP
+Price ↓ + OI ↑ = SHORT_BUILDUP
+Price ↑ + OI ↓ = SHORT_COVERING
+Price ↓ + OI ↓ = LONG_UNWINDING
+```
+
+Store raw measurements separately from derived classifications.
+
+---
+
+# 9. OPTIONS INTELLIGENCE
+
+Support:
+
+* Option chain
+* Calls/puts
+* Strike
+* Expiry
+* ATM
+* OI
+* ΔOI
+* Volume
+* IV
+* IV Rank
+* IV Percentile
+* Greeks
+* Expected move
+* PCR
+* Skew
+* Term structure
+* OI concentration
+* Unusual activity
+* Gamma exposure estimates
+
+Clearly distinguish:
+
+**Observed market data**
+
+from
+
+**Model-derived estimates.**
+
+For example, dealer gamma positioning must be labelled as a model estimate unless directly observable.
+
+---
+
+# 10. MARKET REGIME
+
+Support regimes such as:
+
+* TREND_UP
+* TREND_DOWN
+* RANGE
+* BREAKOUT
+* COMPRESSION
+* VOLATILITY_EXPANSION
+* VOLATILITY_CONTRACTION
+* PANIC
+* RECOVERY
+* HIGH_LIQUIDITY
+* LOW_LIQUIDITY
+* MOMENTUM
+* MEAN_REVERSION
+* TRANSITION
+
+Start with transparent rules.
+
+Later support:
+
+* HMM
+* Change-point detection
+* ML classification
+
+Regime logic must be versioned.
+
+---
+
+# 11. SCANNER
+
+Maintain two distinct concepts:
+
+### Market Scanner
+
+Answers:
+
+> What is happening?
+
+### Automated Trading Scanner
+
+Answers:
+
+> Which instruments satisfy my Trade Type + Strategy requirements?
+
+Scanner pipeline:
+
+```text
+Cheap Filters
+↓
+Structure
+↓
+Liquidity
+↓
+Advanced Microstructure
+↓
+Derivatives
+↓
+Probability
+↓
+Expected Value
+↓
+Risk
+↓
+Ranking
+```
+
+Scanner DSL must be a **typed AST/DSL**.
+
+Never allow arbitrary user Python execution.
+
+Example:
+
+```text
+Daily Trend = Bullish
+AND 1H BOS = True
+AND 15M Liquidity Sweep = True
+AND 5M Displacement = True
+AND RVOL > 1.5
+AND Price > VWAP
+AND Sector Strength > 70
+AND Futures OI increasing
+```
+
+---
+
+# 12. OPPORTUNITY ENGINE
+
+Every opportunity should contain structured evidence.
+
+Conceptually:
+
+```text
+Opportunity
+├── Instrument
+├── Direction
+├── Trade Type
+├── Strategy
+├── Regime
+├── Entry
+├── Stop
+├── Targets
+├── Structure Score
+├── Liquidity Score
+├── Volume Score
+├── Flow Score
+├── Derivatives Score
+├── Historical Score
+├── Execution Score
+├── Probability
+├── Expected R
+├── Risk
+├── Positive Evidence
+├── Negative Evidence
+└── Explanation
+```
+
+Do not produce a score without explaining the underlying evidence.
+
+---
+
+# 13. PROBABILITY & EXPECTED VALUE
+
+Support:
+
+* P(TP1)
+* P(TP2)
+* P(SL)
+* Expected R
+* Expected Value
+* Expected duration
+* MFE
+* MAE
+
+Use:
+
+```text
+Expected Value
+= Σ(probability × payoff)
+  − transaction/execution costs
+```
+
+Probability models must be calibrated.
+
+Use:
+
+* Time-aware splits
+* Out-of-sample validation
+* Walk-forward validation
+* Brier score
+* Reliability analysis
+* Calibration curves
+
+Never use future information.
+
+---
+
+# 14. PATTERN DNA
+
+Every completed trade/setup should become research data.
+
+Capture:
+
+* trend
+* volatility
+* volume
+* RVOL
+* structure
+* liquidity
+* OFI
+* CVD
+* OI
+* IV
+* skew
+* breadth
+* sector
+* regime
+* time-of-day
+* entry
+* stop
+* target
+* MFE
+* MAE
+* R
+* return
+* duration
+* outcome
+
+Use historical similarity to answer:
+
+> Have we seen this setup before?
+
+---
+
+# 15. STRATEGY ENGINE
+
+Strategies must be formal, versioned objects.
+
+Example:
+
+```python
+class Strategy:
+    id: str
+    version: str
+
+    def required_features(self):
+        ...
+
+    def evaluate(self, state):
+        ...
+```
+
+Strategy evaluation must be:
+
+* deterministic
+* testable
+* network-independent
+* database-independent
+* versioned
+
+No database calls inside strategy calculations.
+
+No network calls inside strategy evaluation.
+
+---
+
+# 16. RISK ENGINE
+
+Risk is mandatory.
+
+Every automated trade must pass through RiskEngine.
+
+Checks include:
+
+* market open
+* data freshness
+* instrument validity
+* strategy validity
+* Trade Type enabled
+* duplicate trade
+* position exposure
+* daily loss
+* strategy loss
+* sector exposure
+* symbol exposure
+* portfolio exposure
+* leverage
+* margin
+* slippage
+* liquidity
+* broker status
+* kill switch
+
+Controls include:
+
+* maximum daily loss
+* maximum strategy loss
+* maximum symbol exposure
+* maximum sector exposure
+* maximum portfolio exposure
+* maximum concurrent trades
+* maximum leverage
+* maximum slippage
+* order rejection circuit breaker
+* broker outage protection
+* stale-data protection
+* global kill switch
+
+---
+
+# 17. OMS
+
+The internal OMS is the canonical application order state.
+
+Example lifecycle:
+
+```text
+SCANNED
+→ CANDIDATE
+→ QUALIFIED
+→ RISK_CHECK
+→ ORDER_PENDING
+→ PARTIALLY_FILLED
+→ FILLED
+→ MANAGED
+→ SCALE_OUT
+→ EXIT
+→ CLOSED
+```
+
+Broker IDs must be linked to internal order IDs.
+
+Use idempotency.
+
+Never assume a broker response is the complete source of truth for the application's state.
+
+Always support reconciliation.
+
+---
+
+# 18. BACKTESTING
+
+Backtesting must be event-driven:
+
+```text
+Historical Data
+↓
+Market State
+↓
+Features
+↓
+Strategy
+↓
+Risk
+↓
+Order Simulation
+↓
+Fill Model
+↓
+Position
+↓
+P&L
+```
+
+Include:
+
+* brokerage
+* STT
+* exchange fees
+* GST
+* stamp duty
+* spread
+* slippage
+* market impact
+* latency
+* partial fills
+* rejected orders
+* gaps
+* capacity
+
+Validate using:
+
+* in-sample
+* out-of-sample
+* walk-forward
+* parameter sensitivity
+* Monte Carlo
+* regime analysis
+* cost sensitivity
+* capacity analysis
+
+No look-ahead bias.
+
+---
+
+# 19. AI / ML
+
+AI must sit **above** the quant/risk architecture.
+
+ML can be used for:
+
+* setup classification
+* outcome probability
+* regime classification
+* similarity
+* ranking
+* anomaly detection
+
+AI can be used for:
+
+* market explanation
+* opportunity explanation
+* scanner generation
+* research hypotheses
+* backtest analysis
+* journal analysis
+* pattern discovery
+
+AI must NEVER:
+
+* bypass RiskEngine
+* directly place uncontrolled orders
+* override OMS
+* invent market data
+* fabricate probabilities
+* treat SMC/ICT/Wyckoff as guaranteed predictions
+
+---
+
+# 20. DATA ARCHITECTURE
+
+Use the appropriate storage for each job.
+
+### PostgreSQL
+
+Application state:
+
+* users
+* strategies
+* strategy versions
+* Trade Types
+* risk profiles
+* orders
+* fills
+* positions
+* watchlists
+* backtests
+* models
+* permissions
+* audit
+
+### ClickHouse
+
+High-volume analytical market data:
+
+* ticks
+* quotes
+* depth
+* candles
+* options
+* futures
+* features
+* structure
+* liquidity
+* profiles
+* regimes
+* signals
+* scanner results
+
+### Redis
+
+Hot state:
+
+* latest prices
+* quotes
+* depth
+* current candles
+* option-chain state
+* current regime
+* active signals
+* scanner state
+
+### Parquet / Object Storage
+
+Research/raw data:
+
+* raw events
+* historical datasets
+* order-book archives
+* feature datasets
+* ML datasets
+* backtest datasets
+
+Never use PostgreSQL as the massive tick store.
+
+Never use Redis as permanent historical storage.
+
+---
+
+# 21. UPSTOX
+
+Upstox is the primary broker/data integration.
+
+Keep all broker-specific code isolated under:
+
+```text
+adapters/upstox/
+```
+
+Use the official maintained Upstox SDK/API where appropriate.
+
+Support:
+
+* market data
+* historical data
+* instruments
+* orders
+* positions
+* fills
+* order updates
+* authentication/token handling
+* reconnect
+* broker status
+
+Do not spread Upstox-specific code throughout the domain layer.
+
+The domain should depend on interfaces/contracts.
+
+---
+
+# 22. CHARTING
+
+Build a professional **TradingView-like chart experience**.
+
+Support:
+
+* Candlestick
+* OHLC
+* Line
+* Area
+* Baseline
+* Heikin Ashi
+* multiple timeframes
+* zoom
+* pan
+* crosshair
+* fullscreen
+* symbol search
+* sessions
+* comparison
+* layouts
+* saved workspaces
+* indicators
+* drawings
+* chart templates
+
+Drawing tools should eventually include:
+
+* trendline
+* ray
+* extended line
+* horizontal line
+* vertical line
+* channels
+* Fibonacci
+* anchored VWAP
+* shapes
+* annotations
+* long/short measurement
+* ranges
+* volume profile
+* FVG
+* order blocks
+* liquidity
+* BOS
+* CHoCH
+* MSS
+* Wyckoff markers
+
+Charts should support layers for:
+
+```text
+Price
+Volume
+VWAP
+Structure
+Liquidity
+SMC / ICT
+Market Profile
+Order Flow
+Futures
+Options
+Signals
+Execution
+Research
+```
+
+The chart is a visualization layer.
+
+**The chart is never the source of truth for orders or positions.**
+
+---
+
+# 23. FRONTEND
+
+Build a professional trading-terminal interface.
+
+Use:
+
+* Next.js
+* React
+* TypeScript
+* Tailwind
+* shadcn/ui
+* TanStack Table
+* TanStack Query
+* Zustand
+* React Hook Form
+* Zod
+* WebSocket
+* high-performance financial charting
+
+Prioritize:
+
+* information density
+* realtime updates
+* keyboard navigation
+* resizable panels
+* saved workspaces
+* dark-first interface
+* accessible light theme
+* virtualization
+* server-side filtering
+* progressive disclosure
+
+Never rely on color alone to communicate trading state.
+
+---
+
+# 24. MAIN UI AREAS
+
+Support:
+
+```text
+Dashboard
+Markets
+Equities
+Futures
+Options
+Indices
+Sectors
+Institutional
+Global
+Breadth
+Heatmaps
+Regime
+Scanner
+Opportunities
+Trade Types
+Strategies
+Research
+Backtesting
+Portfolio
+Orders
+Positions
+Automation
+Journal
+Settings
+```
+
+Instrument page should combine:
+
+```text
+Instrument Header
+↓
+Main Chart
+↓
+Structure
+Order Flow
+Futures
+Options
+Sector
+Quant
+↓
+Opportunity Panel
+↓
+Signals / Orders / Positions / Historical Analogues
+```
+
+---
+
+# 25. REALTIME ARCHITECTURE
+
+Use:
+
+```text
+Upstox WebSocket
+↓
+Normalizer
+↓
+Tick State
+↓
+Candle Aggregator
+↓
+Feature Engine
+↓
+Chart Publisher
+↓
+Realtime Gateway
+↓
+Browser Store
+↓
+Chart Renderer
+```
+
+Do not send every raw tick unnecessarily to the browser.
+
+Aggregate server-side.
+
+Use appropriate throttling.
+
+Maintain data-quality and stale-data indicators.
+
+---
+
+# 26. API
+
+Maintain clear versioned APIs.
+
+Examples:
+
+```text
+/api/v1/auth
+/api/v1/instruments
+/api/v1/market/quotes
+/api/v1/market/candles
+/api/v1/market/depth
+/api/v1/market/state
+/api/v1/scanners
+/api/v1/opportunities
+/api/v1/trade-types
+/api/v1/strategies
+/api/v1/backtests
+/api/v1/portfolio
+/api/v1/orders
+/api/v1/positions
+/api/v1/risk
+/api/v1/research
+/api/v1/system
+```
+
+Keep API contracts typed.
+
+---
+
+# 27. ENGINEERING RULES
+
+Before coding:
+
+1. Inspect existing code.
+2. Inspect relevant documentation.
+3. Search for existing abstractions.
+4. Avoid duplicate services.
+5. Understand dependencies.
+6. Determine the smallest coherent change.
+
+During coding:
+
+* Use strong typing.
+* Keep modules cohesive.
+* Keep domain logic independent from infrastructure.
+* Keep broker code inside adapters.
+* Keep strategy calculations pure.
+* Use typed DTOs.
+* Use explicit API contracts.
+* Use versioned behavior.
+* Preserve existing functionality.
+
+Prefer mature maintained libraries over reinventing generic infrastructure.
+
+---
+
+# 28. TESTING
+
+Trading-critical code requires tests.
+
+Use:
+
+* unit tests
+* integration tests
+* replay tests
+* strategy tests
+* risk tests
+* execution tests
+* data-quality tests
+* deterministic historical replay
+
+Always test:
+
+* duplicate orders
+* stale data
+* reconnect
+* partial fills
+* rejected orders
+* broker disconnect
+* risk rejection
+* kill switch
+* position reconciliation
+* look-ahead prevention
+
+---
+
+# 29. SECURITY
+
+Never:
+
+* commit API keys
+* commit access tokens
+* expose secrets
+* hardcode credentials
+* log sensitive credentials
+* enable live trading automatically
+
+Use environment/configuration management.
+
+Check changed files for secrets before committing.
+
+---
+
+# 30. PAPER-FIRST RULE
+
+The system must start in:
+
+```text
+PAPER
+```
+
+mode.
+
+Live trading must NEVER be enabled automatically.
+
+Live trading requires:
+
+* explicit user approval
+* completed validation
+* risk controls
+* reconciliation
+* monitoring
+* tested execution
+* production readiness
+
+If implementation could accidentally create a live execution path, stop and verify the safety boundary.
+
+---
+
+# 31. AMBIGUITY RULE
+
+If a requirement is ambiguous:
+
+First inspect:
+
+* `AGENTS.md`
+* Blueprint
+* `.ai/DECISIONS.md`
+* `.ai/CURRENT_STATE.md`
+* `.ai/TODO.md`
+* relevant docs
+
+Do not invent major architecture.
+
+If the change affects:
+
+* risk limits
+* position sizing
+* execution semantics
+* database ownership
+* architecture boundaries
+* broker/provider
+* live trading
+
+**STOP and ask for approval.**
+
+For normal implementation details, use the existing architecture and proceed.
+
+---
+
+# 32. PROJECT STATE MANAGEMENT
+
+After meaningful work:
+
+Update:
+
+```text
+.ai/CURRENT_STATE.md
+.ai/TODO.md
+.ai/CHANGELOG.md
+```
+
+when applicable.
+
+Keep the project state accurate.
+
+Record:
+
+* what was implemented
+* what remains
+* known limitations
+* important decisions
+* next recommended step
+
+Never claim a feature is production-ready when it is only a skeleton.
+
+---
+
+# 33. GIT WORKFLOW
+
+Before modifying code:
+
+```text
+inspect repository
+→ inspect branch/status
+→ inspect relevant files
+→ implement
+→ test
+→ review diff
+→ update project state
+→ commit
+```
+
+Use focused commits.
+
+Do not overwrite unrelated work.
+
+Do not reset/delete existing work without explicit approval.
+
+Use feature branches for substantial changes.
+
+---
+
+# 34. IMPLEMENTATION PRIORITY
+
+Follow this order unless the current repository state requires otherwise:
+
+1. Upstox V3 market-data ingestion
+2. Instrument master
+3. Data normalization
+4. Data quality/reconnect
+5. Candle engine
+6. Redis + ClickHouse storage
+7. Realtime chart gateway
+8. Market Intelligence
+9. Scanner DSL
+10. Opportunity Engine
+11. Trade Types
+12. Strategy Engine
+13. Risk Engine
+14. OMS
+15. Paper Trading
+16. Backtesting
+17. ML probability/calibration
+18. Production observability
+19. Production validation
+20. Live trading — **only after explicit approval**
+
+---
+
+# 35. WHEN I SAY "CONTINUE"
+
+If I simply say:
+
+> Continue
+
+do NOT ask me to explain the project again.
+
+Instead:
+
+1. Inspect repository state.
+2. Read the current project state.
+3. Identify the next logical milestone.
+4. Implement the smallest coherent production-quality step.
+5. Test it.
+6. Review the diff.
+7. Update project state.
+8. Report the result.
+9. Continue only when safe and unambiguous.
+
+---
+
+# 36. WHEN I SAY "BUILD THIS"
+
+Treat it as an implementation request.
+
+First determine:
+
+* where it belongs
+* which existing abstractions should be reused
+* dependencies
+* API contracts
+* data ownership
+* tests required
+* safety implications
+
+Then implement it according to this constitution.
+
+---
+
+# 37. WHEN I SAY "FIX THIS"
+
+Do not rewrite unrelated parts of the project.
+
+Instead:
+
+```text
+Reproduce
+→ Diagnose
+→ Find root cause
+→ Minimal coherent fix
+→ Regression test
+→ Verify
+```
+
+---
+
+# 38. FINAL RESPONSE FORMAT
+
+After implementation, report:
+
+### What Changed
+
+Short summary.
+
+### Files Changed
+
+List important files.
+
+### Tests / Checks
+
+List tests, lint, type checks, builds, replay tests, etc.
+
+### Known Limitations
+
+Be honest.
+
+### Next Recommended Step
+
+Give the next logical implementation milestone.
+
+Never claim success without verification.
+
+---
+
+# GOLDEN RULE
+
+**Do the work.**
+
+Do not repeatedly ask me to explain the project.
+
+Do not simplify the product into a generic trading dashboard.
+
+Do not bypass architecture.
+
+Do not bypass risk.
+
+Do not bypass OMS.
+
+Do not invent data.
+
+Do not use future information.
+
+Do not enable live trading automatically.
+
+Understand the repository, follow the Blueprint, follow `AGENTS.md`, implement the next logical piece, test it, document it, and continue from the existing state.
