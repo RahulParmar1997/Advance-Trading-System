@@ -1,3 +1,4 @@
+from dataclasses import replace
 from datetime import datetime, timezone
 from decimal import Decimal
 
@@ -12,32 +13,23 @@ class Opportunity:
 
 def context() -> RiskContext:
     now = datetime(2026, 9, 14, 10, 0, tzinfo=timezone.utc)
-    return RiskContext(
-        now=now,
-        market_open=True,
-        last_market_data_at=now,
-        snapshot=RiskSnapshot(),
-    )
+    return RiskContext(now=now, market_open=True, last_market_data_at=now, snapshot=RiskSnapshot())
 
 
 def engine() -> RiskEngine:
     return RiskEngine(RiskPolicy(
-        max_daily_loss=Decimal("100000"),
-        max_strategy_loss=Decimal("50000"),
-        max_symbol_exposure=Decimal("100000"),
-        max_portfolio_exposure=Decimal("500000"),
-        max_concurrent_trades=10,
-        max_leverage=Decimal("5"),
-        max_slippage_bps=Decimal("25"),
-        max_data_age_seconds=30,
+        max_daily_loss=Decimal("100000"), max_strategy_loss=Decimal("50000"),
+        max_symbol_exposure=Decimal("100000"), max_portfolio_exposure=Decimal("500000"),
+        max_concurrent_trades=10, max_leverage=Decimal("5"),
+        max_slippage_bps=Decimal("25"), max_data_age_seconds=30,
         min_risk_reward=Decimal("1"),
     ))
 
 
-def test_workflow_requires_risk_approval_before_oms() -> None:
+def test_workflow_rejects_before_oms_when_risk_fails() -> None:
     workflow = PaperExecutionWorkflow(engine())
     order = OmsOrder("paper-1", "NSE_EQ|TEST", 10)
-    result = workflow.submit(order, context(), client_key="opp-1")
+    result = workflow.submit(order, Opportunity(), replace(context(), market_open=False), client_key="opp-1")
     assert result.risk.allowed is False
     assert result.order.state is OmsState.SCANNED
 
@@ -45,12 +37,9 @@ def test_workflow_requires_risk_approval_before_oms() -> None:
 def test_approved_order_enters_paper_oms_and_is_idempotent() -> None:
     workflow = PaperExecutionWorkflow(engine())
     order = OmsOrder("paper-2", "NSE_EQ|TEST", 10)
-    # RiskEngine consumes an opportunity object; the workflow contract keeps the
-    # gate explicit even though the current order model is broker-neutral.
-    approved = engine().check(Opportunity(), context())
-    assert approved.allowed
-    result = workflow.submit(order, context(), client_key="opp-2")
+    result = workflow.submit(order, Opportunity(), context(), client_key="opp-2")
+    assert result.risk.allowed
     assert result.order.order_id == order.order_id
     assert result.replayed is False
-    replay = workflow.submit(order, context(), client_key="opp-2")
+    replay = workflow.submit(order, Opportunity(), context(), client_key="opp-2")
     assert replay.replayed is True
