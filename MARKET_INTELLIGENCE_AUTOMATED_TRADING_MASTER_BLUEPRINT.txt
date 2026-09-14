@@ -1,0 +1,445 @@
+MARKET INTELLIGENCE & AUTOMATED TRADING PLATFORM
+
+Master Idea, Workflow & Blueprint
+
+1. PRODUCT VISION
+
+Build an India-focused Market Intelligence + Quant Research + Automated Trading Platform using broker/exchange data, quantitative analytics, market structure, derivatives, order-flow intelligence, statistical research, machine learning, and controlled automated execution.
+
+Core workflow:
+
+DATA → MARKET STATE → MARKET INTELLIGENCE → REGIME → SCANNER → TRADE TYPE → STRATEGY → OPPORTUNITY → PROBABILITY → EXPECTED VALUE → RISK → OMS → EXECUTION → POSITION → JOURNAL → PATTERN DNA → RESEARCH / ML → IMPROVED INTELLIGENCE
+
+2. CORE ARCHITECTURE
+
+UPSTOX
+
+→ DATA INGESTION
+
+→ NORMALIZATION
+
+→ DATA QUALITY
+
+→ REDIS / CLICKHOUSE / PARQUET
+
+→ CANDLE ENGINE
+
+→ FEATURE ENGINE
+
+→ MARKET INTELLIGENCE
+
+→ MARKET SCANNER
+
+→ TRADE TYPE FILTER
+
+→ STRATEGY ENGINE
+
+→ OPPORTUNITY ENGINE
+
+→ PROBABILITY + EXPECTED VALUE
+
+→ RISK ENGINE
+
+→ OMS
+
+→ PAPER EXECUTION
+
+→ POSITION MANAGER
+
+→ JOURNAL
+
+→ PATTERN DNA
+
+→ RESEARCH / ML
+
+3. MARKET DATA
+
+Collect LTP, OHLC, volume, turnover, bid/ask, spread, depth, trades, timestamps and market status.
+
+Futures: underlying, expiry, LTP, volume, OI, OI change, basis, premium/discount, VWAP, volatility, rollover.
+
+Options: underlying, spot/future, strike, expiry, CE/PE, LTP, volume, OI, OI change, IV, Greeks, bid/ask.
+
+Broker: orders, status, fills, positions, margin and reconciliation data.
+
+4. DATA NORMALIZATION & QUALITY
+
+Convert broker-specific events into canonical QuoteEvent, TradeEvent, DepthEvent, CandleEvent, MarketStatusEvent, FutureSnapshot, OptionSnapshot, OrderEvent, FillEvent and PositionEvent.
+
+Validate timestamps, instruments, duplicates, ordering, gaps, staleness and market sessions.
+
+Data states: HEALTHY, DEGRADED, STALE, INVALID.
+
+5. STORAGE
+
+Redis: hot state, latest prices/quotes/depth, current candles, regime, active signals.
+
+ClickHouse: ticks, trades, quotes, depth, candles, futures, options, features, structure, liquidity, profiles, regimes and scanner results.
+
+PostgreSQL: users, strategies, versions, Trade Types, risk profiles, orders, fills, positions, watchlists, backtests, models, permissions and audit.
+
+Parquet + S3/MinIO: raw, historical, research, ML, replay and order-book datasets.
+
+6. CANDLE ENGINE
+
+Convert ticks/events into deterministic 1s, 1m, 3m, 5m, 15m, 30m, 1h, 4h and daily candles.
+
+Handle duplicates, out-of-order events, gaps, session boundaries, partial/closed candles, volume and VWAP.
+
+Closed candles are immutable.
+
+7. FEATURE ENGINE
+
+Price: returns, ATR, volatility, gaps, momentum, VWAP and moving averages.
+
+Volume: RVOL, anomalies, acceleration, turnover, volume profile.
+
+Structure: swing highs/lows, HH, HL, LH, LL, BOS, CHoCH, MSS, displacement, compression and expansion.
+
+Liquidity: equal highs/lows, PDH/PDL, PWH/PWL, session liquidity, range liquidity and sweeps.
+
+8. SMC / ICT / WYCKOFF
+
+Treat these as measurable hypotheses, not guaranteed predictive truths.
+
+SMC/ICT: liquidity sweep, BOS, CHoCH, MSS, FVG, displacement, order block, premium/discount.
+
+Wyckoff: Spring, Upthrust, SOS, SOW, climax, absorption and test.
+
+Formal sequence:
+
+Liquidity Pool → Sweep → Reaction → Displacement → Structure Change → Retest.
+
+9. MARKET / AUCTION PROFILE
+
+POC, VAH, VAL, HVN, LVN, initial balance, opening range, value migration, acceptance, rejection, failed auction and excess.
+
+10. ORDER FLOW / MICROSTRUCTURE
+
+OFI, CVD, bid/ask imbalance, microprice, queue imbalance, depth imbalance, absorption, exhaustion, replenishment, cancellation, liquidity vacuum, price impact, Kyle lambda, Amihud illiquidity, change points, entropy and Hurst where data supports them.
+
+11. FUTURES INTELLIGENCE
+
+Spot → Near Future → Next Future → Far Future.
+
+Calculate price change, volume, OI, OI change, basis, premium/discount, rollover, contango/backwardation, long buildup, short buildup, short covering and long unwinding.
+
+12. OPTIONS INTELLIGENCE
+
+Full option chain with OI, volume, IV, Greeks and bid/ask.
+
+Analytics: ATM IV, IV Rank, IV Percentile, expected move, skew, term structure, call/put concentration, unusual activity and model-derived gamma exposure estimates.
+
+13. BREADTH, SECTORS & GLOBAL
+
+Breadth: advance/decline, up/down volume, new highs/lows, % above 20/50/200 DMA, F&O breadth, momentum breadth and divergences.
+
+Sectors: strength, breadth, momentum, relative strength, volume, dispersion, futures positioning, options activity and rotation.
+
+Global: US, Europe, Asia, bonds/rates, dollar, commodities and FX.
+
+14. MARKET REGIME
+
+TREND_UP, TREND_DOWN, RANGE, BREAKOUT, COMPRESSION, VOLATILITY_EXPANSION, VOLATILITY_CONTRACTION, PANIC, RECOVERY, MOMENTUM, MEAN_REVERSION, TRANSITION, HIGH_LIQUIDITY and LOW_LIQUIDITY.
+
+Start with transparent rules; later use HMM/change-point/ML.
+
+15. MARKET INTELLIGENCE DASHBOARD
+
+Show market regime, confidence, breadth, sector leadership, futures positioning, options activity, unusual activity, heatmaps, global context and qualified opportunities.
+
+The dashboard answers:
+
+• What is happening?
+
+• Where is money/volume/OI moving?
+
+• Which sectors are strong/weak?
+
+• Which instruments have unusual activity?
+
+• What is the current regime?
+
+16. MARKET SCANNER
+
+Stage 1: price, volume, RVOL, ATR, liquidity, spread.
+
+Stage 2: BOS, CHoCH, MSS, FVG, sweep, VWAP, profile.
+
+Stage 3: OFI, CVD, depth, absorption.
+
+Stage 4: OI, IV, skew, basis, options activity.
+
+Stage 5: probability, EV, historical similarity, regime compatibility, execution quality and risk.
+
+Scanner DSL supports AND/OR/NOT, nested conditions, thresholds, timeframes and cross-asset conditions.
+
+Example:
+
+Daily Trend = Bullish
+
+AND 1H BOS = True
+
+AND 15M Liquidity Sweep = True
+
+AND 5M Displacement = True
+
+AND RVOL > 1.5
+
+AND Price > VWAP
+
+AND Sector Strength > 70
+
+AND Futures OI Increasing
+
+17. TRADE TYPE
+
+Trade Type is a selection/filter before automated trading, not manual trading.
+
+SCALPING, INTRADAY, BREAKOUT, MOMENTUM, TREND FOLLOWING, MEAN REVERSION, REVERSAL, RANGE, SWING, POSITIONAL, BTST, OPTION BUYING, OPTION SELLING, FUTURES, CUSTOM.
+
+Trade Type defines timeframe, holding period, allowed setups, execution style, stop logic, target logic, risk limits, session and liquidity requirements.
+
+Trade Type = WHAT
+
+Strategy = HOW
+
+Regime = WHEN
+
+Risk = HOW MUCH
+
+Execution = HOW
+
+18. STRATEGY ENGINE
+
+Every strategy is deterministic and versioned.
+
+Strategy consumes market state/features and produces a structured signal.
+
+Strategies must never directly access the broker.
+
+19. OPPORTUNITY ENGINE
+
+Opportunity contains instrument, direction, Trade Type, strategy, regime, entry, stop, targets, structure/liquidity/volume/flow/derivatives/historical/execution scores, probability, expected R, risk and explanation.
+
+Starting scoring weights:
+
+structure 0.18, liquidity 0.14, volume 0.10, flow 0.14, derivatives 0.10, regime 0.12, historical 0.10, execution 0.07, risk 0.05.
+
+Weights must be validated statistically.
+
+20. PROBABILITY + EXPECTED VALUE
+
+Calculate P(TP1), P(TP2), P(SL), expected R, expected duration and expected value.
+
+Include brokerage, STT, exchange charges, GST, stamp duty, spread, slippage, market impact and latency.
+
+Probability models must be calibrated, time-aware and out-of-sample validated.
+
+21. RISK ENGINE
+
+Mandatory hard gate between opportunity and OMS.
+
+Checks: strategy validity, Trade Type enabled, market open, fresh data, valid instrument, duplicate signal, existing position, daily loss, strategy loss, symbol/sector/portfolio exposure, margin, leverage, slippage and kill switch.
+
+Any critical failure = REJECT.
+
+22. POSITION SIZING
+
+Risk Amount = Account Equity × Risk Fraction.
+
+Risk Per Unit = |Entry − Stop| × Point Value.
+
+Quantity = Risk Amount / Risk Per Unit.
+
+Production sizing also considers lot size, margin, liquidity, volatility, spread, portfolio/sector exposure, leverage and capacity.
+
+23. OMS
+
+Lifecycle:
+
+SCANNED → CANDIDATE → QUALIFIED → RISK_CHECK → ORDER_PENDING → PARTIALLY_FILLED → FILLED → MANAGED → SCALE_OUT → EXIT → CLOSED.
+
+OMS is the application source of truth; broker state is reconciled against OMS.
+
+24. IDEMPOTENCY
+
+Use a key based on strategy version + instrument + signal timestamp + direction.
+
+If the same signal is processed twice, return the existing intent/order instead of creating a duplicate.
+
+25. PAPER TRADING
+
+Default mode is PAPER.
+
+Real market data → real features → intelligence → scanner → strategy → probability → risk → OMS → paper execution simulator → position → P&L.
+
+Simulate spread, slippage, latency, partial fills, rejects, gaps, fees and liquidity.
+
+26. LIVE TRADING SAFETY
+
+Live execution disabled by default.
+
+Required sequence:
+
+Explicit approval → Production → LIVE mode → Risk Engine → OMS → Broker.
+
+Never allow Strategy → Broker or AI → Broker.
+
+27. POSITION MANAGER
+
+Manage average entry, quantity, realized/unrealized P&L, stops, targets, scale-outs, exits, MFE, MAE, duration and slippage.
+
+28. JOURNAL & PATTERN DNA
+
+Every trade becomes research data.
+
+Capture entry state, market state, features, signal, risk decision, execution, exit, MFE, MAE, R, duration, slippage, regime and strategy version.
+
+Pattern DNA:
+
+Trend, volatility, volume, RVOL, structure, liquidity, OFI, CVD, OI, IV, skew, breadth, sector, regime and time of day.
+
+Workflow:
+
+Current Setup → Similar Historical Setups → Outcome Distribution → Probability → Expected Value.
+
+29. BACKTESTING
+
+Historical Data → Market State → Features → Market Intelligence → Scanner → Trade Type → Strategy → Risk Engine → Order Simulation → Fill Model → Position → P&L.
+
+Validate with in-sample, out-of-sample, walk-forward, parameter sensitivity, Monte Carlo, regime analysis, cost sensitivity and capacity analysis.
+
+Prevent look-ahead bias, leakage, survivorship bias and unrealistic fills/costs.
+
+30. AI / ML
+
+ML: setup classification, outcome probability, regime classification, similarity, ranking and anomaly detection.
+
+AI: market explanation, opportunity explanation, scanner-rule generation, research hypotheses, backtest analysis, journal analysis and pattern discovery.
+
+AI is an intelligence/research layer and cannot bypass Quant, Risk or OMS.
+
+31. FRONTEND
+
+Navigation:
+
+Dashboard, Markets, Equities, Futures, Options, Indices, Sectors, Institutional, Global, Breadth, Heatmaps, Scanner, Opportunities, Trade Types, Strategies, Paper Trading, Positions, Orders, Journal, Pattern DNA, Backtesting, Research, Models, Settings.
+
+Professional chart layers:
+
+Price, volume, VWAP, structure, liquidity, SMC/ICT, profile, order flow, derivatives, signals, execution and research.
+
+Realtime chart:
+
+Upstox WebSocket → Normalizer → Tick State → Candle Aggregator → Feature Engine → Chart Publisher → Realtime Gateway → Browser Store → Chart Renderer.
+
+32. VERSIONING
+
+Version data, features, strategies, scanner, risk profiles, models and execution.
+
+Every historical trade must be reproducible.
+
+33. RESEARCH WORKFLOW
+
+Question → Dataset → Feature Version → Hypothesis → Experiment → Backtest → Validation → Statistical Analysis → Conclusion → Strategy Version.
+
+34. OBSERVABILITY
+
+Track market-data latency, stale feeds, dropped events, sequence gaps, normalization errors, feature/scanner latency, opportunities, probability distributions, model drift, orders, rejects, fills, slippage, execution latency and infrastructure health.
+
+Use structured logs, metrics, tracing, alerts and audit logs.
+
+35. DEVELOPMENT ROADMAP
+
+Phase 1 Foundation: backend, frontend, Docker, PostgreSQL, Redis, ClickHouse, configuration, logging and testing.
+
+Phase 2 Market Data: Upstox authentication, instrument master, WebSocket, protobuf, normalization, data quality, reconnect and subscriptions.
+
+Phase 3 Market State: candle engine, VWAP, ATR, volume, OHLC and multi-timeframe state.
+
+Phase 4 Market Intelligence: structure, liquidity, SMC/ICT, Wyckoff, profile, order flow, futures, options, breadth, sectors, global and regime.
+
+Phase 5 Scanner: broad market scanner, DSL, multi-timeframe conditions, cross-asset conditions, ranking and explanations.
+
+Phase 6 Automated Trading: Trade Type, strategy, opportunity, probability, EV, risk, OMS and paper execution.
+
+Phase 7 Research: journal, Pattern DNA, backtester, walk-forward, Monte Carlo, costs, capacity, ML and probability calibration.
+
+Phase 8 Production: observability, reconciliation, recovery, HA, disaster recovery, security, audit and controlled live execution.
+
+36. GOLDEN RULES
+
+1. Data first.
+
+2. Bad data must never produce a trusted signal.
+
+3. Market Intelligence comes before Automated Trading.
+
+4. Trade Type is a pre-trading filter, not manual execution.
+
+5. Strategy does not directly access the broker.
+
+6. Probability must be calibrated.
+
+7. Expected Value must include costs.
+
+8. Risk Engine is mandatory.
+
+9. OMS controls execution.
+
+10. Paper Trading comes before Live Trading.
+
+11. AI cannot bypass Quant/Risk/OMS.
+
+12. Every trade becomes research data.
+
+13. Every strategy/model/signal must be versioned.
+
+14. Backtest and live logic share the same conceptual pipeline.
+
+15. No look-ahead bias.
+
+16. No live execution by default.
+
+FINAL PRODUCT
+
+A quantitative Market Intelligence system that converts real-time market data into measurable market state, identifies statistically qualified opportunities, filters them by Trade Type and Strategy, validates probability and expected value, enforces risk through a centralized Risk Engine, executes through an OMS, and continuously learns from historical outcomes.
+
+MASTER FLOW
+
+MARKET DATA
+
+→ DATA QUALITY
+
+→ MARKET STATE
+
+→ MARKET INTELLIGENCE
+
+→ REGIME
+
+→ MARKET SCANNER
+
+→ TRADE TYPE
+
+→ STRATEGY
+
+→ OPPORTUNITY ENGINE
+
+→ PROBABILITY + EV
+
+→ RISK ENGINE
+
+→ OMS
+
+→ PAPER EXECUTION
+
+→ POSITION
+
+→ JOURNAL
+
+→ PATTERN DNA
+
+→ RESEARCH / ML
+
+→ IMPROVED MARKET INTELLIGENCE
