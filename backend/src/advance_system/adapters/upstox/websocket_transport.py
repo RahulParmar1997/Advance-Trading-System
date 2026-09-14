@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import asyncio
+import json
 from collections.abc import AsyncIterator, Sequence
 from dataclasses import dataclass
 from typing import Any, Protocol
 
-from advance_system.adapters.upstox.feed_mapper import UpstoxFeedMapper
+from advance_system.adapters.upstox.feed_mapper import ProtobufFeedDecoder, UpstoxFeedMapper
 from advance_system.adapters.upstox.market_data import UpstoxQuote
 from advance_system.ingestion.adapters import Instrument
 
@@ -34,11 +35,12 @@ class UpstoxWebSocketConfig:
 
 
 class UpstoxLibraryWebSocketTransport:
-    """Concrete Upstox transport; the third-party WebSocket client is injectable."""
+    """Concrete transport; network and protobuf implementations remain injectable."""
 
-    def __init__(self, connector: WebSocketConnector, mapper: UpstoxFeedMapper, config: UpstoxWebSocketConfig) -> None:
+    def __init__(self, connector: WebSocketConnector, mapper: UpstoxFeedMapper, decoder: ProtobufFeedDecoder, config: UpstoxWebSocketConfig) -> None:
         self._connector = connector
         self._mapper = mapper
+        self._decoder = decoder
         self._config = config
         self._connection: WebSocketConnection | None = None
 
@@ -51,9 +53,9 @@ class UpstoxLibraryWebSocketTransport:
         )
 
     async def subscribe(self, *, instruments: Sequence[Instrument]) -> None:
-        connection = self._require_connection()
-        payload = self._mapper.subscription_payload(instruments)
-        await connection.send(payload)
+        await self._require_connection().send(
+            json.dumps({"guid": "advance-trading-system", "method": "sub", "data": {"instrumentKeys": [i.symbol for i in instruments]}})
+        )
 
     async def receive(self) -> AsyncIterator[UpstoxQuote]:
         connection = self._require_connection()
@@ -65,11 +67,11 @@ class UpstoxLibraryWebSocketTransport:
                 message = message.encode("utf-8")
             if not isinstance(message, bytes):
                 raise TypeError("websocket message must be bytes or text")
-            yield self._mapper.decode(message)
+            for quote in self._mapper.map_message(self._decoder.decode(message)):
+                yield quote
 
     async def ping(self) -> None:
-        connection = self._require_connection()
-        pong = await connection.ping()
+        pong = await self._require_connection().ping()
         if hasattr(pong, "__await__"):
             await pong
 
@@ -96,7 +98,6 @@ class WebsocketsConnector:
 
 
 async def run_heartbeat(transport: UpstoxLibraryWebSocketTransport, stop: asyncio.Event) -> None:
-    """Run transport heartbeats until shutdown or cancellation."""
     while not stop.is_set():
         try:
             await asyncio.wait_for(stop.wait(), timeout=transport._config.ping_interval)
