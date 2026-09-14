@@ -5,8 +5,6 @@ from decimal import Decimal
 from random import Random
 from typing import Sequence
 
-from advance_system.backtest.engine import BacktestFill
-
 
 @dataclass(frozen=True, slots=True)
 class MonteCarloResult:
@@ -23,12 +21,6 @@ class SensitivityPoint:
     parameter: str
     value: Decimal
     total_pnl: Decimal
-
-
-def _pnl(fill: BacktestFill, entry_price: Decimal | None = None) -> Decimal:
-    # A fill stream is treated as signed only when callers provide paired fills.
-    # This helper intentionally does not infer trade direction from raw fills.
-    return Decimal("0")
 
 
 class BacktestSensitivity:
@@ -49,12 +41,11 @@ class BacktestSensitivity:
         rng = Random(seed)
         totals = [sum((rng.choice(values) for _ in values), Decimal("0")) for _ in range(simulations)]
         ordered = sorted(totals)
-        median = ordered[len(ordered) // 2]
         losses = sum(1 for total in totals if total < 0)
         return MonteCarloResult(
             simulations,
             sum(totals, Decimal("0")) / Decimal(simulations),
-            median,
+            ordered[len(ordered) // 2],
             ordered[0],
             ordered[-1],
             Decimal(losses) / Decimal(simulations),
@@ -70,11 +61,14 @@ class BacktestSensitivity:
             raise ValueError("gross_trade_pnls and notionals must have equal non-zero length")
         if any(n <= 0 for n in notionals) or any(b < 0 for b in fee_bps):
             raise ValueError("notionals must be positive and fee_bps cannot be negative")
-        result: list[SensitivityPoint] = []
-        for bps in fee_bps:
-            total = sum((p - n * bps / Decimal("10000") for p, n in zip(gross_trade_pnls, notionals)), Decimal("0"))
-            result.append(SensitivityPoint("fee_bps", bps, total))
-        return tuple(result)
+        return tuple(
+            SensitivityPoint(
+                "fee_bps",
+                bps,
+                sum((p - n * bps / Decimal("10000") for p, n in zip(gross_trade_pnls, notionals)), Decimal("0")),
+            )
+            for bps in fee_bps
+        )
 
     def capacity_sensitivity(
         self,
@@ -83,8 +77,7 @@ class BacktestSensitivity:
         participation_rates: Sequence[Decimal],
         market_volumes: Sequence[Decimal],
     ) -> tuple[SensitivityPoint, ...]:
-        if len(trade_pnls) != len(trade_notionals) or len(trade_pnls) != len(market_volumes) or not trade_pnls:
-            raise ValueError("capacity inputs must have equal non-zero length")
+        self._validate_parallel(trade_pnls, trade_notionals, market_volumes)
         if any(n < 0 for n in trade_notionals) or any(v <= 0 for v in market_volumes):
             raise ValueError("trade notionals cannot be negative and market volumes must be positive")
         result: list[SensitivityPoint] = []
@@ -97,3 +90,23 @@ class BacktestSensitivity:
             )
             result.append(SensitivityPoint("participation_rate", rate, total))
         return tuple(result)
+
+    def regime_sensitivity(
+        self,
+        trade_pnls: Sequence[Decimal],
+        regimes: Sequence[str],
+    ) -> dict[str, Decimal]:
+        """Aggregate observed trade P&L by caller-supplied historical regime label."""
+        if len(trade_pnls) != len(regimes) or not trade_pnls:
+            raise ValueError("trade_pnls and regimes must have equal non-zero length")
+        if any(not regime.strip() for regime in regimes):
+            raise ValueError("regime labels must be non-empty")
+        result: dict[str, Decimal] = {}
+        for pnl, regime in zip(trade_pnls, regimes):
+            result[regime] = result.get(regime, Decimal("0")) + pnl
+        return dict(sorted(result.items()))
+
+    @staticmethod
+    def _validate_parallel(*series: Sequence[object]) -> None:
+        if not series or not series[0] or any(len(values) != len(series[0]) for values in series):
+            raise ValueError("sensitivity inputs must have equal non-zero length")
