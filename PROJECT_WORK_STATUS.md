@@ -59,6 +59,10 @@ Core flow:
 - [x] Runtime-only Upstox settings from environment variables.
 - [x] Injectable OAuth HTTP client implementation.
 - [x] Process-local token-store abstraction for PAPER/testing.
+- [x] Production-safe secret-backed token-store abstraction with injected secret-manager boundary.
+- [x] Secret-backed token serialization is versioned, expiry-aware and fails closed on malformed/unsupported data.
+- [x] Secret-backed token storage has no filesystem or environment-variable persistence fallback.
+- [x] Secret-store tests cover round-trip, expiry, clear, missing secret and fail-closed validation paths.
 - [x] Upstox market-data client protocol.
 - [x] Injectable WebSocket transport boundary.
 - [x] Bounded exponential reconnect policy.
@@ -171,7 +175,7 @@ A temporary `foundation/paper-vertical-slice` prototype existed before the main-
 - [x] Broader CI quality gates.
 
 ### Phase 2 — Market data
-- [ ] Production secret-backed token store.
+- [x] Production-safe secret-backed token store abstraction.
 - [ ] Real WebSocket library transport implementation.
 - [ ] Generated Upstox V3 protobuf package/version pinning.
 - [ ] Production instrument-master ingestion/update process.
@@ -252,4 +256,4 @@ Journal / Audit
 The milestone is complete only when automated tests cover the complete flow and it runs without live order execution.
 
 ## Current next task
-Begin **Phase 2 market-data production hardening** with a production-safe secret-backed token-store abstraction, keeping credentials outside source control and maintaining PAPER/test isolation.
+Implement the **real WebSocket library transport** behind the existing injectable Upstox transport boundary, with bounded reconnects, heartbeat behavior, cancellation safety and deterministic tests; keep live credentials/order execution out of tests and preserve PAPER-first behavior.
