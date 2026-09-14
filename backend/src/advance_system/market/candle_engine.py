@@ -70,6 +70,10 @@ class CandleEngine:
         )
         return None
 
+    def current_candles(self) -> tuple[Candle, ...]:
+        """Return a stable snapshot of in-progress candles."""
+        return tuple(self._current.values())
+
     def _new_candle(self, event: QuoteEvent, start: datetime, end: datetime, volume: int) -> Candle:
         return Candle(
             event.instrument,
@@ -115,10 +119,6 @@ class MultiTimeframeCandleEngine:
                 completed[interval] = candle
         return completed
 
-    def flush(self) -> dict[int, Candle]:
-        """Return current in-progress candles without mutating engine state."""
-        result: dict[int, Candle] = {}
-        for interval, engine in self._engines.items():
-            for candle in engine._current.values():
-                result[interval] = candle
-        return result
+    def current_candles(self) -> dict[int, tuple[Candle, ...]]:
+        """Return immutable snapshots of the in-progress candles by interval."""
+        return {interval: engine.current_candles() for interval, engine in self._engines.items()}
