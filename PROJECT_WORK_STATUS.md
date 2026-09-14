@@ -133,6 +133,10 @@ Core flow:
 - [x] Pattern similarity distance/search with deterministic tie-breaking.
 - [x] Outcome summaries use only explicitly observed outcomes and never infer missing labels.
 - [x] Pattern DNA unit tests.
+- [x] Leakage-safe ML dataset row contract with explicit train/validation/test splits.
+- [x] Feature-matrix extraction with schema validation.
+- [x] Deterministic probability calibration bins over explicit predictions/outcomes.
+- [x] ML dataset and calibration unit tests.
 
 ## Previously prototyped — not used as the implementation branch
 A temporary `foundation/paper-vertical-slice` prototype existed before the main-only rule. Its useful ideas were reviewed and recreated deliberately on `main`; it is not the active development branch.
@@ -180,7 +184,7 @@ A temporary `foundation/paper-vertical-slice` prototype existed before the main-
 - [x] Walk-forward/OOS split foundation.
 - [x] Monte Carlo and regime/cost/capacity sensitivity foundation.
 - [x] Pattern DNA / similarity search foundation.
-- [ ] ML datasets and calibration.
+- [x] ML dataset generation and probability-calibration primitives.
 - [ ] More realistic historical liquidity/rejection modeling.
 
 ### Phase 8 — Frontend
@@ -227,4 +231,4 @@ Journal / Audit
 The milestone is complete only when automated tests cover the complete flow and it runs without live order execution.
 
 ## Current next task
-Implement **ML dataset generation and calibration primitives** from explicit backtest/PATTERN-DNA observations, with strict train/OOS separation and no outcome leakage.
+Implement **more realistic historical liquidity/rejection modeling** in the backtester, including explicit liquidity availability, participation limits, rejected/partial fills and audit-friendly rejection reasons without introducing look-ahead.
