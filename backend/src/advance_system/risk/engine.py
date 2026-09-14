@@ -3,7 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from decimal import Decimal
-from typing import Iterable
 
 
 @dataclass(frozen=True, slots=True)
@@ -93,8 +92,6 @@ class RiskEngine:
             return RiskDecision(False, "market is closed", tuple(checks))
         checks.append("market session")
 
-        if context.kill_switch if False else False:
-            return RiskDecision(False, "kill switch active", tuple(checks))
         if snapshot.kill_switch:
             return RiskDecision(False, "kill switch active", tuple(checks))
         if snapshot.circuit_breaker:
