@@ -121,7 +121,9 @@ Core flow:
 - [x] Strategy → Opportunity → RiskEngine → OMS integration boundary for historical decisions.
 - [x] Risk-approved opportunities transition through canonical OMS states before simulated execution.
 - [x] Risk-rejected opportunities are recorded as rejected and never reach simulated execution.
-- [x] Unit tests for integrated approval/rejection flow.
+- [x] Walk-forward train/test window contracts with chronological, disjoint OOS boundaries.
+- [x] Walk-forward runner keeps training data separate from the backtest test window.
+- [x] Unit tests for walk-forward chronology, rolling windows, invalid sizes and OOS execution isolation.
 
 ## Previously prototyped — not used as the implementation branch
 A temporary `foundation/paper-vertical-slice` prototype existed before the main-only rule. Its useful ideas were reviewed and recreated deliberately on `main`; it is not the active development branch.
@@ -166,7 +168,7 @@ A temporary `foundation/paper-vertical-slice` prototype existed before the main-
 - [ ] Stronger durable journal backend.
 
 ### Phase 7 — Research
-- [ ] Walk-forward/OOS validation.
+- [x] Walk-forward/OOS split foundation.
 - [ ] Monte Carlo and regime/cost/capacity sensitivity.
 - [ ] Pattern DNA and similarity search.
 - [ ] ML datasets and calibration.
@@ -216,4 +218,4 @@ Journal / Audit
 The milestone is complete only when automated tests cover the complete flow and it runs without live order execution.
 
 ## Current next task
-Implement **backtest research validation**: walk-forward/OOS split contracts and metrics, then Monte Carlo/regime/cost/capacity sensitivity. Keep all validation isolated from live execution.
+Implement **Monte Carlo and regime/cost/capacity sensitivity** for backtest results, keeping simulations deterministic and isolated from live execution.
