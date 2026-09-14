@@ -6,14 +6,13 @@
 **Last updated:** 2026-09-14
 
 ## Current status
-The repository has a substantial deterministic PAPER/research foundation. Upstox transport/protobuf boundaries remain isolated behind adapters. Instrument-master ingestion has a concrete Upstox BOD JSON source, and authoritative exchange status is now enforced by the RiskEngine with freshness and fail-closed safety gates.
+The repository has a substantial deterministic PAPER/research foundation. Upstox transport/protobuf boundaries remain isolated behind adapters. Instrument-master ingestion has a concrete Upstox BOD JSON source, authoritative exchange status is enforced by the RiskEngine, and the official Upstox V3 protobuf schema is now vendored/pinned behind the decoder boundary.
 
 ## Latest completed work
-- [x] Broker-neutral authoritative `MarketStatus` contract added.
-- [x] RiskEngine now requires fresh authoritative market status by default.
-- [x] Only `NORMAL_OPEN` can pass the market-status gate; close/pre-open/CAS states fail closed.
-- [x] Market-status timestamp, exchange identity and timezone validity are enforced.
-- [x] Unit coverage added for fresh open, missing, stale, non-open, CAS, exchange mismatch and conservative boolean-gate cases.
+- [x] Official Upstox V3 `MarketDataFeedV3.proto` vendored under the adapter boundary.
+- [x] Generated-compatible Python protobuf artifact added with the upstream schema blob SHA pinned.
+- [x] Stable lowercase protobuf import boundary added for the decoder.
+- [x] Protobuf round-trip and enum compatibility tests added.
 - [x] Changes committed directly to `main`.
 
 ## Done on `main`
@@ -35,6 +34,7 @@ The repository has a substantial deterministic PAPER/research foundation. Upstox
 - [x] Monotonic atomic instrument-master publication.
 - [x] Upstox instrument-master adapter boundary.
 - [x] Concrete Upstox BOD JSON instrument-master source and parser.
+- [x] Upstox V3 protobuf schema/artifact vendoring and pinning.
 - [x] Upstox V3 protobuf decoder boundary and deterministic feed mapper.
 - [x] Real `websockets` transport with injectable connector/decoder.
 
@@ -64,12 +64,12 @@ The repository has a substantial deterministic PAPER/research foundation. Upstox
 - [x] Production-safe secret-backed token store.
 - [x] Real WebSocket transport.
 - [x] Upstox V3 protobuf decoder boundary.
+- [x] Vendor/pin Upstox V3 protobuf schema/artifact.
 - [x] Instrument-master ingestion/update foundation.
 - [x] Concrete Upstox BOD JSON instrument-master source.
 - [x] Production Upstox exchange market-status source.
 - [x] Wire authoritative Upstox status into the RiskEngine market-open gate.
 - [x] Add market-status freshness/staleness protection and fail-closed behavior.
-- [ ] Vendor/pin actual generated Upstox V3 protobuf module artifact.
 
 ### Phase 3 — Market state / analytics
 - [ ] Multi-timeframe candle/session engine.
@@ -120,4 +120,4 @@ The repository has a substantial deterministic PAPER/research foundation. Upstox
 `Market Event → Normalization → Validation → Candle → Features → Market State → Strategy → Opportunity → Probability/EV → RiskEngine → OMS → Paper Fill → Position → P&L → Journal`
 
 ## Current next task
-Vendor/pin the actual generated Upstox V3 protobuf module artifact behind the existing decoder package boundary. Keep all work directly on `main`.
+Advance to Phase 3: strengthen the multi-timeframe candle/session engine while preserving deterministic ordering, session boundaries, and broker-neutral contracts. Keep all work directly on `main`.
