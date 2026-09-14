@@ -1,4 +1,4 @@
-from datetime import date, datetime, time, timezone
+from datetime import date, datetime, timezone
 
 import pytest
 
@@ -41,5 +41,4 @@ def test_assert_open_fails_closed_outside_regular_session():
     calendar = session()
     with pytest.raises(RuntimeError, match="market is not open"):
         calendar.assert_open(dt(4, 0))
-
     calendar.assert_open(dt(3, 45))
