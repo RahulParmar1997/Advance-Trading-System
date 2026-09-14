@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
+
+from advance_system.domain.market_status import MarketStatus
 
 
 @dataclass(frozen=True, slots=True)
@@ -17,17 +19,19 @@ class RiskPolicy:
     max_leverage: Decimal = Decimal("0")
     max_slippage_bps: Decimal = Decimal("0")
     max_data_age_seconds: int = 0
+    max_market_status_age_seconds: int = 60
     min_risk_reward: Decimal = Decimal("0")
     min_probability: Decimal = Decimal("0")
     max_order_notional: Decimal = Decimal("0")
     max_participation_rate: Decimal = Decimal("0")
+    require_authoritative_market_status: bool = True
 
     def validate(self) -> None:
         if self.max_daily_loss < 0 or self.max_strategy_loss < 0:
             raise ValueError("loss limits cannot be negative")
         if self.max_symbol_exposure < 0 or self.max_portfolio_exposure < 0 or self.max_order_notional < 0:
             raise ValueError("exposure limits cannot be negative")
-        if self.max_concurrent_trades < 0 or self.max_data_age_seconds < 0:
+        if self.max_concurrent_trades < 0 or self.max_data_age_seconds < 0 or self.max_market_status_age_seconds < 0:
             raise ValueError("count and age limits cannot be negative")
         if self.max_leverage < 0 or self.max_slippage_bps < 0:
             raise ValueError("leverage and slippage limits cannot be negative")
@@ -66,6 +70,8 @@ class RiskContext:
     probability: Decimal | None = None
     order_notional: Decimal = Decimal("0")
     estimated_market_volume: Decimal = Decimal("0")
+    market_status: MarketStatus | None = None
+    expected_exchange: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -97,6 +103,24 @@ class RiskEngine:
 
         if not context.market_open:
             return RiskDecision(False, "market is closed", tuple(checks))
+        if policy.require_authoritative_market_status:
+            if context.market_status is None:
+                return RiskDecision(False, "authoritative market status unavailable", tuple(checks))
+            try:
+                context.market_status.validate()
+            except ValueError:
+                return RiskDecision(False, "authoritative market status is invalid", tuple(checks))
+            status_at = context.market_status.observed_at.astimezone(timezone.utc)
+            now = context.now.astimezone(timezone.utc)
+            if status_at > now:
+                return RiskDecision(False, "market status timestamp is in the future", tuple(checks))
+            if now - status_at > timedelta(seconds=policy.max_market_status_age_seconds):
+                return RiskDecision(False, "market status is stale", tuple(checks))
+            if context.expected_exchange and context.market_status.exchange.upper() != context.expected_exchange.strip().upper():
+                return RiskDecision(False, "market status exchange mismatch", tuple(checks))
+            if not context.market_status.is_normal_open:
+                return RiskDecision(False, "market status is not normal open", tuple(checks))
+            checks.append("authoritative market status")
         checks.append("market session")
 
         if snapshot.kill_switch:
