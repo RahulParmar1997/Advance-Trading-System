@@ -5,6 +5,8 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import Protocol, Sequence
 
+from advance_system.backtest.rejections import RejectionPolicy
+
 
 @dataclass(frozen=True, slots=True)
 class BacktestEvent:
@@ -36,6 +38,7 @@ class BacktestResult:
     ending_position: int = 0
     ending_equity: Decimal = Decimal("0")
     max_drawdown: Decimal = Decimal("0")
+    rejected_orders: int = 0
 
 
 class BacktestStrategy(Protocol):
@@ -45,7 +48,6 @@ class BacktestStrategy(Protocol):
 
 @dataclass(frozen=True, slots=True)
 class FillPolicy:
-    """Deterministic execution policy; no broker/network side effects."""
     fee_bps: Decimal = Decimal("0")
     slippage_bps: Decimal = Decimal("0")
     latency: timedelta = timedelta(0)
@@ -87,11 +89,13 @@ class EventDrivenBacktester:
         average = Decimal("0")
         realized = Decimal("0")
         fills: list[BacktestFill] = []
+        rejected = 0
         equity_peak = starting_cash
         max_drawdown = Decimal("0")
         last_price = Decimal("0")
+        rejection_policy = RejectionPolicy()
 
-        for event in ordered:
+        for index, event in enumerate(ordered):
             last_price = event.price
             delta = strategy.on_event(event)
             if delta == 0:
@@ -100,19 +104,28 @@ class EventDrivenBacktester:
                 max_drawdown = max(max_drawdown, equity_peak - equity)
                 continue
 
+            rejection = rejection_policy.validate(delta, event.price)
+            if rejection is not None:
+                rejected += 1
+                continue
+
+            execution_time = event.timestamp + policy.latency
+            execution_event = next((candidate for candidate in ordered[index:] if candidate.timestamp >= execution_time), None)
+            if execution_event is None:
+                rejected += 1
+                continue
+
             quantity = abs(delta)
             remaining = quantity
             while remaining:
                 fill_qty = min(remaining, policy.max_fill_quantity or remaining)
-                # Latency is represented as execution time only; price comes from the
-                # next observable event at/after the latency horizon, never the future
-                # value of the current event.
-                execution_time = event.timestamp + policy.latency
-                execution_event = next((candidate for candidate in ordered if candidate.timestamp >= execution_time), event)
                 direction = Decimal("1") if delta > 0 else Decimal("-1")
                 execution_price = execution_event.price * (Decimal("1") + direction * policy.slippage_bps / Decimal("10000"))
                 notional = execution_price * fill_qty
                 fee = notional * policy.fee_bps / Decimal("10000")
+                if delta > 0 and cash < notional + fee:
+                    rejected += 1
+                    break
                 if delta > 0:
                     cash -= notional + fee
                 else:
@@ -140,4 +153,4 @@ class EventDrivenBacktester:
             max_drawdown = max(max_drawdown, equity_peak - equity)
 
         ending_equity = cash + Decimal(position) * last_price if last_price else cash
-        return BacktestResult(tuple(fills), realized, cash, position, ending_equity, max_drawdown)
+        return BacktestResult(tuple(fills), realized, cash, position, ending_equity, max_drawdown, rejected)
