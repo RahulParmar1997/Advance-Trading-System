@@ -3,6 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass, replace
 from enum import StrEnum
 
+from advance_system.domain.versioning import ContractName, validate_contract_version
+
 
 class OmsState(StrEnum):
     SCANNED = "SCANNED"
@@ -37,12 +39,19 @@ _ALLOWED: dict[OmsState, frozenset[OmsState]] = {
 
 @dataclass(frozen=True, slots=True)
 class OmsOrder:
+    """Canonical order lifecycle contract.
+
+    ``version`` is the optimistic/lifecycle transition counter. It is distinct
+    from ``contract_version``, which identifies the serialized schema.
+    """
+
     order_id: str
     instrument: str
     quantity: int
     state: OmsState = OmsState.SCANNED
     filled_quantity: int = 0
     version: int = 0
+    contract_version: int = 1
 
 
 class OmsTransitionError(RuntimeError):
@@ -53,6 +62,7 @@ class OrderStateMachine:
     """Pure canonical OMS state transitions; no broker/network side effects."""
 
     def transition(self, order: OmsOrder, target: OmsState, *, filled_quantity: int | None = None) -> OmsOrder:
+        validate_contract_version(ContractName.ORDER, order.contract_version)
         if not order.order_id or not order.instrument:
             raise ValueError("order_id and instrument are required")
         if order.quantity <= 0:
