@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
 from typing import Iterable
 
 from advance_system.domain.market_events import QuoteEvent
+from advance_system.market.session import IndiaMarketSession, SessionPhase
 
 
 @dataclass(frozen=True, slots=True)
@@ -18,19 +19,18 @@ class Candle:
     low: Decimal
     close: Decimal
     volume: int
+    session_date: date | None = None
+    session_phase: SessionPhase | None = None
 
 
 class CandleEngine:
-    """Build fixed-time candles from validated canonical quote events.
+    """Build fixed-time candles without crossing India trading sessions."""
 
-    Events must be non-decreasing per instrument. Volume is treated as cumulative
-    feed volume when present; the engine converts it to a per-candle delta.
-    """
-
-    def __init__(self, interval_seconds: int = 60) -> None:
+    def __init__(self, interval_seconds: int = 60, session: IndiaMarketSession | None = None) -> None:
         if interval_seconds <= 0:
             raise ValueError("interval_seconds must be positive")
         self.interval_seconds = interval_seconds
+        self.session = session
         self._current: dict[str, Candle] = {}
         self._last_timestamp: dict[str, datetime] = {}
         self._last_cumulative_volume: dict[str, int] = {}
@@ -42,6 +42,10 @@ class CandleEngine:
             raise ValueError("out-of-order quote event")
         self._last_timestamp[event.instrument] = event.timestamp
 
+        session_status = self.session.status_at(event.timestamp) if self.session else None
+        if session_status is not None and session_status.phase is not SessionPhase.OPEN:
+            raise ValueError(f"quote is outside regular trading session: {session_status.phase.value}")
+
         epoch = int(event.timestamp.timestamp())
         start_epoch = epoch - (epoch % self.interval_seconds)
         start = datetime.fromtimestamp(start_epoch, tz=event.timestamp.tzinfo)
@@ -49,12 +53,13 @@ class CandleEngine:
         current = self._current.get(event.instrument)
 
         if current is None:
-            self._current[event.instrument] = self._new_candle(event, start, end, self._volume_delta(event))
+            self._current[event.instrument] = self._new_candle(event, start, end, self._volume_delta(event), session_status)
             return None
 
-        if start >= current.end:
+        crosses_session = session_status is not None and current.session_date != session_status.session_date
+        if start >= current.end or crosses_session:
             completed = current
-            self._current[event.instrument] = self._new_candle(event, start, end, self._volume_delta(event))
+            self._current[event.instrument] = self._new_candle(event, start, end, self._volume_delta(event), session_status)
             return completed
 
         delta = self._volume_delta(event)
@@ -67,14 +72,15 @@ class CandleEngine:
             min(current.low, event.last_price),
             event.last_price,
             current.volume + delta,
+            current.session_date,
+            current.session_phase,
         )
         return None
 
     def current_candles(self) -> tuple[Candle, ...]:
-        """Return a stable snapshot of in-progress candles."""
         return tuple(self._current.values())
 
-    def _new_candle(self, event: QuoteEvent, start: datetime, end: datetime, volume: int) -> Candle:
+    def _new_candle(self, event: QuoteEvent, start: datetime, end: datetime, volume: int, status) -> Candle:
         return Candle(
             event.instrument,
             start,
@@ -84,6 +90,8 @@ class CandleEngine:
             event.last_price,
             event.last_price,
             volume,
+            status.session_date if status else None,
+            status.phase if status else None,
         )
 
     def _volume_delta(self, event: QuoteEvent) -> int:
@@ -101,17 +109,16 @@ class CandleEngine:
 class MultiTimeframeCandleEngine:
     """Maintain independent fixed-time candle streams for multiple intervals."""
 
-    def __init__(self, intervals_seconds: Iterable[int]) -> None:
+    def __init__(self, intervals_seconds: Iterable[int], session: IndiaMarketSession | None = None) -> None:
         intervals = tuple(dict.fromkeys(intervals_seconds))
         if not intervals:
             raise ValueError("at least one candle interval is required")
         if any(interval <= 0 for interval in intervals):
             raise ValueError("candle intervals must be positive")
         self.intervals_seconds = intervals
-        self._engines = {interval: CandleEngine(interval) for interval in intervals}
+        self._engines = {interval: CandleEngine(interval, session) for interval in intervals}
 
     def update(self, event: QuoteEvent) -> dict[int, Candle]:
-        """Return only candles completed by this event, keyed by interval."""
         completed: dict[int, Candle] = {}
         for interval, engine in self._engines.items():
             candle = engine.update(event)
@@ -120,5 +127,4 @@ class MultiTimeframeCandleEngine:
         return completed
 
     def current_candles(self) -> dict[int, tuple[Candle, ...]]:
-        """Return immutable snapshots of the in-progress candles by interval."""
         return {interval: engine.current_candles() for interval, engine in self._engines.items()}
