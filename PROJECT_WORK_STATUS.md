@@ -50,6 +50,10 @@ Core flow:
 - [x] Sequence-aware feed validation.
 - [x] Deterministic OAuth, token-store, sequence and transport tests.
 - [x] No credentials or secrets committed.
+- [x] Injectable Upstox V3 protobuf decoder boundary.
+- [x] Deterministic V3 feed mapper for LTPC/full-feed structures.
+- [x] PAPER market-data vertical smoke test through normalization, quality, candle, RiskEngine and PaperOMS.
+- [x] V3 mapper tests for LTPC, bid/ask, volume and invalid payload fields.
 
 ## Previously prototyped — not used as the implementation branch
 A temporary `foundation/paper-vertical-slice` prototype existed before the main-only rule. Its useful ideas were reviewed and recreated deliberately on `main`; it is not the active development branch.
@@ -65,9 +69,9 @@ A temporary `foundation/paper-vertical-slice` prototype existed before the main-
 ### Phase 2 — Market data
 - [ ] Production secret-backed token store.
 - [ ] Real WebSocket library transport implementation.
-- [ ] Upstox V3 Protobuf decoder and feed mapper.
+- [ ] Generated Upstox V3 protobuf package/version pinning.
 - [ ] Instrument master.
-- [ ] End-to-end PAPER market-data smoke test.
+- [ ] Production market-session/status handling.
 
 ### Phase 3 — Market state / analytics
 - [ ] Multi-timeframe candle/session engine.
@@ -152,4 +156,4 @@ Execution
 The milestone is complete only when automated tests cover the complete flow and it runs without live order execution.
 
 ## Current next task
-Implement the **Upstox V3 Protobuf feed decoder and mapper**, keeping the decoder behind an injectable transport/codec interface, then connect it to DataQuality → Candle → Features in a deterministic PAPER smoke test. Upstox documents V3 as a Protobuf WebSocket feed with binary subscription messages and `market_info`/snapshot/live-feed sequencing. citeturn0search1
+Implement the **production WebSocket transport using a pinned client/runtime, generated Upstox V3 protobuf package integration, instrument-master ingestion, and market-session/status gate** while keeping all order execution PAPER-only.
