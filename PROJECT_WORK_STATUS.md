@@ -31,6 +31,10 @@ Core flow:
 - [x] Sensitive logging context is recursively redacted for tokens, secrets, passwords, authorization and API keys.
 - [x] Structured logging configuration is idempotent and process-safe for repeated setup calls.
 - [x] Structured logging tests cover JSON output, context and secret redaction.
+- [x] Deterministic health/readiness boundary added with explicit dependency checks.
+- [x] Readiness fails closed when dependencies are missing or unhealthy.
+- [x] Health-check exceptions expose only exception type, not connection or credential details.
+- [x] Health/readiness unit tests added for healthy, unhealthy, exception and deterministic ordering cases.
 
 ### Market-data foundation
 - [x] Canonical broker-neutral `QuoteEvent` contract.
@@ -160,7 +164,7 @@ A temporary `foundation/paper-vertical-slice` prototype existed before the main-
 ### Phase 1 — Engineering foundation
 - [x] Domain contract versioning.
 - [x] Structured logging.
-- [ ] Health/readiness checks.
+- [x] Health/readiness checks.
 - [ ] Broader CI quality gates.
 
 ### Phase 2 — Market data
@@ -245,4 +249,4 @@ Journal / Audit
 The milestone is complete only when automated tests cover the complete flow and it runs without live order execution.
 
 ## Current next task
-Implement **health/readiness checks** for the backend foundation, with explicit dependency status, fail-closed readiness semantics, deterministic tests, and no live trading side effects.
+Implement **broader CI quality gates**: linting/type checks where practical, deterministic test execution, and CI failure visibility without introducing live broker dependencies.
