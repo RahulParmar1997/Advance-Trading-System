@@ -1,10 +1,11 @@
 import asyncio
+import json
 
 import pytest
 
 from advance_system.adapters.upstox.websocket_transport import (
-    UpstoxWebSocketConfig,
     UpstoxLibraryWebSocketTransport,
+    UpstoxWebSocketConfig,
     run_heartbeat,
 )
 
@@ -40,41 +41,41 @@ class FakeConnector:
 
 
 class FakeMapper:
-    def subscription_payload(self, instruments):
-        return b"subscribe"
+    def map_message(self, message):
+        return [message]
 
+
+class FakeDecoder:
     def decode(self, message):
         return message
 
 
 @pytest.mark.asyncio
-async def test_connect_subscribe_receive_and_close_do_not_expose_token_in_payload():
+async def test_connect_subscribe_receive_and_close():
     connection = FakeConnection()
     connector = FakeConnector(connection)
     transport = UpstoxLibraryWebSocketTransport(
-        connector, FakeMapper(), UpstoxWebSocketConfig("wss://feed.example")
+        connector, FakeMapper(), FakeDecoder(), UpstoxWebSocketConfig("wss://feed.example")
     )
-
     await transport.connect(access_token="secret-token")
     await transport.subscribe(instruments=[])
     connection.messages.append(b"feed")
     values = [quote async for quote in transport.receive()]
     await transport.close()
-
+    payload = json.loads(connection.sent[0])
     assert values == [b"feed"]
     assert connector.calls == [("wss://feed.example", {"Authorization": "Bearer secret-token"})]
-    assert connection.sent == [b"subscribe"]
+    assert payload["method"] == "sub"
     assert connection.closed is True
-    assert b"secret-token" not in connection.sent
+    assert "secret-token" not in connection.sent[0]
 
 
 @pytest.mark.asyncio
 async def test_empty_token_is_rejected_before_network_connect():
     connector = FakeConnector(FakeConnection())
     transport = UpstoxLibraryWebSocketTransport(
-        connector, FakeMapper(), UpstoxWebSocketConfig("wss://feed.example")
+        connector, FakeMapper(), FakeDecoder(), UpstoxWebSocketConfig("wss://feed.example")
     )
-
     with pytest.raises(ValueError, match="access token cannot be empty"):
         await transport.connect(access_token=" ")
     assert connector.calls == []
@@ -83,28 +84,25 @@ async def test_empty_token_is_rejected_before_network_connect():
 @pytest.mark.asyncio
 async def test_operations_require_connection():
     transport = UpstoxLibraryWebSocketTransport(
-        FakeConnector(FakeConnection()), FakeMapper(), UpstoxWebSocketConfig("wss://feed.example")
+        FakeConnector(FakeConnection()), FakeMapper(), FakeDecoder(), UpstoxWebSocketConfig("wss://feed.example")
     )
     with pytest.raises(RuntimeError, match="not connected"):
         await transport.ping()
-    with pytest.raises(RuntimeError, match="not connected"):
-        await transport.close()
+    await transport.close()
 
 
 @pytest.mark.asyncio
 async def test_heartbeat_pings_and_stops_cleanly():
     connection = FakeConnection()
     transport = UpstoxLibraryWebSocketTransport(
-        FakeConnector(connection), FakeMapper(), UpstoxWebSocketConfig("wss://feed.example", ping_interval=0.01)
+        FakeConnector(connection), FakeMapper(), FakeDecoder(), UpstoxWebSocketConfig("wss://feed.example", ping_interval=0.01)
     )
     await transport.connect(access_token="token")
     stop = asyncio.Event()
-
     task = asyncio.create_task(run_heartbeat(transport, stop))
     await asyncio.sleep(0.03)
     stop.set()
     await asyncio.wait_for(task, timeout=1)
-
     assert connection.pings >= 1
 
 
