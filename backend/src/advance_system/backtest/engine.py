@@ -6,6 +6,7 @@ from decimal import Decimal
 from typing import Protocol, Sequence
 
 from advance_system.backtest.rejections import HistoricalLiquidity, RejectionPolicy
+from advance_system.domain.versioning import ContractName, validate_contract_version
 
 
 @dataclass(frozen=True, slots=True)
@@ -14,8 +15,10 @@ class BacktestEvent:
     instrument: str
     price: Decimal
     liquidity: HistoricalLiquidity | None = None
+    contract_version: int = 1
 
     def validate(self) -> None:
+        validate_contract_version(ContractName.BACKTEST_EVENT, self.contract_version)
         if self.timestamp.tzinfo is None:
             raise ValueError("timestamp must be timezone-aware")
         if not self.instrument or self.price <= 0:
