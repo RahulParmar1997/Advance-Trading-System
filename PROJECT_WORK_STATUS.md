@@ -35,6 +35,9 @@ Core flow:
 - [x] Readiness fails closed when dependencies are missing or unhealthy.
 - [x] Health-check exceptions expose only exception type, not connection or credential details.
 - [x] Health/readiness unit tests added for healthy, unhealthy, exception and deterministic ordering cases.
+- [x] Backend development quality tooling defined in `pyproject.toml`.
+- [x] CI now installs pinned major-version development tooling, runs Ruff linting and executes the backend pytest suite.
+- [x] CI permissions are explicitly read-only for repository contents.
 
 ### Market-data foundation
 - [x] Canonical broker-neutral `QuoteEvent` contract.
@@ -165,7 +168,7 @@ A temporary `foundation/paper-vertical-slice` prototype existed before the main-
 - [x] Domain contract versioning.
 - [x] Structured logging.
 - [x] Health/readiness checks.
-- [ ] Broader CI quality gates.
+- [x] Broader CI quality gates.
 
 ### Phase 2 — Market data
 - [ ] Production secret-backed token store.
@@ -249,4 +252,4 @@ Journal / Audit
 The milestone is complete only when automated tests cover the complete flow and it runs without live order execution.
 
 ## Current next task
-Implement **broader CI quality gates**: linting/type checks where practical, deterministic test execution, and CI failure visibility without introducing live broker dependencies.
+Begin **Phase 2 market-data production hardening** with a production-safe secret-backed token-store abstraction, keeping credentials outside source control and maintaining PAPER/test isolation.
