@@ -106,6 +106,16 @@ Core flow:
 - [x] Position updates emit auditable lifecycle events.
 - [x] Unit tests for PAPER fills, position manager, capacity gates, reconciliation and journal behavior.
 
+### Research / backtesting
+- [x] Deterministic event-driven backtester core.
+- [x] Chronological event processing to establish a no-look-ahead execution boundary.
+- [x] Strategy protocol isolated from broker/network/database dependencies.
+- [x] Simulated execution price with configurable slippage.
+- [x] Configurable transaction fees.
+- [x] Partial/full signed quantity handling foundation.
+- [x] Backtest fill and ending-cash result contracts.
+- [x] Unit tests for chronological processing, slippage, fees, round-trip P&L and invalid costs.
+
 ## Previously prototyped — not used as the implementation branch
 A temporary `foundation/paper-vertical-slice` prototype existed before the main-only rule. Its useful ideas were reviewed and recreated deliberately on `main`; it is not the active development branch.
 
@@ -150,8 +160,9 @@ A temporary `foundation/paper-vertical-slice` prototype existed before the main-
 - [ ] Stronger durable journal backend.
 
 ### Phase 7 — Research
-- [ ] Event-driven backtester.
-- [ ] Realistic costs/fills/slippage/latency/partial fills/rejections.
+- [ ] Realistic fill/rejection/latency model expansion.
+- [ ] Explicit position mark-to-market in backtest results.
+- [ ] Event-driven strategy integration with existing MarketState/Strategy/Opportunity/RiskEngine/OMS contracts.
 - [ ] Walk-forward/OOS validation.
 - [ ] Monte Carlo and regime/cost/capacity sensitivity.
 - [ ] Pattern DNA and similarity search.
@@ -201,4 +212,4 @@ Journal / Audit
 The milestone is complete only when automated tests cover the complete flow and it runs without live order execution.
 
 ## Current next task
-Implement **live PositionBook → RiskSnapshot integration and then start the event-driven backtester core**, preserving realistic execution semantics and zero look-ahead.
+Implement **backtest realism and integration**: position mark-to-market, explicit rejection/latency/fill policies, then connect the existing Strategy/Opportunity/RiskEngine/OMS contracts into the event-driven backtester without look-ahead.
