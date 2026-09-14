@@ -27,6 +27,10 @@ Core flow:
 - [x] Contract versions are validated at domain boundaries and remain distinct from strategy versions and OMS lifecycle transition counters.
 - [x] Existing positional constructors remain backward-compatible through version-1 defaults.
 - [x] Contract-version compatibility and rejection tests added.
+- [x] Structured JSON logging foundation added with deterministic fields.
+- [x] Sensitive logging context is recursively redacted for tokens, secrets, passwords, authorization and API keys.
+- [x] Structured logging configuration is idempotent and process-safe for repeated setup calls.
+- [x] Structured logging tests cover JSON output, context and secret redaction.
 
 ### Market-data foundation
 - [x] Canonical broker-neutral `QuoteEvent` contract.
@@ -155,7 +159,7 @@ A temporary `foundation/paper-vertical-slice` prototype existed before the main-
 
 ### Phase 1 — Engineering foundation
 - [x] Domain contract versioning.
-- [ ] Structured logging.
+- [x] Structured logging.
 - [ ] Health/readiness checks.
 - [ ] Broader CI quality gates.
 
@@ -241,4 +245,4 @@ Journal / Audit
 The milestone is complete only when automated tests cover the complete flow and it runs without live order execution.
 
 ## Current next task
-Implement **structured logging** across the backend foundation, with consistent event fields, safe handling of sensitive values, deterministic test coverage, and no broker/order side effects.
+Implement **health/readiness checks** for the backend foundation, with explicit dependency status, fail-closed readiness semantics, deterministic tests, and no live trading side effects.
