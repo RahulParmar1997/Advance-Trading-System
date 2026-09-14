@@ -1,16 +1,16 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from decimal import Decimal
 
 import pytest
 
-from advance_system.adapters.upstox.market_data import UpstoxQuote
 from advance_system.domain.orders import Order, OrderSide, OrderStatus
-from advance_system.ingestion.adapters import Instrument
+from advance_system.ingestion.adapters import Instrument, QuoteIngestionPipeline
 from advance_system.ingestion.normalizer import RawQuote
 from advance_system.ingestion.quality import DataQualityService
 from advance_system.market.candle_engine import CandleEngine
 from advance_system.oms.engine import PaperOMS
 from advance_system.risk.engine import RiskEngine
+from advance_system.domain.market_events import QuoteEvent
 
 
 class FakePaperAdapter:
@@ -31,10 +31,8 @@ class FakePaperAdapter:
 async def test_market_data_to_paper_order_vertical_slice():
     instrument = Instrument("NSE_EQ|TEST", "NSE", "TEST", "EQUITY")
     adapter = FakePaperAdapter()
-    from advance_system.ingestion.adapters import QuoteIngestionPipeline
-
     pipeline = QuoteIngestionPipeline(adapter)
-    quality = DataQualityService()
+    quality = DataQualityService(max_age=timedelta(minutes=2))
     candles = CandleEngine(interval_seconds=60)
     emitted = []
     now = datetime(2026, 1, 2, 9, 16, 1, tzinfo=timezone.utc)
@@ -51,7 +49,12 @@ async def test_market_data_to_paper_order_vertical_slice():
     assert emitted[0].close == Decimal("101")
     assert emitted[0].volume == 10
 
-    quote = await _last_quote(adapter, instrument)
+    quote = QuoteEvent(
+        instrument=instrument.instrument,
+        timestamp=datetime(2026, 1, 2, 9, 16, tzinfo=timezone.utc),
+        last_price=Decimal("102"),
+        volume=1030,
+    )
     order = Order(
         order_id="paper-smoke-1",
         instrument=instrument.instrument,
@@ -69,16 +72,3 @@ async def test_market_data_to_paper_order_vertical_slice():
     assert filled.status is OrderStatus.FILLED
     await pipeline.close()
     assert adapter.closed
-
-
-async def _last_quote(adapter, instrument):
-    quotes = [quote async for quote in adapter.stream_quotes([instrument])]
-    last = quotes[-1]
-    return __import__("advance_system.domain.market_events", fromlist=["QuoteEvent"]).QuoteEvent(
-        instrument=last.instrument,
-        timestamp=last.timestamp,
-        last_price=last.ltp,
-        bid=last.bid,
-        ask=last.ask,
-        volume=last.volume,
-    )
