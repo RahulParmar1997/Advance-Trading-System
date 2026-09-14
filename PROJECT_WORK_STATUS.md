@@ -32,6 +32,9 @@ Core flow:
 - [x] Cumulative-volume-to-candle-delta handling.
 - [x] Deterministic basic candle feature engine.
 - [x] Unit tests for normalization, validation, candle boundary behavior, volume delta, ordering and features.
+- [x] Deterministic `DataQualityService` for stale, future, duplicate, out-of-order and timestamp-gap observations.
+- [x] Broker-neutral `MarketDataAdapter` protocol and normalization pipeline.
+- [x] Unit tests for data-quality rules and broker-neutral ingestion boundary.
 
 ## Previously prototyped — not used as the implementation branch
 A temporary `foundation/paper-vertical-slice` prototype existed before the main-only rule. Its useful ideas were reviewed and recreated deliberately on `main`; it is not the active development branch.
@@ -46,11 +49,11 @@ A temporary `foundation/paper-vertical-slice` prototype existed before the main-
 - [ ] Broader CI quality gates.
 
 ### Phase 2 — Market data
-- [ ] Upstox adapter interfaces.
+- [ ] Upstox adapter implementation.
 - [ ] Authentication/token lifecycle.
 - [ ] WebSocket ingestion.
 - [ ] Reconnect/heartbeat handling.
-- [ ] Data-quality service: stale, gap, duplicate and sequence detection.
+- [ ] Sequence-aware feed validation.
 - [ ] Instrument master.
 
 ### Phase 3 — Market state / analytics
@@ -136,4 +139,4 @@ Execution
 The milestone is complete only when automated tests cover the complete flow and it runs without live order execution.
 
 ## Current next task
-Build the next market-data production layer on `main`: **data-quality contracts and validation (staleness, duplicates, ordering, gaps) plus broker adapter interfaces**, with deterministic unit tests. Then proceed to Upstox connectivity behind those interfaces.
+Implement the **Upstox adapter boundary and authentication/token lifecycle interfaces** without embedding secrets or broker-specific assumptions into domain code. Then add a deterministic mock adapter test before any real WebSocket connectivity is introduced.
