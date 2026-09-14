@@ -118,8 +118,10 @@ Core flow:
 - [x] Mark-to-market ending equity and maximum drawdown tracking.
 - [x] Signed position accounting for long and short fills.
 - [x] Explicit deterministic rejection policy and insufficient-cash guard.
-- [x] Backtest fill and result contracts.
-- [x] Unit tests for chronological processing, slippage, fees, latency, partial fills, rejection and round-trip P&L.
+- [x] Strategy → Opportunity → RiskEngine → OMS integration boundary for historical decisions.
+- [x] Risk-approved opportunities transition through canonical OMS states before simulated execution.
+- [x] Risk-rejected opportunities are recorded as rejected and never reach simulated execution.
+- [x] Unit tests for integrated approval/rejection flow.
 
 ## Previously prototyped — not used as the implementation branch
 A temporary `foundation/paper-vertical-slice` prototype existed before the main-only rule. Its useful ideas were reviewed and recreated deliberately on `main`; it is not the active development branch.
@@ -164,11 +166,11 @@ A temporary `foundation/paper-vertical-slice` prototype existed before the main-
 - [ ] Stronger durable journal backend.
 
 ### Phase 7 — Research
-- [ ] Connect existing Strategy/Opportunity/RiskEngine/OMS contracts into backtester.
 - [ ] Walk-forward/OOS validation.
 - [ ] Monte Carlo and regime/cost/capacity sensitivity.
 - [ ] Pattern DNA and similarity search.
 - [ ] ML datasets and calibration.
+- [ ] More realistic historical liquidity/rejection modeling.
 
 ### Phase 8 — Frontend
 - [ ] Next.js/React/TypeScript foundation.
@@ -214,4 +216,4 @@ Journal / Audit
 The milestone is complete only when automated tests cover the complete flow and it runs without live order execution.
 
 ## Current next task
-Connect the existing **Strategy → Opportunity → RiskEngine → OMS** contracts into the backtester with explicit risk context, canonical OMS state transitions, and rejection reasons, while preserving zero look-ahead.
+Implement **backtest research validation**: walk-forward/OOS split contracts and metrics, then Monte Carlo/regime/cost/capacity sensitivity. Keep all validation isolated from live execution.
