@@ -2,6 +2,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
 
+from advance_system.domain.versioning import ContractName, validate_contract_version
+
 
 @dataclass(frozen=True, slots=True)
 class QuoteEvent:
@@ -13,8 +15,10 @@ class QuoteEvent:
     bid: Decimal | None = None
     ask: Decimal | None = None
     volume: int | None = None
+    contract_version: int = 1
 
     def validate(self) -> None:
+        validate_contract_version(ContractName.QUOTE_EVENT, self.contract_version)
         if not self.instrument:
             raise ValueError("instrument is required")
         if self.timestamp.tzinfo is None:
