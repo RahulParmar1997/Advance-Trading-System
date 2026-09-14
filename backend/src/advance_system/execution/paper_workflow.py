@@ -21,14 +21,11 @@ class PaperExecutionWorkflow:
         self._risk = risk_engine
         self._gateway = gateway or PaperOrderGateway()
 
-    def submit(self, order: OmsOrder, context: RiskContext, *, client_key: str) -> PaperSubmission:
-        decision = self._risk.check(order, context)
+    def submit(self, order: OmsOrder, opportunity: object, context: RiskContext, *, client_key: str) -> PaperSubmission:
+        decision = self._risk.check(opportunity, context)
         if not decision.allowed:
             return PaperSubmission(order, decision, False)
-
-        # The order is allowed into OMS only after the hard risk gate passes.
-        risk_checked = self._gateway.transition(order.order_id, OmsState.CANDIDATE) if False else order
-        result = self._gateway.submit(risk_checked, client_key=client_key)
+        result = self._gateway.submit(order, client_key=client_key)
         return PaperSubmission(result.order, decision, result.replayed)
 
     def advance(self, order_id: str, target: OmsState, *, filled_quantity: int | None = None) -> OmsOrder:
