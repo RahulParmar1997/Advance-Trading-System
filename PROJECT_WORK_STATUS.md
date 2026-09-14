@@ -11,8 +11,8 @@ All normal implementation is committed directly to `main`. Before changes: inspe
 ## Product goal
 Build the India-focused Market Intelligence + Quant Research + Automated Trading Platform defined by the project specifications.
 
-Core flow:
-`DATA → MARKET STATE → INTELLIGENCE → REGIME → SCANNER → TRADE TYPE → STRATEGY → OPPORTUNITY → PROBABILITY → EV → RISK → OMS → EXECUTION → POSITION → JOURNAL → PATTERN DNA → RESEARCH/ML`
+## Current status
+The repository has a substantial deterministic PAPER/research foundation. Live broker execution is not enabled by this work. Upstox transport/protobuf boundaries are isolated behind adapters, and the instrument-master update path now has a broker-neutral contract, deterministic validation, content-addressed snapshots and monotonic atomic publication.
 
 ## Done on `main`
 
@@ -36,7 +36,7 @@ Core flow:
 - [x] Health-check exceptions expose only exception type, not connection or credential details.
 - [x] Health/readiness unit tests added for healthy, unhealthy, exception and deterministic ordering cases.
 - [x] Backend development quality tooling defined in `pyproject.toml`.
-- [x] CI now installs pinned major-version development tooling, runs Ruff linting and executes the backend pytest suite.
+- [x] CI installs development tooling, runs Ruff linting and executes the backend pytest suite.
 - [x] CI permissions are explicitly read-only for repository contents.
 
 ### Market-data foundation
@@ -51,6 +51,14 @@ Core flow:
 - [x] Deterministic `DataQualityService` for stale, future, duplicate, out-of-order and timestamp-gap observations.
 - [x] Broker-neutral `MarketDataAdapter` protocol and normalization pipeline.
 - [x] Unit tests for data-quality rules and broker-neutral ingestion boundary.
+
+### Instrument master
+- [x] Broker-neutral `InstrumentMasterRecord` identity contract with exchange, symbol, asset type and tradability.
+- [x] Deterministic instrument validation and duplicate-identity rejection.
+- [x] Versioned, sorted and content-addressed `InstrumentMasterSnapshot`.
+- [x] Monotonic snapshot publication through an injected repository boundary.
+- [x] Empty/invalid update batches fail closed without replacing the current snapshot.
+- [x] Instrument-master updater and validation unit tests.
 
 ### Upstox integration foundation
 - [x] Upstox-specific adapter package created outside domain code.
@@ -71,12 +79,8 @@ Core flow:
 - [x] Concrete `websockets`-backed transport with injectable connector and protobuf decoder boundary.
 - [x] WebSocket authentication, subscription, receive/decode, ping and close behavior covered by deterministic tests.
 - [x] Optional `websockets` dependency isolated behind the live transport extra.
-- [x] Deterministic OAuth, token-store, sequence and transport tests.
-- [x] No credentials or secrets committed.
-- [x] Injectable Upstox V3 protobuf decoder boundary.
-- [x] Explicit generated-protobuf package boundary and pinned V3 module/version identifiers.
+- [x] Injectable Upstox V3 protobuf decoder boundary and explicit pinned package/module identifiers.
 - [x] Protobuf runtime dependency isolated behind the live extra.
-- [x] Generated decoder factory fails closed when the pinned package is unavailable.
 - [x] Protobuf decoder tests cover payload validation and parser-error sanitization.
 - [x] Deterministic V3 feed mapper for LTPC/full-feed structures.
 - [x] PAPER market-data vertical smoke-test foundation.
@@ -170,9 +174,6 @@ Core flow:
 - [x] Backtester integration for observable partial fills and liquidity-limited execution.
 - [x] Historical-liquidity unit tests.
 
-## Previously prototyped — not used as the implementation branch
-A temporary `foundation/paper-vertical-slice` prototype existed before the main-only rule. Its useful ideas were reviewed and recreated deliberately on `main`; it is not the active development branch.
-
 ## Pending work
 
 ### Phase 1 — Engineering foundation
@@ -184,8 +185,9 @@ A temporary `foundation/paper-vertical-slice` prototype existed before the main-
 ### Phase 2 — Market data
 - [x] Production-safe secret-backed token store abstraction.
 - [x] Real WebSocket library transport implementation.
-- [x] Generated Upstox V3 protobuf package/version pinning.
-- [ ] Production instrument-master ingestion/update process.
+- [x] Upstox V3 protobuf decoder boundary and package/version identifiers.
+- [x] Production instrument-master ingestion/update contract and safe snapshot publication foundation.
+- [ ] Vendor/pin the actual generated Upstox V3 protobuf module artifact.
 - [ ] Production market-session/status integration.
 
 ### Phase 3 — Market state / analytics
@@ -232,22 +234,6 @@ A temporary `foundation/paper-vertical-slice` prototype existed before the main-
 - [ ] Migrations and reverse proxy.
 
 ## Non-negotiable architecture rules
-```text
-Strategy
-  ↓
-Probability / Expected Value
-  ↓
-RiskEngine
-  ↓
-OMS
-  ↓
-Execution
-  ↓
-Position / P&L
-  ↓
-Journal / Audit
-```
-
 - AI never bypasses RiskEngine.
 - AI never places uncontrolled orders.
 - Charting is not the source of truth for orders/positions.
@@ -263,4 +249,4 @@ Journal / Audit
 The milestone is complete only when automated tests cover the complete flow and it runs without live order execution.
 
 ## Current next task
-Implement the **production instrument-master ingestion/update process** with broker-neutral instrument contracts, deterministic validation, versioned snapshots and safe update semantics; keep PAPER/test mode isolated from live credentials and orders.
+Fix and verify the existing WebSocket transport test/development dependency mismatch, then continue with **production market-session/status integration**. Keep all work directly on `main`.
