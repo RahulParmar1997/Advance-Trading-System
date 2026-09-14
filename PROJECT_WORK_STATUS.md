@@ -6,13 +6,14 @@
 **Last updated:** 2026-09-14
 
 ## Current status
-The repository has a substantial deterministic PAPER/research foundation. Upstox transport/protobuf boundaries remain isolated behind adapters. Instrument-master ingestion has a concrete Upstox BOD JSON source, authoritative exchange status is enforced by the RiskEngine, and the official Upstox V3 protobuf schema is vendored/pinned behind the decoder boundary. Multi-timeframe candle aggregation is now available with independent interval state and deterministic completion.
+The repository has a substantial deterministic PAPER/research foundation. Upstox transport/protobuf boundaries remain isolated behind adapters. Instrument-master ingestion has a concrete Upstox BOD JSON source, authoritative exchange status is enforced by the RiskEngine, and the official Upstox V3 protobuf schema is vendored/pinned behind the decoder boundary. Multi-timeframe candles are now session-aware when configured with the India market-session calendar.
 
 ## Latest completed work
-- [x] Added `MultiTimeframeCandleEngine` with independent fixed-time intervals.
-- [x] Preserved per-instrument ordering and cumulative-volume delta semantics for every interval.
-- [x] Added immutable current-candle snapshots without exposing mutable engine state.
-- [x] Added tests for interval completion, OHLC/volume aggregation, duplicate interval handling and invalid configuration.
+- [x] Session-aware candle engine using the existing India market-session contract.
+- [x] Candle session date/phase metadata is captured deterministically.
+- [x] Quotes outside the regular trading session are rejected fail-closed.
+- [x] Multi-timeframe candle engines propagate the same session boundary rules independently.
+- [x] Tests added for session metadata and out-of-session rejection.
 - [x] Changes committed directly to `main`.
 
 ## Done on `main`
@@ -29,6 +30,7 @@ The repository has a substantial deterministic PAPER/research foundation. Upstox
 - [x] Canonical broker-neutral `QuoteEvent` and normalization boundary.
 - [x] Candle engine, ordering protection, volume delta and feature foundation.
 - [x] Multi-timeframe candle aggregation with independent interval state.
+- [x] Session-aware candle boundaries and session metadata.
 - [x] Deterministic data-quality service.
 - [x] Broker-neutral `MarketDataAdapter` protocol.
 - [x] Versioned, sorted, content-addressed instrument-master snapshots.
@@ -74,7 +76,7 @@ The repository has a substantial deterministic PAPER/research foundation. Upstox
 
 ### Phase 3 — Market state / analytics
 - [x] Multi-timeframe candle aggregation foundation.
-- [ ] Session-aware candle boundaries and session metadata.
+- [x] Session-aware candle boundaries and session metadata.
 - [ ] Expanded feature engine and displacement confirmation.
 - [ ] Volume profile/order flow where feed data supports it.
 - [ ] Futures/options analytics.
@@ -122,4 +124,4 @@ The repository has a substantial deterministic PAPER/research foundation. Upstox
 `Market Event → Normalization → Validation → Candle → Features → Market State → Strategy → Opportunity → Probability/EV → RiskEngine → OMS → Paper Fill → Position → P&L → Journal`
 
 ## Current next task
-Make candle aggregation session-aware: attach deterministic India-session metadata to completed candles and prevent cross-session aggregation. Keep all work directly on `main`.
+Expand the feature engine with deterministic displacement confirmation, using completed session-aware candles only. Keep all work directly on `main`.
