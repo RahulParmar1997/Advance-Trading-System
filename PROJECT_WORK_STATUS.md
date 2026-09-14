@@ -74,6 +74,10 @@ Core flow:
 - [x] Deterministic OAuth, token-store, sequence and transport tests.
 - [x] No credentials or secrets committed.
 - [x] Injectable Upstox V3 protobuf decoder boundary.
+- [x] Explicit generated-protobuf package boundary and pinned V3 module/version identifiers.
+- [x] Protobuf runtime dependency isolated behind the live extra.
+- [x] Generated decoder factory fails closed when the pinned package is unavailable.
+- [x] Protobuf decoder tests cover payload validation and parser-error sanitization.
 - [x] Deterministic V3 feed mapper for LTPC/full-feed structures.
 - [x] PAPER market-data vertical smoke-test foundation.
 - [x] V3 mapper tests for LTPC, bid/ask, volume and invalid payload fields.
@@ -180,7 +184,7 @@ A temporary `foundation/paper-vertical-slice` prototype existed before the main-
 ### Phase 2 — Market data
 - [x] Production-safe secret-backed token store abstraction.
 - [x] Real WebSocket library transport implementation.
-- [ ] Generated Upstox V3 protobuf package/version pinning.
+- [x] Generated Upstox V3 protobuf package/version pinning.
 - [ ] Production instrument-master ingestion/update process.
 - [ ] Production market-session/status integration.
 
@@ -259,4 +263,4 @@ Journal / Audit
 The milestone is complete only when automated tests cover the complete flow and it runs without live order execution.
 
 ## Current next task
-Implement **generated Upstox V3 protobuf package/version pinning** and wire the generated decoder into the existing injectable feed-decoder boundary without committing broker credentials or live-order behavior.
+Implement the **production instrument-master ingestion/update process** with broker-neutral instrument contracts, deterministic validation, versioned snapshots and safe update semantics; keep PAPER/test mode isolated from live credentials and orders.
