@@ -104,7 +104,8 @@ Core flow:
 - [x] Append-only in-memory journal/audit boundary.
 - [x] Durable JSONL journal boundary for PAPER/testing.
 - [x] Position updates emit auditable lifecycle events.
-- [x] Unit tests for PAPER fills, position manager, capacity gates, reconciliation and journal behavior.
+- [x] PositionBook → RiskSnapshot integration with explicit mark prices and caller-supplied daily/strategy P&L.
+- [x] Unit tests for PAPER fills, position manager, capacity gates, reconciliation, journal and RiskSnapshot behavior.
 
 ### Research / backtesting
 - [x] Deterministic event-driven backtester core.
@@ -112,9 +113,13 @@ Core flow:
 - [x] Strategy protocol isolated from broker/network/database dependencies.
 - [x] Simulated execution price with configurable slippage.
 - [x] Configurable transaction fees.
-- [x] Partial/full signed quantity handling foundation.
-- [x] Backtest fill and ending-cash result contracts.
-- [x] Unit tests for chronological processing, slippage, fees, round-trip P&L and invalid costs.
+- [x] Latency policy and next-observable-event execution boundary.
+- [x] Configurable partial-fill quantity policy.
+- [x] Mark-to-market ending equity and maximum drawdown tracking.
+- [x] Signed position accounting for long and short fills.
+- [x] Explicit deterministic rejection policy and insufficient-cash guard.
+- [x] Backtest fill and result contracts.
+- [x] Unit tests for chronological processing, slippage, fees, latency, partial fills, rejection and round-trip P&L.
 
 ## Previously prototyped — not used as the implementation branch
 A temporary `foundation/paper-vertical-slice` prototype existed before the main-only rule. Its useful ideas were reviewed and recreated deliberately on `main`; it is not the active development branch.
@@ -155,14 +160,11 @@ A temporary `foundation/paper-vertical-slice` prototype existed before the main-
 - [ ] Explanation/audit evidence persistence.
 
 ### Phase 6 — Risk / execution
-- [ ] Strategy/portfolio risk snapshot integration with live position book.
 - [ ] Broker reconciliation adapter implementation.
 - [ ] Stronger durable journal backend.
 
 ### Phase 7 — Research
-- [ ] Realistic fill/rejection/latency model expansion.
-- [ ] Explicit position mark-to-market in backtest results.
-- [ ] Event-driven strategy integration with existing MarketState/Strategy/Opportunity/RiskEngine/OMS contracts.
+- [ ] Connect existing Strategy/Opportunity/RiskEngine/OMS contracts into backtester.
 - [ ] Walk-forward/OOS validation.
 - [ ] Monte Carlo and regime/cost/capacity sensitivity.
 - [ ] Pattern DNA and similarity search.
@@ -212,4 +214,4 @@ Journal / Audit
 The milestone is complete only when automated tests cover the complete flow and it runs without live order execution.
 
 ## Current next task
-Implement **backtest realism and integration**: position mark-to-market, explicit rejection/latency/fill policies, then connect the existing Strategy/Opportunity/RiskEngine/OMS contracts into the event-driven backtester without look-ahead.
+Connect the existing **Strategy → Opportunity → RiskEngine → OMS** contracts into the backtester with explicit risk context, canonical OMS state transitions, and rejection reasons, while preserving zero look-ahead.
