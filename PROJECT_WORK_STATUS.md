@@ -36,25 +36,38 @@ Core flow:
 - [x] Broker-neutral `MarketDataAdapter` protocol and normalization pipeline.
 - [x] Unit tests for data-quality rules and broker-neutral ingestion boundary.
 
+### Upstox integration foundation
+- [x] Upstox-specific adapter package created outside domain code.
+- [x] Access-token value/expiry contract.
+- [x] TokenProvider and OAuth exchange/refresh interfaces.
+- [x] Runtime-only Upstox settings from environment variables.
+- [x] Injectable OAuth HTTP client implementation.
+- [x] Process-local token-store abstraction for PAPER/testing.
+- [x] Upstox market-data client protocol.
+- [x] Injectable WebSocket transport boundary.
+- [x] Bounded exponential reconnect policy.
+- [x] Heartbeat/ping loop abstraction.
+- [x] Sequence-aware feed validation.
+- [x] Deterministic OAuth, token-store, sequence and transport tests.
+- [x] No credentials or secrets committed.
+
 ## Previously prototyped — not used as the implementation branch
 A temporary `foundation/paper-vertical-slice` prototype existed before the main-only rule. Its useful ideas were reviewed and recreated deliberately on `main`; it is not the active development branch.
 
 ## Pending work
 
 ### Phase 1 — Engineering foundation
-- [ ] Configuration/environment handling.
 - [ ] Domain contract versioning.
 - [ ] Structured logging.
 - [ ] Health/readiness checks.
 - [ ] Broader CI quality gates.
 
 ### Phase 2 — Market data
-- [ ] Upstox adapter implementation.
-- [ ] Authentication/token lifecycle.
-- [ ] WebSocket ingestion.
-- [ ] Reconnect/heartbeat handling.
-- [ ] Sequence-aware feed validation.
+- [ ] Production secret-backed token store.
+- [ ] Real WebSocket library transport implementation.
+- [ ] Upstox V3 Protobuf decoder and feed mapper.
 - [ ] Instrument master.
+- [ ] End-to-end PAPER market-data smoke test.
 
 ### Phase 3 — Market state / analytics
 - [ ] Multi-timeframe candle/session engine.
@@ -139,4 +152,4 @@ Execution
 The milestone is complete only when automated tests cover the complete flow and it runs without live order execution.
 
 ## Current next task
-Implement the **Upstox adapter boundary and authentication/token lifecycle interfaces** without embedding secrets or broker-specific assumptions into domain code. Then add a deterministic mock adapter test before any real WebSocket connectivity is introduced.
+Implement the **Upstox V3 Protobuf feed decoder and mapper**, keeping the decoder behind an injectable transport/codec interface, then connect it to DataQuality → Candle → Features in a deterministic PAPER smoke test. Upstox documents V3 as a Protobuf WebSocket feed with binary subscription messages and `market_info`/snapshot/live-feed sequencing. citeturn0search1
