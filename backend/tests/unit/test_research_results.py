@@ -68,7 +68,6 @@ def test_manifest_records_canonical_checksum_and_provenance() -> None:
     assert manifest.created_at.tzinfo is not None
 
 
-
 def test_manifest_rejects_missing_hardware_or_environment() -> None:
     job = computed_job()
     hardware, environment, usage = metadata()
@@ -92,7 +91,6 @@ def test_manifest_rejects_missing_hardware_or_environment() -> None:
             resource_usage=usage,
             created_at=NOW,
         )
-
 
 
 def test_manifest_rejects_resource_limit_breach() -> None:
@@ -125,7 +123,6 @@ async def test_store_is_write_once_and_integrity_checked() -> None:
     stored_manifest, stored_result = await store.read(job.job_id)
     assert stored_manifest == manifest
     assert stored_result == b"result"
-
 
 
 def test_result_persistence_never_promotes_research_status() -> None:
