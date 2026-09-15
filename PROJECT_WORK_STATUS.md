@@ -30,13 +30,13 @@
 - [x] Reverse-proxy configuration with security headers and isolated health endpoint.
 - [x] Prometheus monitoring configuration and operational deployment/incident runbook.
 - [x] Monitoring remains observational and does not create broker execution authority.
-- [x] Ruff quality gate repaired: verified run reports `All checks passed!` for `ruff check src tests`.
+- [x] Ruff quality gate passes.
 - [x] Upstox V3 protobuf decoder boundary restored to the expected generated message surface.
 - [x] Backtest partial-fill execution repaired so configured fill caps can produce deterministic split fills without inventing future market data.
-- [x] Integrated backtests now accept an explicit authoritative market-status input and continue to fail closed when it is absent.
+- [x] Integrated backtests accept explicit authoritative market status and pass observed market-volume information into the RiskEngine participation gate.
 - [x] PAPER fill tests exercise the canonical OMS path through `CANDIDATE → QUALIFIED → RISK_CHECK → ORDER_PENDING` before fills.
 - [x] Storage adapter tests aligned with actual parameter forwarding and fully qualified immutable object keys.
-- [x] Market-session, market-context, liquidity, FVG, swing, probability, calibration, regime and volume-profile tests aligned with their current deterministic contracts.
+- [x] Market-session, market-context, liquidity, FVG, swing, probability, calibration, regime and volume-profile tests aligned with deterministic contracts.
 - [x] Upstox feed mapping validates LTP before requiring a fallback message timestamp.
 - [x] Changes committed directly to `main`.
 
@@ -131,7 +131,7 @@
 - [x] Concrete Parquet/object-storage adapter and dataset layout.
 - [x] Docker/deployment configuration.
 - [x] Monitoring, runbooks and reverse proxy.
-- [ ] Finish backend test-suite repair and verify CI green.
+- [ ] Verify the latest GitHub Actions run after the final two test fixes and certify the full suite green.
 
 ## Non-negotiable architecture rules
 - AI never bypasses RiskEngine or places uncontrolled orders.
@@ -148,7 +148,7 @@
 - Monitoring must remain observational and must not become an execution control plane.
 
 ## Current next task
-Continue backend test-suite repair and verify the GitHub Actions quality gate. Do not mark CI green until the full suite passes.
+Verify the GitHub Actions quality gate for the latest `main` head. Do not mark CI green until the full suite passes.
 
 ## CI note
-Latest **verified** run before the current head: commit `883e51e0fab7f6101090634cec0369debfba5ebf` — Ruff passed and pytest reported **288 passed / 11 failed**. Subsequent commits address those remaining failures; the current `main` head has a fresh Actions run in progress and is not yet certified green.
+Verified run `402` at commit `9311e519f96a8d630c1f63f951fe96b8bd756259`: Ruff passed and pytest reported **297 passed / 2 failed**. The two remaining failures were the integrated backtest participation-volume propagation and equal-low test fixture; both have now been fixed in subsequent commits. A new Actions run is expected and must be verified before declaring green.
