@@ -3,7 +3,12 @@ from datetime import datetime, timezone
 
 import pytest
 
-from advance_system.research.compute import ComputeBackend, ResearchJob, ResearchStatus, ResourceLimits
+from advance_system.research.compute import (
+    ComputeBackend,
+    ResearchJob,
+    ResearchStatus,
+    ResourceLimits,
+)
 from advance_system.research.results import (
     EnvironmentMetadata,
     HardwareMetadata,
