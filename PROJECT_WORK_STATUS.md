@@ -6,10 +6,9 @@
 **Last updated:** 2026-09-15
 
 ## Latest completed work
-- [x] Immutable append-only audit evidence persistence for scanner, scoring, probability and risk decision records.
-- [x] Upstox broker reconciliation adapter boundary with authoritative order/fill translation and identity validation.
 - [x] Durable append-only JSONL journal backend with startup integrity validation and checkpoints.
-- [x] Unit coverage for journal round-trip, corruption rejection, duplicate protection and checkpoint boundaries.
+- [x] Next.js/React/TypeScript frontend foundation with dark-first terminal shell and observational landing dashboard.
+- [x] Frontend explicitly keeps order execution behind the backend RiskEngine → OMS boundary.
 - [x] Changes committed directly to `main`.
 
 ## Done on `main`
@@ -62,14 +61,16 @@
 - [x] Append-only audit evidence contract with content-addressed immutable records and explicit non-execution authority.
 - [x] Durable JSONL journal backend with append-only persistence and startup corruption/duplicate detection.
 
+### Frontend
+- [x] Next.js/React/TypeScript application foundation.
+- [x] App Router root layout, metadata and dark-first global shell.
+- [x] Initial market-intelligence terminal landing dashboard.
+- [x] No direct broker/execution action from frontend.
+
 ## Pending work
 
-### Phase 6 — Risk / execution
-- [x] Broker reconciliation adapter implementation.
-- [x] Stronger durable journal backend.
-
 ### Phase 8 — Frontend
-- [ ] Next.js/React/TypeScript foundation.
+- [x] Next.js/React/TypeScript foundation.
 - [ ] Trading terminal, dashboards, scanner, derivatives, PAPER trading, portfolio, journal, backtest and research UI.
 
 ### Phase 9 — Infrastructure
@@ -82,14 +83,15 @@
 - Charting is not the source of truth for orders/positions.
 - Strategy calculations stay deterministic, testable, network-independent and database-independent.
 - Broker-specific code stays behind adapter interfaces.
-- Observed data and model-derived estimates remain explicitly distinguishable.
+- Observed market data and model-derived estimates remain explicitly distinguishable.
 - Backtests contain no look-ahead bias.
 - PAPER remains the default.
 - Audit evidence is observational only and must never authorize, submit or mutate an order.
 - Journal records are audit/state history only; they are not execution commands.
+- Frontend actions must not directly invoke broker execution.
 
 ## Current next task
-Implement the Next.js/React/TypeScript frontend foundation without connecting UI actions directly to broker execution.
+Implement the first production dashboard route: market overview with explicit backend-read-only data contracts, while keeping all order execution behind RiskEngine → OMS.
 
 ## CI note
 The latest GitHub Actions state is not verified green. Do not claim the quality gate is healthy until the Ruff failure is repaired and a subsequent run passes both Ruff and pytest.
