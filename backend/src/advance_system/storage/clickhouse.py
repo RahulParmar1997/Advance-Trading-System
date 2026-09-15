@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Protocol
 
-from advance_system.storage.contracts import ClickHouseStore, StorageConfig
+from advance_system.storage.contracts import StorageConfig
 
 
 class ClickHouseConnection(Protocol):
