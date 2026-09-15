@@ -54,7 +54,7 @@ async def test_parquet_write_read_and_manifest_are_content_addressed() -> None:
     assert manifest.created_at == created_at
     assert await store.read_dataset(ref()) == payload
     assert await store.read_manifest(ref()) == manifest
-    assert "dataset=features/version=v1/partition=date=2026-09-15/data.parquet" in backend.objects
+    assert "s3://ats-research/dataset=features/version=v1/partition=date=2026-09-15/data.parquet" in backend.objects
 
 
 @pytest.mark.asyncio
