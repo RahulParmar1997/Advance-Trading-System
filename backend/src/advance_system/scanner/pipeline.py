@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from hashlib import sha256
 from typing import Mapping, Sequence
 
-from advance_system.scanner.dsl import ScanResult, ScannerEngine, ScannerRule
+from advance_system.scanner.dsl import ScannerEngine, ScannerRule, ScanResult
 from advance_system.scanner.results import ScannerResult, build_scanner_result
 
 
