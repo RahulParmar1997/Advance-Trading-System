@@ -129,9 +129,9 @@ class EventDrivenBacktester:
                 continue
 
             remaining = abs(delta)
-            cursor = ordered.index(execution_event, index)
-            execution_index = cursor
+            execution_index = ordered.index(execution_event, index)
             while remaining > 0 and execution_event is not None:
+                explicit_liquidity = execution_event.liquidity is not None
                 liquidity = execution_event.liquidity or HistoricalLiquidity(remaining)
                 fill_qty, liquidity_rejection = rejection_policy.fill_quantity(
                     delta if delta > 0 else -remaining,
@@ -178,6 +178,8 @@ class EventDrivenBacktester:
 
                 if remaining <= 0:
                     break
+                if not explicit_liquidity and policy.max_fill_quantity is not None:
+                    continue
                 execution_index += 1
                 execution_event = ordered[execution_index] if execution_index < len(ordered) else None
                 if execution_event is None:
