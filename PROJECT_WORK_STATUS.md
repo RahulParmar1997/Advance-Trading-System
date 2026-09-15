@@ -9,7 +9,9 @@
 - [x] Durable append-only JSONL journal backend with startup integrity validation and checkpoints.
 - [x] Next.js/React/TypeScript frontend foundation with dark-first terminal shell and observational landing dashboard.
 - [x] First read-only production dashboard route at `/market-overview` with explicit typed market-state contract.
-- [x] Frontend market overview does not fabricate market values and cannot authorize or submit orders.
+- [x] Trading-terminal navigation shell with read-only links for overview, scanner, portfolio, derivatives, journal and research.
+- [x] First read-only scanner dashboard at `/scanner` with explicit candidate contract and empty-state protection against fabricated market data.
+- [x] Frontend execution boundary remains separate from RiskEngine → OMS.
 - [x] Changes committed directly to `main`.
 
 ## Done on `main`
@@ -67,6 +69,8 @@
 - [x] App Router root layout, metadata and dark-first global shell.
 - [x] Initial market-intelligence terminal landing dashboard.
 - [x] Read-only `/market-overview` route with typed market-state contract.
+- [x] Terminal navigation shell.
+- [x] Read-only `/scanner` dashboard with typed candidate contract.
 - [x] No direct broker/execution action from frontend.
 
 ## Pending work
@@ -74,7 +78,8 @@
 ### Phase 8 — Frontend
 - [x] Next.js/React/TypeScript foundation.
 - [x] First market-overview dashboard route.
-- [ ] Trading terminal, dashboards, scanner, derivatives, PAPER trading, portfolio, journal, backtest and research UI.
+- [x] Navigation shell and first scanner dashboard.
+- [ ] Trading terminal, derivatives, PAPER trading, portfolio, journal, backtest and research UI.
 
 ### Phase 9 — Infrastructure
 - [ ] PostgreSQL, ClickHouse, Redis and Parquet/object storage.
@@ -94,7 +99,7 @@
 - Frontend actions must not directly invoke broker execution.
 
 ## Current next task
-Implement the trading-terminal navigation shell and first scanner dashboard using backend read-only contracts, with no direct execution capability.
+Implement the first derivatives dashboard using typed, read-only option-chain/futures analytics contracts.
 
 ## CI note
 The latest GitHub Actions state is not verified green. Do not claim the quality gate is healthy until the Ruff failure is repaired and a subsequent run passes both Ruff and pytest.
