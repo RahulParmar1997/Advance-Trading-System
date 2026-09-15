@@ -8,9 +8,10 @@
 ## Latest completed work
 - [x] Durable append-only JSONL journal backend with startup integrity validation and checkpoints.
 - [x] Next.js/React/TypeScript frontend foundation with dark-first terminal shell and observational landing dashboard.
-- [x] First read-only production dashboard route at `/market-overview` with explicit typed market-state contract.
-- [x] Trading-terminal navigation shell with read-only links for overview, scanner, portfolio, derivatives, journal and research.
-- [x] First read-only scanner dashboard at `/scanner` with explicit candidate contract and empty-state protection against fabricated market data.
+- [x] Read-only `/market-overview` route with typed market-state contract.
+- [x] Trading-terminal navigation shell and read-only `/scanner` dashboard.
+- [x] Read-only `/derivatives` dashboard with typed option-chain and futures-basis contracts.
+- [x] Derivatives UI explicitly avoids fabricated strikes, Greeks, IV, prices and basis values when backend data is unavailable.
 - [x] Frontend execution boundary remains separate from RiskEngine → OMS.
 - [x] Changes committed directly to `main`.
 
@@ -71,15 +72,19 @@
 - [x] Read-only `/market-overview` route with typed market-state contract.
 - [x] Terminal navigation shell.
 - [x] Read-only `/scanner` dashboard with typed candidate contract.
+- [x] Read-only `/derivatives` dashboard with option-chain and futures-basis presentation contracts.
 - [x] No direct broker/execution action from frontend.
 
 ## Pending work
 
 ### Phase 8 — Frontend
 - [x] Next.js/React/TypeScript foundation.
-- [x] First market-overview dashboard route.
-- [x] Navigation shell and first scanner dashboard.
-- [ ] Trading terminal, derivatives, PAPER trading, portfolio, journal, backtest and research UI.
+- [x] Market overview.
+- [x] Navigation and scanner dashboard.
+- [x] Derivatives dashboard.
+- [ ] PAPER trading terminal.
+- [ ] Portfolio and position dashboard.
+- [ ] Journal, backtest and research UI.
 
 ### Phase 9 — Infrastructure
 - [ ] PostgreSQL, ClickHouse, Redis and Parquet/object storage.
@@ -99,7 +104,7 @@
 - Frontend actions must not directly invoke broker execution.
 
 ## Current next task
-Implement the first derivatives dashboard using typed, read-only option-chain/futures analytics contracts.
+Implement the PAPER trading terminal with read-only order/position state first; any future order action must flow through backend RiskEngine → OMS and never directly to the broker.
 
 ## CI note
 The latest GitHub Actions state is not verified green. Do not claim the quality gate is healthy until the Ruff failure is repaired and a subsequent run passes both Ruff and pytest.
