@@ -7,8 +7,8 @@ import pytest
 from advance_system.research.compute import (
     ComputeBackend,
     ResearchJob,
-    ResourceLimits,
     ResearchStatus,
+    ResourceLimits,
 )
 from advance_system.research.results import (
     EnvironmentMetadata,
