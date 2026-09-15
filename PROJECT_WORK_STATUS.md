@@ -6,6 +6,9 @@
 **Last updated:** 2026-09-15
 
 ## Latest completed work
+- [x] Added concrete immutable ObjectStore-backed research-result persistence using the existing vendor-neutral ObjectStore boundary.
+- [x] Added manifest deserialization and fail-closed integrity verification for persisted research results.
+- [x] Added deterministic unit coverage for object-store persistence, immutable overwrite rejection, key layout and corrupted-result detection.
 - [x] Fixed scheduler Ruff blocker: removed unused `Callable` import from the research scheduler boundary.
 - [x] Added immutable research-result provenance contracts covering result SHA-256, size, dataset/strategy/feature/config versions, Git SHA, seed, backend, hardware, environment, resource usage and timezone-aware creation time.
 - [x] Added fail-closed validation requiring COMPUTED status, observed metadata, non-negative resource usage and compliance with job resource limits.
@@ -74,7 +77,8 @@
 - [x] Immutable Parquet research dataset persistence.
 - [x] Research compute job metadata/resource-control boundary.
 - [x] Distributed CPU/GPU and cloud/HPC scheduler adapter boundary with no execution authority.
-- [x] Immutable research-result provenance and write-once integrity boundary (test/in-memory persistence implementation).
+- [x] Immutable research-result provenance and write-once integrity boundary.
+- [x] Concrete ObjectStore-backed research-result persistence adapter with fail-closed integrity checks.
 
 ### Frontend / infrastructure
 - [x] Read-only dark-first trading terminal routes and no direct broker execution from frontend.
@@ -86,7 +90,6 @@
 ## Pending work
 
 ### Research / HPC
-- [ ] Add concrete object-storage persistence adapter for research-result manifests/results using the existing immutable ObjectStore boundary.
 - [ ] Add cancellation/timeout enforcement around actual worker execution.
 - [ ] Connect validated research results to the existing OOS/research-approval workflow without execution authority.
 
@@ -110,7 +113,7 @@
 - Research compute must never place orders, mutate positions/balances or bypass RiskEngine → OMS.
 
 ## Current next task
-Add the concrete immutable ObjectStore-backed research-result persistence adapter, then add worker cancellation/timeout enforcement without introducing execution authority.
+Add cancellation/timeout enforcement around actual research worker execution, keeping cancellation fail-closed and completely outside broker/RiskEngine/OMS authority.
 
 ## CI note
-GitHub Actions run `417` for commit `61505e375f22c59de42610f6ee4f0e9c8b14080f` completed successfully with both Ruff and Pytest. Run `420` for commit `ec43d9dae37c039e7882fff3dd0c642bb5bf3fb9` failed on one Ruff import-order error in the new test; that was corrected on `main`. Run `423` for commit `c0e829a5fe78f5637c9146edfcc1c9cb64e41b2d` is currently in progress; it must complete successfully before CI can be certified green for the result-provenance implementation.
+The latest main commit has no published GitHub status checks yet. The existing verified run `417` for commit `61505e375f22c59de42610f6ee4f0e9c8b14080f` completed successfully with Ruff and Pytest; result-provenance run `420` failed one Ruff import-order error and was corrected on main. Run `423` was previously in progress. Fresh GitHub Actions verification is required before certifying the new ObjectStore adapter as CI-green.
