@@ -12,7 +12,9 @@
 - [x] Evidence-based scanner scoring using explicit evidence and deterministic non-probabilistic weights.
 - [x] Leakage-safe historical probability calibration from labeled historical outcomes.
 - [x] Out-of-sample probability validation with Brier score, log loss and classification accuracy.
-- [x] Unit coverage for scanner evidence, explanations, orchestration, scoring and calibration/validation leakage controls.
+- [x] Immutable append-only audit evidence persistence for scanner, scoring, probability and risk decision records.
+- [x] Audit records are content-addressed, execution-authority-free, and expose no order/execution capability.
+- [x] Unit coverage for scanner evidence, explanations, orchestration, scoring, calibration/validation and audit persistence controls.
 - [x] Changes committed directly to `main`.
 
 ## Done on `main`
@@ -68,7 +70,7 @@
 - [x] Evidence-based scoring.
 - [x] Historical probability calibration.
 - [x] OOS probability validation.
-- [ ] Explanation/audit evidence persistence.
+- [x] Explanation/audit evidence persistence.
 
 ### Phase 6 — Risk / execution
 - [ ] Broker reconciliation adapter implementation.
@@ -91,9 +93,10 @@
 - Observed data and model-derived estimates remain explicitly distinguishable.
 - Backtests contain no look-ahead bias.
 - PAPER remains the default.
+- Audit evidence is observational only and must never authorize, submit or mutate an order.
 
 ## Current next task
-Implement explanation/audit evidence persistence for scanner, scoring, probability and risk decisions without allowing persisted evidence to become an execution authority.
+Implement the broker reconciliation adapter behind a broker-neutral interface, preserving the existing controlled RiskEngine → OMS execution boundary.
 
 ## CI note
 The latest GitHub Actions state is not verified green. Do not claim the quality gate is healthy until the Ruff failure is repaired and a subsequent run passes both Ruff and pytest.
