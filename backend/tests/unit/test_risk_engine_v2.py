@@ -14,12 +14,13 @@ def context(**overrides):
         now=now,
         market_open=True,
         last_market_data_at=now - timedelta(seconds=1),
-        snapshot=RiskSnapshot(),
+        snapshot=RiskSnapshot(available_liquidity=Decimal("100000")),
         strategy_valid=True,
         trade_type_enabled=True,
         duplicate_opportunity=False,
         estimated_slippage_bps=Decimal("1"),
         probability=Decimal("0.60"),
+        order_notional=Decimal("100"),
         market_status=MarketStatus("NSE", "NORMAL_OPEN", now),
         expected_exchange="NSE",
     )
@@ -87,7 +88,7 @@ def test_kill_switch_and_circuit_breaker_are_hard_stops():
 
 
 def test_account_limits_are_enforced():
-    snapshot = RiskSnapshot(symbol_exposure=Decimal("10001"))
+    snapshot = RiskSnapshot(symbol_exposure=Decimal("10001"), available_liquidity=Decimal("100000"))
     decision = engine().check(opportunity(), context(snapshot=snapshot))
     assert decision.reason == "symbol exposure limit exceeded"
 
