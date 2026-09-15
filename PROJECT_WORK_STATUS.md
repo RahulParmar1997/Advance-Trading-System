@@ -6,6 +6,8 @@
 **Last updated:** 2026-09-15
 
 ## Latest completed work
+- [x] Added cancellation/timeout enforcement around actual research worker execution with cooperative task cancellation and fail-closed wall-clock limits.
+- [x] Added deterministic unit coverage for successful worker completion, timeout cancellation, explicit cancellation, and unknown-job cancellation.
 - [x] Added concrete immutable ObjectStore-backed research-result persistence using the existing vendor-neutral ObjectStore boundary.
 - [x] Added manifest deserialization and fail-closed integrity verification for persisted research results.
 - [x] Added deterministic unit coverage for object-store persistence, immutable overwrite rejection, key layout and corrupted-result detection.
@@ -79,6 +81,7 @@
 - [x] Distributed CPU/GPU and cloud/HPC scheduler adapter boundary with no execution authority.
 - [x] Immutable research-result provenance and write-once integrity boundary.
 - [x] Concrete ObjectStore-backed research-result persistence adapter with fail-closed integrity checks.
+- [x] Research worker timeout/cancellation enforcement with no execution authority.
 
 ### Frontend / infrastructure
 - [x] Read-only dark-first trading terminal routes and no direct broker execution from frontend.
@@ -90,7 +93,6 @@
 ## Pending work
 
 ### Research / HPC
-- [ ] Add cancellation/timeout enforcement around actual worker execution.
 - [ ] Connect validated research results to the existing OOS/research-approval workflow without execution authority.
 
 ### Infrastructure / operations
@@ -113,7 +115,7 @@
 - Research compute must never place orders, mutate positions/balances or bypass RiskEngine → OMS.
 
 ## Current next task
-Add cancellation/timeout enforcement around actual research worker execution, keeping cancellation fail-closed and completely outside broker/RiskEngine/OMS authority.
+Connect validated research results to the existing OOS/research-approval workflow without execution authority.
 
 ## CI note
-The latest main commit has no published GitHub status checks yet. The existing verified run `417` for commit `61505e375f22c59de42610f6ee4f0e9c8b14080f` completed successfully with Ruff and Pytest; result-provenance run `420` failed one Ruff import-order error and was corrected on main. Run `423` was previously in progress. Fresh GitHub Actions verification is required before certifying the new ObjectStore adapter as CI-green.
+The latest main commit has no published GitHub status checks yet. The existing verified run `417` for commit `61505e375f22c59de42610f6ee4f0e9c8b14080f` completed successfully with Ruff and Pytest; result-provenance run `420` failed one Ruff import-order error and was corrected on main. Run `427` for the latest status update was observed in progress; fresh GitHub Actions verification is required before certifying the new worker changes as CI-green.
