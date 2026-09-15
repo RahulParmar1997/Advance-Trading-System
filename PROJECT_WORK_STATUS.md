@@ -8,11 +8,9 @@
 ## Latest completed work
 - [x] Durable append-only JSONL journal backend with startup integrity validation and checkpoints.
 - [x] Next.js/React/TypeScript frontend foundation with dark-first terminal shell and observational landing dashboard.
-- [x] Read-only `/market-overview` route with typed market-state contract.
-- [x] Trading-terminal navigation shell and read-only `/scanner` dashboard.
-- [x] Read-only `/derivatives` dashboard with typed option-chain and futures-basis contracts.
-- [x] Derivatives UI explicitly avoids fabricated strikes, Greeks, IV, prices and basis values when backend data is unavailable.
-- [x] Frontend execution boundary remains separate from RiskEngine → OMS.
+- [x] Read-only `/market-overview`, `/scanner` and `/derivatives` dashboard routes with explicit typed contracts.
+- [x] Read-only `/paper-trading` terminal with typed order lifecycle/state contract and no order mutation capability.
+- [x] PAPER UI does not fabricate orders, fills or positions and keeps execution behind backend RiskEngine → OMS.
 - [x] Changes committed directly to `main`.
 
 ## Done on `main`
@@ -73,6 +71,7 @@
 - [x] Terminal navigation shell.
 - [x] Read-only `/scanner` dashboard with typed candidate contract.
 - [x] Read-only `/derivatives` dashboard with option-chain and futures-basis presentation contracts.
+- [x] Read-only `/paper-trading` terminal with typed order state/lifecycle contract.
 - [x] No direct broker/execution action from frontend.
 
 ## Pending work
@@ -82,7 +81,7 @@
 - [x] Market overview.
 - [x] Navigation and scanner dashboard.
 - [x] Derivatives dashboard.
-- [ ] PAPER trading terminal.
+- [x] Read-only PAPER trading terminal.
 - [ ] Portfolio and position dashboard.
 - [ ] Journal, backtest and research UI.
 
@@ -104,7 +103,7 @@
 - Frontend actions must not directly invoke broker execution.
 
 ## Current next task
-Implement the PAPER trading terminal with read-only order/position state first; any future order action must flow through backend RiskEngine → OMS and never directly to the broker.
+Implement the portfolio and position dashboard using backend read-only position, exposure and P&L contracts.
 
 ## CI note
 The latest GitHub Actions state is not verified green. Do not claim the quality gate is healthy until the Ruff failure is repaired and a subsequent run passes both Ruff and pytest.
