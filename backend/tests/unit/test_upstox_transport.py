@@ -54,7 +54,10 @@ async def test_reconnect_policy_retries_then_streams():
 
     client = UpstoxWebSocketClient(factory, reconnect=ReconnectPolicy(initial_delay=0, max_delay=0, max_attempts=2))
     instrument = Instrument("NSE_EQ|TEST", "NSE", "TEST", "EQUITY")
-    quotes = [q async for q in client.stream_quotes([instrument], "test-token")]
+    quotes = []
+    async for quote in client.stream_quotes([instrument], "test-token"):
+        quotes.append(quote)
+        await client.close()
 
     assert len(quotes) == 1
     assert FakeTransport.attempts == 2
