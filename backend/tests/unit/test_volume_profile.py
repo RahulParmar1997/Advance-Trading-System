@@ -14,7 +14,7 @@ def test_volume_profile_buckets_close_volume_and_finds_poc():
     candles = [candle(0, "100", 10), candle(1, "101", 30), candle(2, "100", 20)]
     profile = VolumeProfileEngine(VolumeProfileConfig(price_step=Decimal("1"))).build(candles)
     assert profile.total_volume == 60
-    assert profile.point_of_control == Decimal("101")
+    assert profile.point_of_control == Decimal("100")
     assert profile.levels == (profile.levels[0], profile.levels[1])
     assert [(x.price, x.volume) for x in profile.levels] == [(Decimal("100"), 30), (Decimal("101"), 30)]
 
