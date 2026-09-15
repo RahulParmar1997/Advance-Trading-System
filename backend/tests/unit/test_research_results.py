@@ -1,5 +1,6 @@
 from dataclasses import replace
 from datetime import datetime, timezone
+from uuid import UUID
 
 import pytest
 
@@ -13,6 +14,7 @@ from advance_system.research.results import (
     EnvironmentMetadata,
     HardwareMetadata,
     InMemoryResearchResultStore,
+    ObjectStoreResearchResultStore,
     ResearchResultManifest,
     ResourceUsage,
 )
@@ -128,6 +130,60 @@ async def test_store_is_write_once_and_integrity_checked() -> None:
     stored_manifest, stored_result = await store.read(job.job_id)
     assert stored_manifest == manifest
     assert stored_result == b"result"
+
+
+class FakeObjectStore:
+    def __init__(self) -> None:
+        self.objects: dict[str, bytes] = {}
+
+    async def exists(self, key: str) -> bool:
+        return key in self.objects
+
+    async def read(self, key: str) -> bytes:
+        return self.objects[key]
+
+    async def write_if_absent(self, key: str, payload: bytes) -> bool:
+        if key in self.objects:
+            return False
+        self.objects[key] = bytes(payload)
+        return True
+
+    async def healthcheck(self) -> bool:
+        return True
+
+
+@pytest.mark.asyncio
+async def test_object_store_persists_manifest_and_result_immutably() -> None:
+    object_store = FakeObjectStore()
+    store = ObjectStoreResearchResultStore(object_store)
+    job = computed_job(max_storage_bytes=100)
+    manifest = manifest_for(job, b"result")
+
+    await store.write(manifest, b"result")
+    stored_manifest, stored_result = await store.read(job.job_id)
+
+    assert stored_manifest == manifest
+    assert stored_result == b"result"
+    assert set(object_store.objects) == {
+        f"research-results/job={job.job_id}/manifest.json",
+        f"research-results/job={job.job_id}/result.bin",
+    }
+
+    with pytest.raises(ValueError, match="different manifest"):
+        await store.write(replace(manifest, created_at=NOW.replace(hour=13)), b"result")
+
+
+@pytest.mark.asyncio
+async def test_object_store_read_fails_closed_on_corrupt_result() -> None:
+    object_store = FakeObjectStore()
+    store = ObjectStoreResearchResultStore(object_store)
+    job = computed_job(max_storage_bytes=100)
+    manifest = manifest_for(job, b"result")
+    await store.write(manifest, b"result")
+
+    object_store.objects[f"research-results/job={job.job_id}/result.bin"] = b"corrupt"
+    with pytest.raises(ValueError, match="checksum"):
+        await store.read(UUID(str(job.job_id)))
 
 
 def test_result_persistence_never_promotes_research_status() -> None:
