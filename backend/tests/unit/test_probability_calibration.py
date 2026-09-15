@@ -62,3 +62,41 @@ def test_calibration_rejects_uncovered_probability_and_invalid_input():
             [HistoricalOutcome(base, Decimal("1.2"), True)],
             training_end=base,
         )
+
+
+def test_oos_validation_calculates_brier_log_loss_and_accuracy():
+    base = datetime(2026, 1, 1, tzinfo=UTC)
+    calibrator = HistoricalProbabilityCalibrator()
+    model = calibrator.fit(
+        [
+            HistoricalOutcome(base, Decimal("0.2"), True),
+            HistoricalOutcome(base, Decimal("0.8"), False),
+        ],
+        training_end=base,
+        bins=2,
+    )
+    result = calibrator.validate_oos(
+        model,
+        [
+            HistoricalOutcome(base + timedelta(days=1), Decimal("0.2"), True),
+            HistoricalOutcome(base + timedelta(days=2), Decimal("0.8"), False),
+        ],
+    )
+    assert result.observations == 2
+    assert result.brier_score == Decimal("0")
+    assert result.log_loss == Decimal("0")
+    assert result.accuracy == Decimal("1")
+
+
+def test_oos_validation_rejects_training_period_and_does_not_mutate_model():
+    base = datetime(2026, 1, 1, tzinfo=UTC)
+    calibrator = HistoricalProbabilityCalibrator()
+    model = calibrator.fit(
+        [HistoricalOutcome(base, Decimal("0.2"), True)],
+        training_end=base,
+        bins=2,
+    )
+    before = model
+    with pytest.raises(ValueError, match="strictly after"):
+        calibrator.validate_oos(model, [HistoricalOutcome(base, Decimal("0.2"), True)])
+    assert model == before
