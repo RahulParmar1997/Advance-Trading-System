@@ -38,7 +38,9 @@
 - [x] Storage adapter tests aligned with actual parameter forwarding and fully qualified immutable object keys.
 - [x] Market-session, market-context, liquidity, FVG, swing, probability, calibration, regime and volume-profile tests aligned with deterministic contracts.
 - [x] Upstox feed mapping validates LTP before requiring a fallback message timestamp.
-- [x] Final two backend test fixes committed directly to `main`.
+- [x] Backend quality gate verified green on GitHub Actions.
+- [x] Added a research-only compute job boundary with reproducibility metadata, selectable CPU/GPU backend identity, resource limits and safe local execution semantics.
+- [x] Added deterministic unit coverage for research compute metadata, resource limits and rejection of unsupported remote execution by the local executor.
 
 ## Done on `main`
 
@@ -89,6 +91,7 @@
 - [x] Append-only audit evidence contract with content-addressed immutable records and explicit non-execution authority.
 - [x] Durable JSONL journal backend with append-only persistence and startup corruption/duplicate detection.
 - [x] Immutable Parquet research dataset persistence with explicit dataset/version/partition addressing.
+- [x] Research compute job metadata and resource-control boundary.
 
 ### Frontend
 - [x] Next.js/React/TypeScript application foundation.
@@ -120,19 +123,15 @@
 
 ## Pending work
 
-### Phase 9 — Infrastructure
-- [x] Storage configuration and vendor-neutral boundaries.
-- [x] PostgreSQL operational adapter boundary.
-- [x] Initial PostgreSQL operational migration.
-- [x] Migration version tracking contract.
-- [x] Concrete PostgreSQL driver integration.
-- [x] Concrete ClickHouse analytics adapter/schema.
-- [x] Concrete Redis hot-state adapter.
-- [x] Concrete Parquet/object-storage adapter and dataset layout.
-- [x] Docker/deployment configuration.
-- [x] Monitoring, runbooks and reverse proxy.
-- [x] Backend test-suite repair.
-- [ ] Verify the latest GitHub Actions run for commit `88cdcf51314fac74bda24d2532dbb464b65fcea9` and certify the full suite green.
+### Research / HPC
+- [ ] Add execution adapters for distributed CPU/GPU and cloud/HPC schedulers behind the compute boundary.
+- [ ] Persist research-job checksums, hardware/environment metadata and resource usage with immutable results.
+- [ ] Add cancellation/timeout enforcement around actual worker execution.
+- [ ] Connect validated research results to the existing OOS/research-approval workflow without execution authority.
+
+### Infrastructure / operations
+- [ ] Production `/metrics` endpoint and end-to-end monitoring validation.
+- [ ] Full deployment/integration validation against configured PostgreSQL, ClickHouse and Redis services.
 
 ## Non-negotiable architecture rules
 - AI never bypasses RiskEngine or places uncontrolled orders.
@@ -147,9 +146,10 @@
 - Frontend actions must not directly invoke broker execution.
 - Redis, ClickHouse and Parquet/object storage must never become execution authority or replace PostgreSQL operational truth.
 - Monitoring must remain observational and must not become an execution control plane.
+- Research compute must never place orders, mutate positions/balances or bypass RiskEngine → OMS.
 
 ## Current next task
-Verify the GitHub Actions quality gate for commit `88cdcf51314fac74bda40e6b092911610b5fc890a9`. Do not mark CI green until the full suite passes.
+Verify the GitHub Actions run triggered by the research compute boundary, then continue the research/HPC safety layer only after the quality gate is verified.
 
 ## CI note
-GitHub Actions run `406` for commit `88cdcf51314fac74bda40e6b092911610b5fc890a9` completed successfully. The `quality` job passed both **Ruff lint** and **Pytest**. This is the first verified green quality run after the final two test fixes.
+The previous verified green run was GitHub Actions run `406` for commit `88cdcf51314fac74bda24d2532dbb464b65fcea9`, with both Ruff and Pytest successful. The research compute changes are now committed to `main` and require a fresh CI verification before being certified.
