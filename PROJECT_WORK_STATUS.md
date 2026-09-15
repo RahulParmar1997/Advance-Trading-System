@@ -9,7 +9,8 @@
 - [x] Deterministic Wyckoff event features from completed candles and explicit volume inputs.
 - [x] Rich scanner result contract with explicit evidence, context identity and deterministic explanations.
 - [x] Scanner pipeline now exposes the richer result without adding probability, risk approval or broker status.
-- [x] Unit coverage for scanner evidence, explanations, validation and pipeline integration.
+- [x] Multi-symbol / multi-timeframe scanner orchestration with explicit scope identity and deterministic ordering.
+- [x] Unit coverage for scanner evidence, explanations, scope validation and orchestration.
 - [x] Changes committed directly to `main`.
 
 ## Done on `main`
@@ -62,7 +63,7 @@
 ### Phase 4 — Intelligence / scanning
 - [x] Wyckoff features from completed candles/explicit volume with chronology and look-ahead protections.
 - [x] Richer scanner result contracts and explanations.
-- [ ] Multi-symbol / multi-timeframe scanner orchestration.
+- [x] Multi-symbol / multi-timeframe scanner orchestration.
 
 ### Phase 5 — Trading decision engine
 - [ ] Evidence-based scoring.
@@ -93,7 +94,7 @@
 - PAPER remains the default.
 
 ## Current next task
-Implement multi-symbol / multi-timeframe scanner orchestration with explicit instrument/timeframe identity and deterministic ordering. Keep all work directly on `main`.
+Implement evidence-based scanner/opportunity scoring using explicit observed evidence only, with deterministic weights and no fabricated probabilities. Keep all work directly on `main`.
 
 ## CI note
 The latest known GitHub Actions state is not verified green. Do not claim the quality gate is healthy until the Ruff failure is repaired and a subsequent run passes both Ruff and pytest.
