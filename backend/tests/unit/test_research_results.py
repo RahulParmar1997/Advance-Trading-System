@@ -1,3 +1,4 @@
+from dataclasses import replace
 from datetime import datetime, timezone
 
 import pytest
@@ -41,7 +42,7 @@ def metadata() -> tuple[HardwareMetadata, EnvironmentMetadata, ResourceUsage]:
     return (
         HardwareMetadata(cpu="actual-cpu", gpu=None, worker_count=1),
         EnvironmentMetadata(os="Linux", python="3.11.9", runtime="pytest"),
-        ResourceUsage(elapsed_seconds=3, storage_bytes=4, concurrency=1),
+        ResourceUsage(elapsed_seconds=3, storage_bytes=11, concurrency=1),
     )
 
 
@@ -61,10 +62,11 @@ def test_manifest_records_canonical_checksum_and_provenance() -> None:
     result = b"test-result"
     manifest = manifest_for(computed_job(), result)
 
-    assert manifest.result_sha256 == "8f4a6f1e5b3a7f48c6c2f8c7f0f2a1a2fbd0fefec6b2c9f5d5f6f3d3d5b5e7d1"
+    assert manifest.result_sha256 == "b1dc7b8ec52f50b8e8a7ffc1adbccbb08fe7cad5cbb7a2bdeec9c75ca61065a4"
     assert manifest.result_size_bytes == len(result)
     assert manifest.status is ResearchStatus.COMPUTED
     assert manifest.created_at.tzinfo is not None
+
 
 
 def test_manifest_rejects_missing_hardware_or_environment() -> None:
@@ -92,6 +94,7 @@ def test_manifest_rejects_missing_hardware_or_environment() -> None:
         )
 
 
+
 def test_manifest_rejects_resource_limit_breach() -> None:
     job = computed_job(max_seconds=2, max_concurrency=1, max_storage_bytes=3)
     hardware, environment, _ = metadata()
@@ -107,36 +110,26 @@ def test_manifest_rejects_resource_limit_breach() -> None:
         )
 
 
-def test_store_is_write_once_and_integrity_checked() -> None:
-    async def scenario() -> None:
-        store = InMemoryResearchResultStore()
-        job = computed_job(max_storage_bytes=100)
-        manifest = manifest_for(job, b"result")
+@pytest.mark.asyncio
+async def test_store_is_write_once_and_integrity_checked() -> None:
+    store = InMemoryResearchResultStore()
+    job = computed_job(max_storage_bytes=100)
+    manifest = manifest_for(job, b"result")
 
+    await store.write(manifest, b"result")
+    with pytest.raises(ValueError, match="already exists"):
         await store.write(manifest, b"result")
-        with pytest.raises(ValueError, match="already exists"):
-            await store.write(manifest, b"result")
-        with pytest.raises(ValueError, match="checksum"):
-            await store.write(
-                ResearchResultManifest(
-                    **{**manifest.__dict__, "result_sha256": "0" * 64}
-                ),
-                b"result",
-            )
+    with pytest.raises(ValueError, match="checksum"):
+        await store.write(replace(manifest, result_sha256="0" * 64), b"result")
 
-        stored_manifest, stored_result = await store.read(job.job_id)
-        assert stored_manifest == manifest
-        assert stored_result == b"result"
+    stored_manifest, stored_result = await store.read(job.job_id)
+    assert stored_manifest == manifest
+    assert stored_result == b"result"
 
-    import asyncio
-
-    asyncio.run(scenario())
 
 
 def test_result_persistence_never_promotes_research_status() -> None:
     manifest = manifest_for(computed_job())
     assert manifest.status is ResearchStatus.COMPUTED
     with pytest.raises(ValueError, match="COMPUTED"):
-        ResearchResultManifest(
-            **{**manifest.__dict__, "status": ResearchStatus.RESEARCH_APPROVED}
-        ).validate()
+        replace(manifest, status=ResearchStatus.RESEARCH_APPROVED).validate()
