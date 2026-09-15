@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Callable
 
 from advance_system.oms.state_machine import OmsOrder, OmsState, OrderStateMachine
 
