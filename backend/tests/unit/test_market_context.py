@@ -10,7 +10,7 @@ from advance_system.market.session import IndiaMarketSession, SessionPhase, Trad
 
 
 def candle(index: int, close: str, *, phase: SessionPhase = SessionPhase.OPEN) -> Candle:
-    start = datetime(2026, 9, 15, 3, 30 + index, tzinfo=timezone.utc)
+    start = datetime(2026, 9, 15, 3, 45 + index, tzinfo=timezone.utc)
     return Candle(
         "NSE_EQ|TEST",
         start,
