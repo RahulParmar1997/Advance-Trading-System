@@ -27,6 +27,9 @@
 - [x] PAPER-safe container defaults, non-root runtime, read-only backend filesystem and health-gated dependencies.
 - [x] Next.js standalone production output for the frontend image.
 - [x] Docker build exclusions for secrets, caches and local dependencies.
+- [x] Reverse-proxy configuration with security headers and isolated health endpoint.
+- [x] Prometheus monitoring configuration and operational deployment/incident runbook.
+- [x] Monitoring remains observational and does not create broker execution authority.
 - [x] Changes committed directly to `main`.
 
 ## Done on `main`
@@ -104,6 +107,8 @@
 - [x] Content-addressed dataset manifests and no-overwrite semantics.
 - [x] Docker Compose deployment stack for PostgreSQL, ClickHouse, Redis, backend and frontend.
 - [x] Backend container runs as non-root with read-only root filesystem.
+- [x] Reverse proxy configuration and deployment runbook.
+- [x] Prometheus monitoring configuration with application scrape gated until `/metrics` exists.
 
 ## Pending work
 
@@ -117,7 +122,8 @@
 - [x] Concrete Redis hot-state adapter.
 - [x] Concrete Parquet/object-storage adapter and dataset layout.
 - [x] Docker/deployment configuration.
-- [ ] Monitoring, runbooks and reverse proxy.
+- [x] Monitoring, runbooks and reverse proxy.
+- [ ] Repair and verify the existing CI quality gate.
 
 ## Non-negotiable architecture rules
 - AI never bypasses RiskEngine or places uncontrolled orders.
@@ -131,9 +137,10 @@
 - Journal records are audit/state history only; they are not execution commands.
 - Frontend actions must not directly invoke broker execution.
 - Redis, ClickHouse and Parquet/object storage must never become execution authority or replace PostgreSQL operational truth.
+- Monitoring must remain observational and must not become an execution control plane.
 
 ## Current next task
-Implement monitoring, operational runbooks and reverse-proxy configuration without introducing broker execution authority.
+Repair and verify the GitHub Actions quality gate: resolve Ruff failures, run the full backend test suite, and only then mark CI green.
 
 ## CI note
-The latest GitHub Actions state is not verified green. Do not claim the quality gate is healthy until the Ruff failure is repaired and a subsequent run passes both Ruff and pytest.
+The latest GitHub Actions state is not verified green. Do not claim the quality gate is healthy until Ruff and pytest both pass in a subsequent workflow run.
