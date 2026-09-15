@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from decimal import Decimal
 
 from advance_system.journal.audit import AuditEvent, InMemoryAuditJournal
 from advance_system.portfolio.positions import Position, PositionBook
