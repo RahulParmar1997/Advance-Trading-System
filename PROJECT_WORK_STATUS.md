@@ -5,57 +5,46 @@
 **Execution policy:** PAPER-first; no uncontrolled live execution
 **Last updated:** 2026-09-15
 
-## Current status
-The repository has a substantial deterministic PAPER/research foundation. Upstox transport/protobuf boundaries remain isolated behind adapters. Instrument-master ingestion has a concrete Upstox BOD JSON source, authoritative exchange status is enforced by the RiskEngine, and the official Upstox V3 protobuf schema is vendored/pinned behind the decoder boundary. Multi-timeframe candles are session-aware when configured with the India market-session calendar. Feature analytics include deterministic displacement, candle-volume profile, explicit trade-print order flow, and derivatives analytics.
-
 ## Latest completed work
-- [x] Added deterministic derivative contract metadata and option-chain validation.
-- [x] Added European Black-Scholes option price and Greeks: delta, gamma, vega, theta/day and rho.
-- [x] Added deterministic bounded-bisection implied-volatility solver with explicit inputs and fail-closed bounds.
-- [x] Added deterministic futures basis analytics.
-- [x] Added unit coverage for call/put Greeks, IV recovery, invalid inputs and futures basis.
-- [x] Added `PROJECT_MEMORY.md` as the persistent project memory/handoff store.
+- [x] Deterministic derivative contract metadata and option-chain validation.
+- [x] European Black-Scholes option price and Greeks: delta, gamma, vega, theta/day and rho.
+- [x] Deterministic bounded-bisection implied-volatility solver with explicit inputs and fail-closed bounds.
+- [x] Deterministic futures basis analytics.
+- [x] Deterministic market breadth, sector breadth/rotation and explicit institutional-flow aggregation.
+- [x] Unit coverage for breadth ratios, sector rotation, invalid chronology/data, zero denominators and institutional-flow aggregation.
+- [x] `PROJECT_MEMORY.md` persistent project memory/handoff store.
 - [x] Changes committed directly to `main`.
 
 ## Done on `main`
 
 ### Repository / quality
-- [x] `PROJECT_WORK_STATUS.md` implementation ledger.
-- [x] `PROJECT_MEMORY.md` persistent project memory and handoff.
-- [x] Backend Python package, pytest and Ruff configuration.
-- [x] CI workflow for pushes to `main` and pull requests.
+- [x] Implementation ledger and persistent project memory.
+- [x] Backend Python package, pytest/Ruff and GitHub Actions quality workflow.
 - [x] Domain contract version registry and explicit contract versions.
 - [x] Structured JSON logging with recursive secret redaction.
 - [x] Deterministic health/readiness checks.
 
 ### Market data / instruments
-- [x] Canonical broker-neutral `QuoteEvent` and normalization boundary.
-- [x] Candle engine, ordering protection, volume delta and feature foundation.
-- [x] Multi-timeframe candle aggregation with independent interval state.
-- [x] Session-aware candle boundaries and session metadata.
+- [x] Canonical broker-neutral QuoteEvent and normalization boundary.
+- [x] Candle engine, ordering protection, volume delta and multi-timeframe/session-aware aggregation.
 - [x] Deterministic data-quality service.
-- [x] Broker-neutral `MarketDataAdapter` protocol.
-- [x] Versioned, sorted, content-addressed instrument-master snapshots.
-- [x] Monotonic atomic instrument-master publication.
-- [x] Upstox instrument-master adapter boundary.
-- [x] Concrete Upstox BOD JSON instrument-master source and parser.
-- [x] Upstox V3 protobuf schema/artifact vendoring and pinning.
-- [x] Upstox V3 protobuf decoder boundary and deterministic feed mapper.
+- [x] Versioned/content-addressed instrument-master snapshots and monotonic publication.
+- [x] Upstox instrument-master adapter and BOD JSON parser boundary.
+- [x] Upstox V3 protobuf schema/decoder boundary.
 - [x] Real `websockets` transport with injectable connector/decoder.
 
 ### Market state / analytics
-- [x] India market-session calendar/gate foundation.
-- [x] Broker-neutral authoritative market-status contract.
-- [x] Upstox exchange market-status source.
+- [x] India market-session calendar/gate and authoritative market-status contract/source.
 - [x] RiskEngine market-status freshness and fail-closed gate.
 - [x] Market structure, liquidity, FVG, order-block and regime primitives.
-- [x] Unified `MarketState` foundation.
-- [x] Deterministic displacement feature engine.
-- [x] Deterministic candle-volume profile.
-- [x] Explicit trade-print order-flow boundary.
-- [x] Deterministic futures/options contract metadata and option-chain validation.
+- [x] Unified MarketState foundation.
+- [x] Deterministic displacement, candle-volume profile and explicit trade-print order-flow analytics.
+- [x] Deterministic futures/options metadata and option-chain validation.
 - [x] Deterministic Black-Scholes Greeks / implied-volatility analytics.
 - [x] Deterministic futures basis analytics.
+- [x] Deterministic market breadth and sector breadth analytics.
+- [x] Deterministic sector rotation ranking with optional explicit benchmark return.
+- [x] Explicit institutional FII/DII flow aggregation; no flow inference from price/volume.
 
 ### Trading / risk / execution
 - [x] Trade Type and versioned Strategy framework.
@@ -72,14 +61,13 @@ The repository has a substantial deterministic PAPER/research foundation. Upstox
 ## Pending work
 
 ### Phase 3 — Market state / analytics
-- [x] Multi-timeframe candle aggregation foundation.
-- [x] Session-aware candle boundaries and session metadata.
+- [x] Multi-timeframe/session-aware candle aggregation.
 - [x] Expanded feature engine and displacement confirmation.
 - [x] Candle-volume profile analytics.
 - [x] Explicit order-flow analytics boundary.
 - [x] Futures/options contract metadata and option-chain foundation.
 - [x] Option Greeks/IV analytics with explicit Black-Scholes assumptions.
-- [ ] Breadth, sector rotation and institutional-flow intelligence.
+- [x] Breadth, sector rotation and institutional-flow intelligence.
 - [ ] Richer regime/session context integration.
 
 ### Phase 4 — Intelligence / scanning
@@ -99,19 +87,15 @@ The repository has a substantial deterministic PAPER/research foundation. Upstox
 
 ### Phase 8 — Frontend
 - [ ] Next.js/React/TypeScript foundation.
-- [ ] Trading terminal and market dashboard.
-- [ ] Scanner, derivatives and PAPER trading views.
-- [ ] Portfolio, journal, backtest and research UI.
+- [ ] Trading terminal, dashboards, scanner, derivatives, PAPER trading, portfolio, journal, backtest and research UI.
 
 ### Phase 9 — Infrastructure
 - [ ] PostgreSQL, ClickHouse, Redis and Parquet/object storage.
 - [ ] Docker/deployment configuration.
-- [ ] Monitoring and operational runbooks.
-- [ ] Migrations and reverse proxy.
+- [ ] Monitoring, runbooks, migrations and reverse proxy.
 
 ## Non-negotiable architecture rules
-- AI never bypasses RiskEngine.
-- AI never places uncontrolled orders.
+- AI never bypasses RiskEngine or places uncontrolled orders.
 - Charting is not the source of truth for orders/positions.
 - Strategy calculations stay deterministic, testable, network-independent and database-independent.
 - Broker-specific code stays behind adapter interfaces.
@@ -123,4 +107,4 @@ The repository has a substantial deterministic PAPER/research foundation. Upstox
 `Market Event → Normalization → Validation → Candle → Features → Market State → Strategy → Opportunity → Probability/EV → RiskEngine → OMS → Paper Fill → Position → P&L → Journal`
 
 ## Current next task
-Implement breadth, sector-rotation and institutional-flow intelligence using authoritative constituent/market data only. Keep calculations deterministic and explicitly distinguish observed breadth/flow inputs from derived indicators. Keep all work directly on `main`.
+Implement richer regime/session context integration so strategies and scanners can consume explicit market-session/regime context without inferring unsupported state. Keep all work directly on `main`.
