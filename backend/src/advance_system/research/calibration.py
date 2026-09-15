@@ -45,10 +45,30 @@ class HistoricalCalibrationModel:
             raise ValueError("calibration may only be applied out of sample")
         if not Decimal("0") <= predicted_probability <= Decimal("1"):
             raise ValueError("predicted_probability must be between 0 and 1")
-        bucket = _find_bucket(self.buckets, predicted_probability, self.bins)
+        bucket = _find_bucket(self.buckets, predicted_probability)
         if bucket is None:
             raise ValueError("no historical observations cover predicted probability")
         return bucket.calibrated_probability
+
+
+@dataclass(frozen=True, slots=True)
+class CalibrationValidation:
+    """Out-of-sample validation metrics; contains no fitted-model mutation."""
+
+    observations: int
+    brier_score: Decimal
+    log_loss: Decimal
+    accuracy: Decimal
+
+    def validate(self) -> None:
+        if self.observations <= 0:
+            raise ValueError("validation observations must be positive")
+        if not Decimal("0") <= self.brier_score <= Decimal("1"):
+            raise ValueError("brier_score must be between 0 and 1")
+        if self.log_loss < 0:
+            raise ValueError("log_loss must be non-negative")
+        if not Decimal("0") <= self.accuracy <= Decimal("1"):
+            raise ValueError("accuracy must be between 0 and 1")
 
 
 class HistoricalProbabilityCalibrator:
@@ -97,11 +117,50 @@ class HistoricalProbabilityCalibrator:
             )
         return HistoricalCalibrationModel(training_end, tuple(buckets), bins)
 
+    def validate_oos(
+        self,
+        model: HistoricalCalibrationModel,
+        samples: Sequence[HistoricalOutcome],
+    ) -> CalibrationValidation:
+        if not samples:
+            raise ValueError("OOS validation samples must not be empty")
+        for sample in samples:
+            sample.validate()
+            if sample.timestamp <= model.training_end:
+                raise ValueError("OOS validation samples must be strictly after training_end")
+
+        predictions: list[Decimal] = []
+        outcomes: list[Decimal] = []
+        correct = 0
+        for sample in samples:
+            calibrated = model.probability(sample.predicted_probability, observed_at=sample.timestamp)
+            outcome = Decimal("1") if sample.outcome else Decimal("0")
+            predictions.append(calibrated)
+            outcomes.append(outcome)
+            if (calibrated >= Decimal("0.5")) == sample.outcome:
+                correct += 1
+
+        brier = sum(
+            ((prediction - outcome) ** 2 for prediction, outcome in zip(predictions, outcomes)),
+            Decimal("0"),
+        ) / Decimal(len(predictions))
+        log_loss = sum(
+            (_log_loss(prediction, outcome) for prediction, outcome in zip(predictions, outcomes)),
+            Decimal("0"),
+        ) / Decimal(len(predictions))
+        result = CalibrationValidation(
+            observations=len(predictions),
+            brier_score=brier,
+            log_loss=log_loss,
+            accuracy=Decimal(correct) / Decimal(len(predictions)),
+        )
+        result.validate()
+        return result
+
 
 def _find_bucket(
     buckets: Sequence[CalibrationBucket],
     probability: Decimal,
-    bins: int,
 ) -> CalibrationBucket | None:
     for bucket in buckets:
         if bucket.lower <= probability < bucket.upper or (
@@ -109,3 +168,14 @@ def _find_bucket(
         ):
             return bucket
     return None
+
+
+def _log_loss(prediction: Decimal, outcome: Decimal) -> Decimal:
+    """Compute log loss using Decimal-safe bounded probabilities."""
+    from decimal import getcontext
+
+    epsilon = Decimal("1e-12")
+    bounded = min(max(prediction, epsilon), Decimal("1") - epsilon)
+    if outcome == Decimal("1"):
+        return -getcontext().ln(bounded)
+    return -getcontext().ln(Decimal("1") - bounded)
