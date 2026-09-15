@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
 import pytest
@@ -10,7 +10,7 @@ from advance_system.market.candle_engine import MultiTimeframeCandleEngine
 def quote(second: int, price: str, volume: int) -> QuoteEvent:
     return QuoteEvent(
         instrument="NSE_EQ|TEST",
-        timestamp=datetime(2026, 9, 14, 3, 45, second, tzinfo=timezone.utc),
+        timestamp=datetime(2026, 9, 14, 3, 45, tzinfo=timezone.utc) + timedelta(seconds=second),
         last_price=Decimal(price),
         volume=volume,
     )
