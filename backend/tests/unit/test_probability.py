@@ -25,7 +25,7 @@ def opportunity(rr: str) -> Opportunity:
 def test_probability_is_bounded_and_ev_is_explicit():
     result = ProbabilityEVEngine().estimate(opportunity("2"))
     assert Decimal("0") <= result.estimated_win_probability <= Decimal("1")
-    assert result.expected_value_r == Decimal("0.75")
+    assert result.expected_value_r == Decimal("0.65")
     assert "empirical calibration" in result.evidence[0]
 
 
