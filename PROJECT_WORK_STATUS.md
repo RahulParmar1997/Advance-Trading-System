@@ -12,6 +12,8 @@
 - [x] Phase 9 storage configuration and PostgreSQL/ClickHouse/Redis/Parquet boundary contracts.
 - [x] Concrete PostgreSQL operational adapter with injected connection factory and fail-closed health check.
 - [x] Initial PostgreSQL operational migration for orders, fills, and positions.
+- [x] Migration version tracking and idempotent PostgreSQL migration runner contract.
+- [x] Migration runner unit coverage for pending and already-applied migrations.
 - [x] Changes committed directly to `main`.
 
 ## Done on `main`
@@ -76,6 +78,7 @@
 - [x] Storage source-of-truth and execution-authority rules documented.
 - [x] PostgreSQL operational adapter with injected driver lifecycle.
 - [x] Initial PostgreSQL schema migration for operational order/fill/position state.
+- [x] Migration version tracking and idempotent migration runner contract.
 
 ## Pending work
 
@@ -83,7 +86,8 @@
 - [x] Storage configuration and vendor-neutral boundaries.
 - [x] PostgreSQL operational adapter boundary.
 - [x] Initial PostgreSQL operational migration.
-- [ ] Migration runner/version tracking.
+- [x] Migration runner/version tracking contract.
+- [ ] Concrete PostgreSQL driver integration.
 - [ ] Concrete ClickHouse analytics adapter/schema.
 - [ ] Concrete Redis hot-state adapter.
 - [ ] Concrete Parquet/object-storage adapter and dataset layout.
@@ -104,7 +108,7 @@
 - Redis, ClickHouse and Parquet/object storage must never become execution authority or replace PostgreSQL operational truth.
 
 ## Current next task
-Implement migration version tracking and an idempotent PostgreSQL migration runner behind the storage boundary.
+Implement the concrete PostgreSQL driver integration behind the existing adapter and migration boundary, with connection lifecycle, transaction safety, and no credentials in source.
 
 ## CI note
 The latest GitHub Actions state is not verified green. Do not claim the quality gate is healthy until the Ruff failure is repaired and a subsequent run passes both Ruff and pytest.
