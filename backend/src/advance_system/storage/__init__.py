@@ -9,6 +9,7 @@ from advance_system.storage.contracts import (
     StorageConfig,
     StorageMode,
 )
+from advance_system.storage.parquet import DatasetManifest, ImmutableParquetStore, ParquetStoreAdapter, ResearchDatasetRef
 from advance_system.storage.postgres import PostgreSQLStoreAdapter, PostgresOperationalStore
 from advance_system.storage.redis import RedisHotStateStore, RedisStoreAdapter
 
@@ -16,14 +17,17 @@ __all__ = [
     "ClickHouseAnalyticsStore",
     "ClickHouseStore",
     "ClickHouseStoreAdapter",
+    "DatasetManifest",
+    "ImmutableParquetStore",
     "ParquetStore",
+    "ParquetStoreAdapter",
     "PostgresOperationalStore",
     "PostgreSQLStore",
     "PostgreSQLStoreAdapter",
-    "ParquetStore",
     "RedisHotStateStore",
     "RedisStore",
     "RedisStoreAdapter",
+    "ResearchDatasetRef",
     "StorageConfig",
     "StorageMode",
 ]
