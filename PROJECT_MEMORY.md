@@ -48,6 +48,7 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 - Multi-symbol / multi-timeframe scanner orchestration with explicit `ScanScope` identity, context consistency validation and deterministic scope ordering.
 - Deterministic evidence-based scanner scoring using explicit weighted evidence; scores are not probabilities or expected values.
 - Historical probability calibration from explicit timestamped labeled outcomes, trained only through a fixed historical cutoff and restricted to out-of-sample application.
+- OOS probability validation metrics: Brier score, log loss and threshold accuracy, computed only from samples strictly after the calibration cutoff without mutating the fitted model.
 - Trade Type and versioned Strategy framework.
 - Opportunity, probability and EV primitives.
 - Canonical OMS lifecycle and controlled RiskEngine → PAPER OMS flow.
@@ -93,13 +94,15 @@ Use explicit trade prints/aggressor information when available. BUY/SELL/UNKNOWN
 ### Historical probability calibration
 `research/calibration.py` provides `HistoricalOutcome`, `CalibrationBucket`, `HistoricalCalibrationModel` and `HistoricalProbabilityCalibrator`. Calibration is an empirical mapping from explicit historical predicted probabilities to realized boolean outcomes. Fitting uses only observations at or before a timezone-aware training cutoff; applying a fitted model requires a strictly later observation timestamp. Empty probability buckets are not backfilled or smoothed, so the system does not invent probabilities for unsupported historical regions.
 
+### OOS probability validation
+`HistoricalProbabilityCalibrator.validate_oos()` accepts a fitted immutable calibration model plus separately supplied labeled outcomes. Every validation observation must be strictly after the model's training cutoff. It reports Brier score, log loss and 0.5-threshold accuracy. Validation does not refit, smooth or mutate the calibration model, and it fails closed for empty, invalid or in-sample validation data.
+
 ## Pending roadmap
-1. OOS probability validation.
-2. Explanation/audit evidence persistence.
-3. Broker reconciliation adapter implementation.
-4. Durable journal backend.
-5. Next.js/React/TypeScript trading terminal and dashboards.
-6. PostgreSQL, ClickHouse, Redis, Parquet/object storage and deployment/observability infrastructure.
+1. Explanation/audit evidence persistence.
+2. Broker reconciliation adapter implementation.
+3. Durable journal backend.
+4. Next.js/React/TypeScript trading terminal and dashboards.
+5. PostgreSQL, ClickHouse, Redis, Parquet/object storage and deployment/observability infrastructure.
 
 ## Next implementation rule
 When the user says **NEXT**, inspect the repository and implement the next unchecked roadmap item directly on `main`. Add deterministic tests, update `PROJECT_WORK_STATUS.md`, and update this memory file so the next session can resume without reconstructing project state.
