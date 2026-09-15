@@ -3,9 +3,9 @@ import pytest
 from advance_system.research.compute import (
     ComputeBackend,
     LocalResearchExecutor,
+    ResearchJob,
     ResearchStatus,
     ResourceLimits,
-    ResearchJob,
 )
 
 
