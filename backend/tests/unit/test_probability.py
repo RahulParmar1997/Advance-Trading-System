@@ -9,7 +9,6 @@ from advance_system.opportunity.probability import ProbabilityEVEngine
 def opportunity(rr: str) -> Opportunity:
     return Opportunity(
         opportunity_id="opp-1",
-        candidate_id="cand-1",
         instrument="NSE_EQ|TEST",
         trade_type="BREAKOUT",
         strategy="breakout-continuation",
