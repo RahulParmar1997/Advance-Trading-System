@@ -43,7 +43,6 @@ class UpstoxFeedMapper:
         feeds = _read(message, "feeds")
         if feeds is None:
             return []
-        current_ts = _to_millis(_read(message, "currentTs"))
         result: list[UpstoxQuote] = []
         for instrument, feed in _items(feeds):
             ltpc = _first_present(feed, "ltpc", "firstLevelWithGreeks.ltpc", "fullFeed.marketFF.ltpc", "ff.indexFF.ltpc")
@@ -51,7 +50,11 @@ class UpstoxFeedMapper:
                 continue
             price = _decimal(_read(ltpc, "ltp"), "ltp")
             ltt = _read(ltpc, "ltt")
-            timestamp = datetime.fromtimestamp((_to_millis(ltt) if ltt is not None else current_ts) / 1000, tz=timezone.utc)
+            if ltt is not None:
+                timestamp = datetime.fromtimestamp(_to_millis(ltt) / 1000, tz=timezone.utc)
+            else:
+                current_ts = _to_millis(_read(message, "currentTs"))
+                timestamp = datetime.fromtimestamp(current_ts / 1000, tz=timezone.utc)
             bid_quote = _first_bid_ask(feed)
             result.append(
                 UpstoxQuote(
