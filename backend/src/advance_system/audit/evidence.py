@@ -1,10 +1,10 @@
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from enum import StrEnum
 from hashlib import sha256
-import json
 from threading import RLock
 from typing import Mapping, Protocol
 
