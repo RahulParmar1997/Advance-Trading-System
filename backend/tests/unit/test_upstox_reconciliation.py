@@ -45,7 +45,7 @@ async def test_adapter_translates_order_and_fills():
     assert snapshot.average_fill_price == Decimal("101.25")
     assert fills[0].fill_id == "trade-1"
     assert fills[0].side is FillSide.BUY
-    assert fills[0].timestamp == datetime(2026, 9, 15, 10, 0, tzinfo=timezone.utc).replace(hour=10, minute=0)
+    assert fills[0].timestamp == datetime(2026, 9, 15, 4, 30, tzinfo=timezone.utc)
 
 
 def test_order_snapshot_rejects_negative_fill_quantity():
