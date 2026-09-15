@@ -4,6 +4,7 @@ from types import SimpleNamespace
 
 import pytest
 
+from advance_system.domain.market_status import MarketStatus
 from advance_system.risk.engine import RiskContext, RiskEngine, RiskPolicy, RiskSnapshot
 
 
@@ -19,6 +20,8 @@ def context(**overrides):
         duplicate_opportunity=False,
         estimated_slippage_bps=Decimal("1"),
         probability=Decimal("0.60"),
+        market_status=MarketStatus("NSE", "NORMAL_OPEN", now),
+        expected_exchange="NSE",
     )
     values.update(overrides)
     return RiskContext(**values)
