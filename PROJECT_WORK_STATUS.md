@@ -10,6 +10,8 @@
 - [x] Added deterministic metric rendering, label escaping/validation, counter/gauge semantics and read-only HTTP method enforcement.
 - [x] Wired the backend container to serve metrics on port 8000 and published that port in Docker Compose; the endpoint has no broker, OMS or RiskEngine authority.
 - [x] Added unit coverage for rendering, escaping, validation, HTTP response/content type and read-only behavior.
+- [x] Fixed the `/metrics` renderer to safely handle integer metric samples as well as floating-point samples.
+- [x] Inspected GitHub Actions Run 451 (`34965141139`): Ruff passed and Pytest reported exactly 3 failures / 323 passes, all rooted in integer metric formatting; the failures were corrected directly on `main`.
 - [x] Verified GitHub Actions Run 444 on commit `25c7732d502b046df185c477cd3eb595ff4461df`: Ruff and Pytest both passed successfully.
 - [x] Corrected the remaining GitHub Actions Ruff import-order/spacing failures in `test_research_results.py` and pushed the fixes directly to `main`.
 - [x] Connected immutable COMPUTED research-result provenance to the existing OOS validation and explicit research-approval workflow.
@@ -38,7 +40,7 @@
 ## Pending work
 
 ### Infrastructure / operations
-- [ ] Fresh GitHub Actions verification for the new `/metrics` implementation and Docker wiring (Run 450 failed only at Ruff import ordering; fix committed below, fresh run pending).
+- [ ] Fresh GitHub Actions verification after the integer-format fix (`382b246cec02c66a275b3e696996e37fa68c53a9`).
 - [ ] End-to-end monitoring validation against the deployed monitoring stack.
 - [ ] Full deployment/integration validation against configured PostgreSQL, ClickHouse and Redis services.
 
@@ -58,7 +60,7 @@
 - Research compute must never place orders, mutate positions/balances or bypass RiskEngine → OMS.
 
 ## Current next task
-Verify the corrected `/metrics` implementation through GitHub Actions, then validate the monitoring stack end-to-end before moving to broader PostgreSQL/ClickHouse/Redis deployment integration.
+Verify the integer-format `/metrics` fix through GitHub Actions, then validate the monitoring stack end-to-end before moving to broader PostgreSQL/ClickHouse/Redis deployment integration.
 
 ## CI note
-Run 444 (`34964845295`) on commit `25c7732d502b046df185c477cd3eb595ff4461df` passed Ruff and Pytest. Run 450 (`34965061859`) on the first metrics wiring commit failed Ruff before Pytest: two I001 import-order errors in `observability/server.py` and `tests/unit/test_metrics.py`. Both were corrected directly on `main`; the latest correction commit is `b5702b16beefbd4893e51f1cff801fd468f64481`, and fresh Actions verification is pending.
+Run 451 (`34965141139`) on commit `78de01cdb256bbbf59adbf0bb1d1f528ef7585f8` passed Ruff but failed Pytest with exactly 3 failures and 323 passes. All 3 failures traced to `_format_value()` calling `is_integer()` on integer samples. Commit `382b246cec02c66a275b3e696996e37fa68c53a9` fixes this by normalizing the value to float before formatting. Fresh Actions verification is required before certifying CI-green.
