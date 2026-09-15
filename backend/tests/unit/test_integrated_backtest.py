@@ -3,6 +3,7 @@ from decimal import Decimal
 
 from advance_system.backtest.engine import BacktestEvent
 from advance_system.backtest.pipeline import IntegratedBacktestPipeline
+from advance_system.domain.market_status import MarketStatus
 from advance_system.risk.engine import RiskEngine, RiskPolicy
 from advance_system.strategy.engine import BreakoutContinuationV1
 
@@ -33,6 +34,7 @@ def test_integrated_pipeline_reaches_oms_pending_only_after_risk() -> None:
         quantity=5,
         starting_cash=Decimal("10000"),
         market_context={"structure_direction": "UP"},
+        market_status=MarketStatus("NSE", "NORMAL_OPEN", event.timestamp),
     )
     assert result.decisions[0].risk_allowed is True
     assert result.decisions[0].oms_state.value == "ORDER_PENDING"
@@ -50,6 +52,7 @@ def test_integrated_pipeline_rejects_before_oms_when_risk_fails() -> None:
         quantity=5,
         starting_cash=Decimal("10000"),
         market_context={"structure_direction": "UP"},
+        market_status=MarketStatus("NSE", "NORMAL_OPEN", event.timestamp),
     )
     assert result.decisions[0].risk_allowed is False
     assert result.decisions[0].oms_state.value == "REJECTED"
