@@ -6,6 +6,9 @@
 **Last updated:** 2026-09-15
 
 ## Latest completed work
+- [x] Implemented an observational Prometheus `/metrics` registry and read-only HTTP endpoint using only the Python standard library.
+- [x] Added deterministic metric rendering, label escaping/validation, counter/gauge semantics and read-only HTTP method enforcement.
+- [x] Wired the backend container to serve metrics on port 8000 and published that port in Docker Compose; the endpoint has no broker, OMS or RiskEngine authority.
 - [x] Verified GitHub Actions Run 444 on commit `25c7732d502b046df185c477cd3eb595ff4461df`: Ruff and Pytest both passed successfully.
 - [x] Corrected the remaining GitHub Actions Ruff import-order/spacing failures in `test_research_results.py` and pushed the fixes directly to `main`.
 - [x] Connected immutable COMPUTED research-result provenance to the existing OOS validation and explicit research-approval workflow.
@@ -34,8 +37,8 @@
 ## Pending work
 
 ### Infrastructure / operations
-- [x] Fresh GitHub Actions verification after the latest Ruff correction.
-- [ ] Production `/metrics` endpoint and end-to-end monitoring validation.
+- [ ] Fresh GitHub Actions verification for the new `/metrics` implementation and Docker wiring.
+- [ ] End-to-end monitoring validation against the deployed monitoring stack.
 - [ ] Full deployment/integration validation against configured PostgreSQL, ClickHouse and Redis services.
 
 ## Non-negotiable architecture rules
@@ -54,7 +57,7 @@
 - Research compute must never place orders, mutate positions/balances or bypass RiskEngine → OMS.
 
 ## Current next task
-Implement the production `/metrics` endpoint and end-to-end monitoring validation, keeping monitoring observational and without execution authority.
+Verify the new `/metrics` implementation through GitHub Actions, then validate the monitoring stack end-to-end before moving to broader PostgreSQL/ClickHouse/Redis deployment integration.
 
 ## CI note
-GitHub Actions Run 444 (`34964845295`) for commit `25c7732d502b046df185c477cd3eb595ff4461df` completed successfully. Both Ruff lint and Pytest passed. This is the latest verified CI state.
+Latest completed verification before the metrics changes is GitHub Actions Run 444 (`34964845295`) for commit `25c7732d502b046df185c477cd3eb595ff4461df`; both Ruff lint and Pytest passed. A new Actions run is required to certify the metrics changes.
