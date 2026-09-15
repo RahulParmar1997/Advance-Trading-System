@@ -45,6 +45,7 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 - Explicit MarketContextEngine joining completed-candle regime classification with market-session metadata and rejecting chronology/session/instrument inconsistencies.
 - Deterministic Wyckoff-style event features from completed candles and explicit candle volume, including Spring, Upthrust, Sign of Strength, Sign of Weakness and effort/result absorption observations.
 - Rich scanner result contract with explicit evidence and deterministic explanations; pipeline integration exposes the richer result without probability, risk approval or broker status.
+- Multi-symbol / multi-timeframe scanner orchestration with explicit `ScanScope` identity, context consistency validation and deterministic scope ordering.
 - Trade Type and versioned Strategy framework.
 - Opportunity, probability and EV primitives.
 - Canonical OMS lifecycle and controlled RiskEngine → PAPER OMS flow.
@@ -81,15 +82,17 @@ Use explicit trade prints/aggressor information when available. BUY/SELL/UNKNOWN
 ### Scanner results
 `scanner/results.py` provides immutable `Evidence` and `ScannerResult` contracts. Evidence records field, operator, expected value, observed context value, match state and source. Results may carry explicit instrument and timezone-aware observation time. Explanations are generated only from matched rule evidence. Probability, expected value, risk decisions and broker observations are intentionally outside this contract.
 
+### Scanner orchestration
+`scanner/orchestrator.py` provides `ScanScope(instrument, timeframe_seconds, observed_at)` and `ScannerOrchestrator`. Each scope is validated, its context identity is checked for consistency, missing identity fields are injected explicitly, and scopes are processed in deterministic order before invoking the existing scanner pipeline. This supports multiple symbols and timeframes without introducing hidden market data or concurrency semantics.
+
 ## Pending roadmap
-1. Multi-symbol / multi-timeframe scanner orchestration.
-2. Evidence-based scoring.
-3. Historical/OOS probability calibration and validation.
-4. Explanation/audit evidence persistence.
-5. Broker reconciliation adapter implementation.
-6. Durable journal backend.
-7. Next.js/React/TypeScript trading terminal and dashboards.
-8. PostgreSQL, ClickHouse, Redis, Parquet/object storage and deployment/observability infrastructure.
+1. Evidence-based scoring.
+2. Historical/OOS probability calibration and validation.
+3. Explanation/audit evidence persistence.
+4. Broker reconciliation adapter implementation.
+5. Durable journal backend.
+6. Next.js/React/TypeScript trading terminal and dashboards.
+7. PostgreSQL, ClickHouse, Redis, Parquet/object storage and deployment/observability infrastructure.
 
 ## Next implementation rule
 When the user says **NEXT**, inspect the repository and implement the next unchecked roadmap item directly on `main`. Add deterministic tests, update `PROJECT_WORK_STATUS.md`, and update this memory file so the next session can resume without reconstructing project state.
