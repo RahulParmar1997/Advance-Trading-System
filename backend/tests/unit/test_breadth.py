@@ -6,7 +6,6 @@ import pytest
 from advance_system.market.breadth import (
     ConstituentObservation,
     InstitutionalFlowObservation,
-    InstitutionalFlowSegment,
     InstitutionalSegment,
     build_breadth_snapshot,
     build_institutional_flow_snapshot,
@@ -74,7 +73,7 @@ def test_rejects_mixed_timestamps_duplicates_and_invalid_prices() -> None:
     with pytest.raises(ValueError, match="duplicate instrument"):
         build_breadth_snapshot([observation("A", "IT", "100", "101", 10), observation("A", "BANK", "100", "99", 20)])
     with pytest.raises(ValueError, match="prices must be positive"):
-        build_breadth_snapshot([observation("A", "IT", "0", "101", 10)])
+        build_breadth_snapshot([observation("A", "IT", "100", "0", 10)])
 
 
 def test_zero_denominators_are_explicitly_none() -> None:
