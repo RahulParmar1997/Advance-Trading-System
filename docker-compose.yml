@@ -45,6 +45,10 @@ services:
       ATS_CLICKHOUSE_DSN: http://clickhouse:8123
       ATS_REDIS_URL: redis://redis:6379/0
       ATS_PARQUET_ROOT: ${ATS_PARQUET_ROOT:-file:///var/lib/ats/research}
+      ATS_METRICS_HOST: 0.0.0.0
+      ATS_METRICS_PORT: 8000
+    ports:
+      - "${ATS_METRICS_PORT:-8000}:8000"
     depends_on:
       postgres:
         condition: service_healthy
