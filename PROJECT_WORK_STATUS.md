@@ -11,7 +11,8 @@
 - [x] Deterministic bounded-bisection implied-volatility solver with explicit inputs and fail-closed bounds.
 - [x] Deterministic futures basis analytics.
 - [x] Deterministic market breadth, sector breadth/rotation and explicit institutional-flow aggregation.
-- [x] Unit coverage for breadth ratios, sector rotation, invalid chronology/data, zero denominators and institutional-flow aggregation.
+- [x] Explicit market-context integration joining completed-candle regime state with authoritative session state.
+- [x] Unit coverage for market-context chronology, instrument/session consistency and regime/session joining.
 - [x] `PROJECT_MEMORY.md` persistent project memory/handoff store.
 - [x] Changes committed directly to `main`.
 
@@ -45,6 +46,7 @@
 - [x] Deterministic market breadth and sector breadth analytics.
 - [x] Deterministic sector rotation ranking with optional explicit benchmark return.
 - [x] Explicit institutional FII/DII flow aggregation; no flow inference from price/volume.
+- [x] MarketContextEngine joining completed-candle regime classification with session metadata and fail-closed consistency checks.
 
 ### Trading / risk / execution
 - [x] Trade Type and versioned Strategy framework.
@@ -68,7 +70,7 @@
 - [x] Futures/options contract metadata and option-chain foundation.
 - [x] Option Greeks/IV analytics with explicit Black-Scholes assumptions.
 - [x] Breadth, sector rotation and institutional-flow intelligence.
-- [ ] Richer regime/session context integration.
+- [x] Richer regime/session context integration.
 
 ### Phase 4 — Intelligence / scanning
 - [ ] Wyckoff features.
@@ -103,8 +105,8 @@
 - Backtests contain no look-ahead bias.
 - PAPER remains the default.
 
-## First production milestone
-`Market Event → Normalization → Validation → Candle → Features → Market State → Strategy → Opportunity → Probability/EV → RiskEngine → OMS → Paper Fill → Position → P&L → Journal`
-
 ## Current next task
-Implement richer regime/session context integration so strategies and scanners can consume explicit market-session/regime context without inferring unsupported state. Keep all work directly on `main`.
+Implement deterministic Wyckoff features from completed candles/explicit volume inputs, with chronology and look-ahead protections. Keep all work directly on `main`.
+
+## CI note
+The latest GitHub Actions run after the context implementation still fails at Ruff before pytest. The repository does not claim a green CI state until the lint gate is repaired and verified.
