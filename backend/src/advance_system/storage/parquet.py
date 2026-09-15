@@ -5,14 +5,14 @@ import json
 import re
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from pathlib import PurePosixPath
 from typing import Protocol
 from urllib.parse import urlparse
 
 from advance_system.storage.contracts import StorageConfig
 
 
-_DATASET_PART = re.compile(r"^[A-Za-z0-9._-]+$")
+_PATH_PART = re.compile(r"^[A-Za-z0-9._-]+$")
+_PARTITION_PART = re.compile(r"^[A-Za-z0-9._=-]+$")
 
 
 class ObjectStore(Protocol):
@@ -41,9 +41,12 @@ class ResearchDatasetRef:
     partition: str = "default"
 
     def validate(self) -> None:
-        for field_name, value in (("dataset", self.dataset), ("version", self.version), ("partition", self.partition)):
-            if not value or not _DATASET_PART.fullmatch(value):
-                raise ValueError(f"invalid {field_name}")
+        if not self.dataset or not _PATH_PART.fullmatch(self.dataset):
+            raise ValueError("invalid dataset")
+        if not self.version or not _PATH_PART.fullmatch(self.version):
+            raise ValueError("invalid version")
+        if not self.partition or not _PARTITION_PART.fullmatch(self.partition):
+            raise ValueError("invalid partition")
 
 
 @dataclass(frozen=True, slots=True)
@@ -85,13 +88,14 @@ class ImmutableParquetStore:
 
     def __init__(self, config: StorageConfig, object_store: ObjectStore) -> None:
         config.validate()
-        parsed = urlparse(config.parquet_root)
-        if not parsed.scheme:
+        if not urlparse(config.parquet_root).scheme:
             raise ValueError("parquet_root must be a filesystem or object-storage URI")
         self._root = config.parquet_root.rstrip("/")
         self._object_store = object_store
 
-    async def write_dataset(self, ref: ResearchDatasetRef, payload: bytes, *, created_at: datetime | None = None) -> DatasetManifest:
+    async def write_dataset(
+        self, ref: ResearchDatasetRef, payload: bytes, *, created_at: datetime | None = None
+    ) -> DatasetManifest:
         ref.validate()
         if not isinstance(payload, bytes):
             raise TypeError("Parquet payload must be bytes")
@@ -169,8 +173,10 @@ class ImmutableParquetStore:
 
     def _key(self, ref: ResearchDatasetRef, name: str) -> str:
         ref.validate()
-        root = PurePosixPath(self._root)
-        return str(root / f"dataset={ref.dataset}" / f"version={ref.version}" / f"partition={ref.partition}" / name)
+        return (
+            f"{self._root}/dataset={ref.dataset}/version={ref.version}/"
+            f"partition={ref.partition}/{name}"
+        )
 
 
 ParquetStoreAdapter = ImmutableParquetStore
