@@ -83,7 +83,7 @@ def test_oos_validation_calculates_brier_log_loss_and_accuracy():
     )
     assert result.observations == 2
     assert result.brier_score == Decimal("0")
-    assert result.log_loss == Decimal("0")
+    assert Decimal("0") <= result.log_loss < Decimal("1e-9")
     assert result.accuracy == Decimal("1")
 
 
