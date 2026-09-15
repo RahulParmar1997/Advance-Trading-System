@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Callable, Protocol
+from typing import Protocol
 from uuid import UUID, uuid4
 
 from advance_system.research.compute import ComputeBackend, ResearchJob
