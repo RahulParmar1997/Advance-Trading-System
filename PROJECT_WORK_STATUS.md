@@ -6,7 +6,8 @@
 **Last updated:** 2026-09-15
 
 ## Latest completed work
-- [x] Corrected the remaining GitHub Actions Ruff import-order failure in `test_research_results.py` and pushed the fix directly to `main`.
+- [x] Verified GitHub Actions Run 444 on commit `25c7732d502b046df185c477cd3eb595ff4461df`: Ruff and Pytest both passed successfully.
+- [x] Corrected the remaining GitHub Actions Ruff import-order/spacing failures in `test_research_results.py` and pushed the fixes directly to `main`.
 - [x] Connected immutable COMPUTED research-result provenance to the existing OOS validation and explicit research-approval workflow.
 - [x] Added fail-closed OOS→RESEARCH_APPROVED transitions, provenance binding, and timezone-aware approval evidence with no execution authority.
 - [x] Added deterministic unit coverage for OOS validation entry, explicit approval, provenance mismatch, duplicate approval and timestamp validation.
@@ -33,7 +34,7 @@
 ## Pending work
 
 ### Infrastructure / operations
-- [ ] Fresh GitHub Actions verification after the latest Ruff correction.
+- [x] Fresh GitHub Actions verification after the latest Ruff correction.
 - [ ] Production `/metrics` endpoint and end-to-end monitoring validation.
 - [ ] Full deployment/integration validation against configured PostgreSQL, ClickHouse and Redis services.
 
@@ -53,7 +54,7 @@
 - Research compute must never place orders, mutate positions/balances or bypass RiskEngine → OMS.
 
 ## Current next task
-Fresh CI verification; after CI is green, implement the production `/metrics` endpoint and end-to-end monitoring validation.
+Implement the production `/metrics` endpoint and end-to-end monitoring validation, keeping monitoring observational and without execution authority.
 
 ## CI note
-Run 440 for commit `1db8ed39b7d964418874b3166959699e91992fc4` failed Ruff because the import order was still incorrect: Ruff explicitly requires `ResearchStatus` before `ResourceLimits`. The corrected import ordering is now committed as `3fb85c2d43864121011d862943907af9fe76ce9d`. Fresh Actions verification is required before certifying CI-green.
+GitHub Actions Run 444 (`34964845295`) for commit `25c7732d502b046df185c477cd3eb595ff4461df` completed successfully. Both Ruff lint and Pytest passed. This is the latest verified CI state.
