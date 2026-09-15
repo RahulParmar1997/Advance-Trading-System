@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from typing import Protocol
 
 from advance_system.domain.market_events import QuoteEvent
-from advance_system.ingestion.normalizer import RawQuote, QuoteNormalizer
+from advance_system.ingestion.normalizer import QuoteNormalizer, RawQuote
 
 
 @dataclass(frozen=True, slots=True)
