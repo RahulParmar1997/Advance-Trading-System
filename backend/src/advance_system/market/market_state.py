@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Sequence
 
 from advance_system.market.candle_engine import Candle
-from advance_system.market.liquidity import FairValueGap, LiquidityLevel, LiquidityDetector, OrderBlock
+from advance_system.market.liquidity import FairValueGap, LiquidityDetector, LiquidityLevel, OrderBlock
 from advance_system.market.structure import MarketStructureEngine, StructureSignal, SwingDetector, SwingPoint
 
 
