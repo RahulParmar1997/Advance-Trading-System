@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import Mapping, Sequence
 
-from advance_system.scanner.results import Evidence, ScannerResult
+from advance_system.scanner.results import ScannerResult
 
 
 @dataclass(frozen=True, slots=True)
