@@ -13,7 +13,7 @@ def c(i: int, o: str, h: str, low: str, close: str) -> Candle:
 def test_equal_highs_and_lows_are_liquidity_levels():
     candles = [
         c(0, "10", "12", "8", "11"),
-        c(1, "11", "12", "9", "10"),
+        c(1, "11", "12", "8", "10"),
         c(2, "10", "11", "8", "9"),
         c(3, "9", "10", "9", "9.5"),
     ]
