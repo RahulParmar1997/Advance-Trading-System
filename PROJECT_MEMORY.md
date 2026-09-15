@@ -50,9 +50,13 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 - Historical probability calibration from explicit timestamped labeled outcomes, trained only through a fixed historical cutoff and restricted to out-of-sample application.
 - OOS probability validation metrics: Brier score, log loss and threshold accuracy, computed only from samples strictly after the calibration cutoff without mutating the fitted model.
 - Immutable append-only audit evidence persistence for scanner, scoring, probability and risk decisions.
+- Upstox broker reconciliation adapter translating authoritative order/fill responses into broker-neutral snapshots and fills with identity and timestamp validation.
 
 ## Audit evidence persistence
 `audit/evidence.py` defines `AuditEvidenceRecord`, `AuditDecisionKind`, `AuditEvidenceStore` and `InMemoryAuditEvidenceStore`. Records are frozen, validated, content-addressed with a SHA-256 record id, and append-only. The four supported decision kinds are scanner, score, probability and risk. Evidence is observational provenance only: `execution_authority` is required to remain false, and the store exposes read/append operations but no order or execution capability. Duplicate content is idempotent. This is a persistence boundary; a durable database-backed implementation remains separate future work.
+
+## Broker reconciliation adapter
+`reconciliation/upstox.py` defines `UpstoxReconciliationAdapter` behind the minimal injected `UpstoxOrderApi` protocol. It fetches authoritative order details and fills, translates them into broker-neutral `BrokerOrderSnapshot` and `BrokerFill` contracts, validates positive quantities/prices and timezone-aware timestamps, and rejects fill/order identity mismatches. The adapter contains no order-submission or mutation method, so reconciliation cannot bypass the controlled RiskEngine → OMS execution boundary.
 
 ## Current analytics capability
 ### Breadth / sectors
@@ -95,10 +99,9 @@ Use explicit trade prints/aggressor information when available. BUY/SELL/UNKNOWN
 `HistoricalProbabilityCalibrator.validate_oos()` accepts a fitted immutable calibration model plus separately supplied labeled outcomes. Every validation observation must be strictly after the model's training cutoff. It reports Brier score, log loss and 0.5-threshold accuracy. Validation does not refit, smooth or mutate the calibration model, and it fails closed for empty, invalid or in-sample validation data.
 
 ## Pending roadmap
-1. Broker reconciliation adapter implementation.
-2. Durable journal backend.
-3. Next.js/React/TypeScript trading terminal and dashboards.
-4. PostgreSQL, ClickHouse, Redis, Parquet/object storage and deployment/observability infrastructure.
+1. Durable journal backend.
+2. Next.js/React/TypeScript trading terminal and dashboards.
+3. PostgreSQL, ClickHouse, Redis, Parquet/object storage and deployment/observability infrastructure.
 
 ## Next implementation rule
 When the user says **NEXT**, inspect the repository and implement the next unchecked roadmap item directly on `main`. Add deterministic tests, update `PROJECT_WORK_STATUS.md`, and update this memory file so the next session can resume without reconstructing project state.
