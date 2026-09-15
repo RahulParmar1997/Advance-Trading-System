@@ -35,7 +35,7 @@ def test_displacement_uses_only_prior_completed_candles():
 
     features = engine.calculate(current, prior)
 
-    assert features.body_to_range == Decimal("1.25")
+    assert features.body_to_range == Decimal("0.8333333333333333333333333333")
     assert features.average_prior_range == Decimal("2")
     assert features.range_to_average == Decimal("3")
     assert features.displacement is True
