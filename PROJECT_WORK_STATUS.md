@@ -19,6 +19,8 @@
 - [x] Concrete ClickHouse analytics adapter with injected connection lifecycle and fail-closed health check.
 - [x] Initial ClickHouse market-events and feature analytics schema.
 - [x] ClickHouse adapter unit coverage.
+- [x] Concrete Redis hot-state adapter with TTL, lifecycle, fail-closed health check, and source-of-truth protection.
+- [x] Redis adapter unit coverage and hot-state boundary documentation.
 - [x] Changes committed directly to `main`.
 
 ## Done on `main`
@@ -88,6 +90,8 @@
 - [x] Transaction context with commit/rollback semantics delegated to the PostgreSQL driver.
 - [x] Concrete ClickHouse analytics adapter with injected connection lifecycle.
 - [x] Initial ClickHouse analytics schema for market events and features.
+- [x] Concrete Redis hot-state adapter with TTL and lifecycle controls.
+- [x] Redis source-of-truth prohibition and hot-state usage documentation.
 
 ## Pending work
 
@@ -95,10 +99,10 @@
 - [x] Storage configuration and vendor-neutral boundaries.
 - [x] PostgreSQL operational adapter boundary.
 - [x] Initial PostgreSQL operational migration.
-- [x] Migration runner/version tracking contract.
+- [x] Migration version tracking contract.
 - [x] Concrete PostgreSQL driver integration.
 - [x] Concrete ClickHouse analytics adapter/schema.
-- [ ] Concrete Redis hot-state adapter.
+- [x] Concrete Redis hot-state adapter.
 - [ ] Concrete Parquet/object-storage adapter and dataset layout.
 - [ ] Docker/deployment configuration.
 - [ ] Monitoring, runbooks and reverse proxy.
@@ -117,7 +121,7 @@
 - Redis, ClickHouse and Parquet/object storage must never become execution authority or replace PostgreSQL operational truth.
 
 ## Current next task
-Implement the concrete Redis hot-state adapter with TTL/expiry semantics, connection lifecycle, and explicit prohibition on using Redis as order/position source of truth.
+Implement the concrete Parquet/object-storage adapter with immutable research dataset layout and explicit dataset versioning.
 
 ## CI note
 The latest GitHub Actions state is not verified green. Do not claim the quality gate is healthy until the Ruff failure is repaired and a subsequent run passes both Ruff and pytest.
