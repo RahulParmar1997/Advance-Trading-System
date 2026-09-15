@@ -12,7 +12,8 @@
 - [x] Read-only `/paper-trading` terminal with typed order lifecycle/state contract and no order mutation capability.
 - [x] Read-only `/portfolio` dashboard with typed position, exposure, P&L and risk-state contracts.
 - [x] Read-only `/journal` dashboard with typed audit-event and decision-evidence contracts.
-- [x] Journal UI preserves append-only/non-execution semantics and does not reconstruct missing decisions.
+- [x] Read-only `/research` dashboard with backtest run metadata, performance metrics and validation contracts.
+- [x] Research UI keeps backtest/validation outputs separate from execution authority and does not fabricate results.
 - [x] Changes committed directly to `main`.
 
 ## Done on `main`
@@ -76,6 +77,7 @@
 - [x] Read-only `/paper-trading` terminal with typed order state/lifecycle contract.
 - [x] Read-only `/portfolio` dashboard with position, exposure, P&L and risk-state contracts.
 - [x] Read-only `/journal` dashboard with audit-event and decision-evidence presentation contracts.
+- [x] Read-only `/research` dashboard with backtest and validation presentation contracts.
 - [x] No direct broker/execution action from frontend.
 
 ## Pending work
@@ -88,7 +90,7 @@
 - [x] Read-only PAPER trading terminal.
 - [x] Portfolio and position dashboard.
 - [x] Journal dashboard.
-- [ ] Backtest and research UI.
+- [x] Backtest and research UI.
 
 ### Phase 9 — Infrastructure
 - [ ] PostgreSQL, ClickHouse, Redis and Parquet/object storage.
@@ -108,7 +110,7 @@
 - Frontend actions must not directly invoke broker execution.
 
 ## Current next task
-Implement the backtest/research dashboard with read-only run metadata, performance metrics and validation results, without presenting research outputs as execution authority.
+Begin Phase 9 infrastructure foundation with explicit PostgreSQL/ClickHouse/Redis/Parquet storage boundaries, configuration contracts, and no hard-coded credentials.
 
 ## CI note
 The latest GitHub Actions state is not verified green. Do not claim the quality gate is healthy until the Ruff failure is repaired and a subsequent run passes both Ruff and pytest.
