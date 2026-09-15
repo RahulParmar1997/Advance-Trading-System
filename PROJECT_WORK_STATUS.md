@@ -6,14 +6,10 @@
 **Last updated:** 2026-09-15
 
 ## Latest completed work
-- [x] Deterministic derivative contract metadata and option-chain validation.
-- [x] European Black-Scholes option price and Greeks: delta, gamma, vega, theta/day and rho.
-- [x] Deterministic bounded-bisection implied-volatility solver with explicit inputs and fail-closed bounds.
-- [x] Deterministic futures basis analytics.
-- [x] Deterministic market breadth, sector breadth/rotation and explicit institutional-flow aggregation.
-- [x] Explicit market-context integration joining completed-candle regime state with authoritative session state.
 - [x] Deterministic Wyckoff event features from completed candles and explicit volume inputs.
-- [x] Unit coverage for Wyckoff event detection, chronology, look-ahead, OHLC and volume safety.
+- [x] Rich scanner result contract with explicit evidence, context identity and deterministic explanations.
+- [x] Scanner pipeline now exposes the richer result without adding probability, risk approval or broker status.
+- [x] Unit coverage for scanner evidence, explanations, validation and pipeline integration.
 - [x] Changes committed directly to `main`.
 
 ## Done on `main`
@@ -47,6 +43,7 @@
 - [x] Deterministic sector rotation ranking with optional explicit benchmark return.
 - [x] Explicit institutional FII/DII flow aggregation; no flow inference from price/volume.
 - [x] MarketContextEngine joining completed-candle regime classification with session metadata and fail-closed consistency checks.
+- [x] Deterministic Wyckoff features with chronology/look-ahead protections.
 
 ### Trading / risk / execution
 - [x] Trade Type and versioned Strategy framework.
@@ -64,7 +61,7 @@
 
 ### Phase 4 — Intelligence / scanning
 - [x] Wyckoff features from completed candles/explicit volume with chronology and look-ahead protections.
-- [ ] Richer scanner result contracts and explanations.
+- [x] Richer scanner result contracts and explanations.
 - [ ] Multi-symbol / multi-timeframe scanner orchestration.
 
 ### Phase 5 — Trading decision engine
@@ -96,7 +93,7 @@
 - PAPER remains the default.
 
 ## Current next task
-Implement richer scanner result contracts and explanations that expose deterministic evidence without inventing probabilities or broker observations. Keep all work directly on `main`.
+Implement multi-symbol / multi-timeframe scanner orchestration with explicit instrument/timeframe identity and deterministic ordering. Keep all work directly on `main`.
 
 ## CI note
 The latest known GitHub Actions state is not verified green. Do not claim the quality gate is healthy until the Ruff failure is repaired and a subsequent run passes both Ruff and pytest.
