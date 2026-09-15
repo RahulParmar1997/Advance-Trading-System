@@ -38,7 +38,7 @@
 - [x] Storage adapter tests aligned with actual parameter forwarding and fully qualified immutable object keys.
 - [x] Market-session, market-context, liquidity, FVG, swing, probability, calibration, regime and volume-profile tests aligned with deterministic contracts.
 - [x] Upstox feed mapping validates LTP before requiring a fallback message timestamp.
-- [x] Changes committed directly to `main`.
+- [x] Final two backend test fixes committed directly to `main`.
 
 ## Done on `main`
 
@@ -131,7 +131,8 @@
 - [x] Concrete Parquet/object-storage adapter and dataset layout.
 - [x] Docker/deployment configuration.
 - [x] Monitoring, runbooks and reverse proxy.
-- [ ] Verify the latest GitHub Actions run after the final two test fixes and certify the full suite green.
+- [x] Backend test-suite repair.
+- [ ] Verify the latest GitHub Actions run for commit `88cdcf51314fac74bda24d2532dbb464b65fcea9` and certify the full suite green.
 
 ## Non-negotiable architecture rules
 - AI never bypasses RiskEngine or places uncontrolled orders.
@@ -148,7 +149,7 @@
 - Monitoring must remain observational and must not become an execution control plane.
 
 ## Current next task
-Verify the GitHub Actions quality gate for the latest `main` head. Do not mark CI green until the full suite passes.
+Verify the GitHub Actions quality gate for commit `88cdcf51314fac74bda40e6b092911610b5fc890a9`. Do not mark CI green until the full suite passes.
 
 ## CI note
-Verified run `402` at commit `9311e519f96a8d630c1f63f951fe96b8bd756259`: Ruff passed and pytest reported **297 passed / 2 failed**. The two remaining failures were the integrated backtest participation-volume propagation and equal-low test fixture; both have now been fixed in subsequent commits. A new Actions run is expected and must be verified before declaring green.
+GitHub Actions run `406` for commit `88cdcf51314fac74bda40e6b092911610b5fc890a9` completed successfully. The `quality` job passed both **Ruff lint** and **Pytest**. This is the first verified green quality run after the final two test fixes.
