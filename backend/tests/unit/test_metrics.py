@@ -5,7 +5,7 @@ from threading import Thread
 
 import pytest
 
-from advance_system.observability.metrics import MetricsRegistry, MetricSample, create_metrics_server
+from advance_system.observability.metrics import MetricSample, MetricsRegistry, create_metrics_server
 
 
 def test_render_is_deterministic_and_prometheus_compatible() -> None:
