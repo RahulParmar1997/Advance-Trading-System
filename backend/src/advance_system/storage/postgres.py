@@ -3,7 +3,7 @@ from __future__ import annotations
 from contextlib import asynccontextmanager
 from typing import Any, AsyncIterator, Protocol
 
-from advance_system.storage.contracts import PostgreSQLStore, StorageConfig
+from advance_system.storage.contracts import StorageConfig
 
 
 class AsyncConnection(Protocol):
