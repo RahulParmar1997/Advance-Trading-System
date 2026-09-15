@@ -19,7 +19,6 @@ from advance_system.research.results import (
     ResourceUsage,
 )
 
-
 NOW = datetime(2026, 9, 15, 12, 0, tzinfo=UTC)
 
 
