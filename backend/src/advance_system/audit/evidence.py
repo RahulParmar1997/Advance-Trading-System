@@ -53,8 +53,7 @@ class AuditEvidenceRecord:
         for item in self.evidence:
             if not isinstance(item, Mapping):
                 raise ValueError("evidence entries must be mappings")
-        expected = self.compute_record_id()
-        if self.record_id and self.record_id != expected:
+        if self.record_id and self.record_id != self.compute_record_id():
             raise ValueError("record_id does not match immutable record content")
 
     def canonical_payload(self) -> dict[str, object]:
@@ -78,7 +77,7 @@ class AuditEvidenceRecord:
 
     def finalized(self) -> "AuditEvidenceRecord":
         self.validate()
-        return AuditEvidenceRecord(**{**self.__dict__, "record_id": self.compute_record_id()}) if hasattr(self, "__dict__") else AuditEvidenceRecord(
+        return AuditEvidenceRecord(
             decision_kind=self.decision_kind,
             decision_id=self.decision_id,
             observed_at=self.observed_at,
@@ -118,8 +117,6 @@ class InMemoryAuditEvidenceStore:
         with self._lock:
             existing = self._records.get(finalized.record_id)
             if existing is not None:
-                if existing != finalized:
-                    raise ValueError("audit record id collision")
                 return finalized.record_id
             self._records[finalized.record_id] = finalized
             self._order.append(finalized.record_id)
