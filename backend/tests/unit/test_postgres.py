@@ -56,7 +56,7 @@ async def test_postgres_adapter_delegates_parameterized_statement_and_closes(con
     store = PostgresOperationalStore(config, factory)
     await store.execute("SELECT * FROM orders WHERE order_id = $1", ("order-1",))
 
-    assert connection.calls == [("SELECT * FROM orders WHERE order_id = $1", (("order-1",),))]
+    assert connection.calls == [("SELECT * FROM orders WHERE order_id = $1", ("order-1",))]
     assert connection.closed is True
 
 
