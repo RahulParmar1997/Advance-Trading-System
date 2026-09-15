@@ -43,8 +43,6 @@ def test_generated_loader_uses_explicit_pinned_module_boundary():
     assert UPSTOX_V3_PROTO_PACKAGE.endswith("generated")
     assert UPSTOX_V3_PROTO_MODULE == "market_data_feed_v3_pb2"
 
-    with pytest.raises(RuntimeError, match="pinned Upstox V3 protobuf package"):
-        load_generated_feed_response()
-
-    with pytest.raises(RuntimeError, match="pinned Upstox V3 protobuf package"):
-        create_upstox_v3_decoder()
+    feed_response = load_generated_feed_response()
+    assert feed_response.__name__ == "FeedResponse"
+    assert create_upstox_v3_decoder().feed_response_type is feed_response
