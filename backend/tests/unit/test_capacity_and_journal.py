@@ -3,6 +3,7 @@ from decimal import Decimal
 
 import pytest
 
+from advance_system.domain.market_status import MarketStatus
 from advance_system.journal.audit import AuditEvent
 from advance_system.journal.durable import JsonlAuditJournal
 from advance_system.risk.engine import RiskContext, RiskEngine, RiskPolicy, RiskSnapshot
@@ -23,6 +24,8 @@ def context(**kwargs) -> RiskContext:
         snapshot=RiskSnapshot(available_liquidity=Decimal("100000")),
         order_notional=Decimal("10000"),
         estimated_market_volume=Decimal("100000"),
+        market_status=MarketStatus("NSE", "NORMAL_OPEN", NOW),
+        expected_exchange="NSE",
     )
     values.update(kwargs)
     return RiskContext(**values)
