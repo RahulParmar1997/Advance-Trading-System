@@ -23,6 +23,10 @@
 - [x] Redis adapter unit coverage and hot-state boundary documentation.
 - [x] Concrete immutable Parquet/object-storage adapter with content-addressed manifests and explicit dataset versioning.
 - [x] Research dataset layout documentation and immutable write/read integrity tests.
+- [x] Docker backend/frontend images and local PostgreSQL/ClickHouse/Redis deployment stack.
+- [x] PAPER-safe container defaults, non-root runtime, read-only backend filesystem and health-gated dependencies.
+- [x] Next.js standalone production output for the frontend image.
+- [x] Docker build exclusions for secrets, caches and local dependencies.
 - [x] Changes committed directly to `main`.
 
 ## Done on `main`
@@ -80,6 +84,7 @@
 - [x] Dark-first terminal shell and navigation.
 - [x] Read-only market overview, scanner, derivatives, PAPER trading, portfolio, journal and research dashboards.
 - [x] No direct broker/execution action from frontend.
+- [x] Standalone Next.js production build configuration.
 
 ### Infrastructure
 - [x] Explicit storage configuration contract for PostgreSQL, ClickHouse, Redis and Parquet/object storage.
@@ -97,6 +102,8 @@
 - [x] Redis source-of-truth prohibition and hot-state usage documentation.
 - [x] Concrete immutable Parquet/object-storage adapter with injected vendor-neutral object boundary.
 - [x] Content-addressed dataset manifests and no-overwrite semantics.
+- [x] Docker Compose deployment stack for PostgreSQL, ClickHouse, Redis, backend and frontend.
+- [x] Backend container runs as non-root with read-only root filesystem.
 
 ## Pending work
 
@@ -109,7 +116,7 @@
 - [x] Concrete ClickHouse analytics adapter/schema.
 - [x] Concrete Redis hot-state adapter.
 - [x] Concrete Parquet/object-storage adapter and dataset layout.
-- [ ] Docker/deployment configuration.
+- [x] Docker/deployment configuration.
 - [ ] Monitoring, runbooks and reverse proxy.
 
 ## Non-negotiable architecture rules
@@ -126,7 +133,7 @@
 - Redis, ClickHouse and Parquet/object storage must never become execution authority or replace PostgreSQL operational truth.
 
 ## Current next task
-Implement Docker/deployment configuration with PAPER-safe defaults and explicit service boundaries.
+Implement monitoring, operational runbooks and reverse-proxy configuration without introducing broker execution authority.
 
 ## CI note
 The latest GitHub Actions state is not verified green. Do not claim the quality gate is healthy until the Ruff failure is repaired and a subsequent run passes both Ruff and pytest.
