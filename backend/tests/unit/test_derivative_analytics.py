@@ -45,8 +45,16 @@ def test_implied_volatility_recovers_known_volatility():
 
 
 def test_iv_rejects_price_below_intrinsic():
+    intrinsic_inputs = OptionAnalyticsInput(
+        spot=Decimal("110"),
+        strike=Decimal("100"),
+        time_to_expiry_years=Decimal("1"),
+        risk_free_rate=Decimal("0.05"),
+        volatility=Decimal("0.20"),
+        option_type=OptionType.CALL,
+    )
     with pytest.raises(ValueError, match="intrinsic"):
-        implied_volatility(market_price=Decimal("1"), inputs=inputs())
+        implied_volatility(market_price=Decimal("1"), inputs=intrinsic_inputs)
 
 
 def test_invalid_option_inputs_fail_closed():
