@@ -6,16 +6,10 @@
 **Last updated:** 2026-09-15
 
 ## Latest completed work
-- [x] Deterministic Wyckoff event features from completed candles and explicit volume inputs.
-- [x] Rich scanner result contract with explicit evidence, context identity and deterministic explanations.
-- [x] Multi-symbol / multi-timeframe scanner orchestration with explicit scope identity and deterministic ordering.
-- [x] Evidence-based scanner scoring using explicit evidence and deterministic non-probabilistic weights.
-- [x] Leakage-safe historical probability calibration from labeled historical outcomes.
-- [x] Out-of-sample probability validation with Brier score, log loss and classification accuracy.
 - [x] Immutable append-only audit evidence persistence for scanner, scoring, probability and risk decision records.
-- [x] Audit records are content-addressed, execution-authority-free, and expose no order/execution capability.
 - [x] Upstox broker reconciliation adapter boundary with authoritative order/fill translation and identity validation.
-- [x] Unit coverage for scanner evidence, explanations, orchestration, scoring, calibration/validation, audit persistence, and broker reconciliation parsing.
+- [x] Durable append-only JSONL journal backend with startup integrity validation and checkpoints.
+- [x] Unit coverage for journal round-trip, corruption rejection, duplicate protection and checkpoint boundaries.
 - [x] Changes committed directly to `main`.
 
 ## Done on `main`
@@ -66,12 +60,13 @@
 - [x] Historical probability calibration fit from explicit labeled outcomes, restricted to a chronological training cutoff and out-of-sample application.
 - [x] OOS validation metrics computed only from samples strictly after the calibration cutoff; fitted models remain immutable.
 - [x] Append-only audit evidence contract with content-addressed immutable records and explicit non-execution authority.
+- [x] Durable JSONL journal backend with append-only persistence and startup corruption/duplicate detection.
 
 ## Pending work
 
 ### Phase 6 — Risk / execution
 - [x] Broker reconciliation adapter implementation.
-- [ ] Stronger durable journal backend.
+- [x] Stronger durable journal backend.
 
 ### Phase 8 — Frontend
 - [ ] Next.js/React/TypeScript foundation.
@@ -91,9 +86,10 @@
 - Backtests contain no look-ahead bias.
 - PAPER remains the default.
 - Audit evidence is observational only and must never authorize, submit or mutate an order.
+- Journal records are audit/state history only; they are not execution commands.
 
 ## Current next task
-Implement the stronger durable journal backend, preserving append-only audit semantics and keeping journal records separate from execution authority.
+Implement the Next.js/React/TypeScript frontend foundation without connecting UI actions directly to broker execution.
 
 ## CI note
 The latest GitHub Actions state is not verified green. Do not claim the quality gate is healthy until the Ruff failure is repaired and a subsequent run passes both Ruff and pytest.
