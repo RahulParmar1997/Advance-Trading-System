@@ -2,6 +2,7 @@ from dataclasses import replace
 from datetime import datetime, timezone
 from decimal import Decimal
 
+from advance_system.domain.market_status import MarketStatus
 from advance_system.execution.paper_workflow import PaperExecutionWorkflow
 from advance_system.oms.state_machine import OmsOrder, OmsState
 from advance_system.risk.engine import RiskContext, RiskEngine, RiskPolicy, RiskSnapshot
@@ -13,7 +14,15 @@ class Opportunity:
 
 def context() -> RiskContext:
     now = datetime(2026, 9, 14, 10, 0, tzinfo=timezone.utc)
-    return RiskContext(now=now, market_open=True, last_market_data_at=now, snapshot=RiskSnapshot())
+    return RiskContext(
+        now=now,
+        market_open=True,
+        last_market_data_at=now,
+        snapshot=RiskSnapshot(available_liquidity=Decimal("100000")),
+        order_notional=Decimal("100"),
+        market_status=MarketStatus("NSE", "NORMAL_OPEN", now),
+        expected_exchange="NSE",
+    )
 
 
 def engine() -> RiskEngine:
