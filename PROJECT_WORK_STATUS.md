@@ -10,7 +10,8 @@
 - [x] Rich scanner result contract with explicit evidence, context identity and deterministic explanations.
 - [x] Multi-symbol / multi-timeframe scanner orchestration with explicit scope identity and deterministic ordering.
 - [x] Evidence-based scanner scoring using explicit evidence and deterministic non-probabilistic weights.
-- [x] Unit coverage for scanner evidence, explanations, orchestration and scoring.
+- [x] Leakage-safe historical probability calibration from labeled historical outcomes.
+- [x] Unit coverage for scanner evidence, explanations, orchestration, scoring and calibration leakage controls.
 - [x] Changes committed directly to `main`.
 
 ## Done on `main`
@@ -57,12 +58,13 @@
 - [x] Event-driven backtester with costs, slippage, fees, latency, partial fills and liquidity limits.
 - [x] Walk-forward/OOS, Monte Carlo and cost/capacity/regime sensitivity foundations.
 - [x] Pattern DNA similarity and leakage-safe ML dataset/calibration primitives.
+- [x] Historical probability calibration fit from explicit labeled outcomes, restricted to a chronological training cutoff and out-of-sample application.
 
 ## Pending work
 
 ### Phase 5 — Trading decision engine
 - [x] Evidence-based scoring.
-- [ ] Historical probability calibration.
+- [x] Historical probability calibration.
 - [ ] OOS probability validation.
 - [ ] Explanation/audit evidence persistence.
 
@@ -89,7 +91,7 @@
 - PAPER remains the default.
 
 ## Current next task
-Implement historical probability calibration from labeled historical outcomes, keeping calibration data separate from in-sample scanner scoring and preventing look-ahead/leakage. Keep all work directly on `main`.
+Implement OOS probability validation metrics against unseen labeled outcomes. Validation must be chronological, separate from calibration fitting, and must not alter the fitted calibration model.
 
 ## CI note
-The latest known GitHub Actions state is not verified green. Do not claim the quality gate is healthy until the Ruff failure is repaired and a subsequent run passes both Ruff and pytest.
+The latest GitHub Actions state is not verified green. Do not claim the quality gate is healthy until the Ruff failure is repaired and a subsequent run passes both Ruff and pytest.
