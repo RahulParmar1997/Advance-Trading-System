@@ -6,7 +6,7 @@
 **Last updated:** 2026-09-15
 
 ## Latest completed work
-- [x] Backend quality gate verified green on GitHub Actions run 411 after research compute changes.
+- [x] Fixed scheduler Ruff blocker: removed unused `Callable` import from the research scheduler boundary.
 - [x] Added a research-only compute job boundary with reproducibility metadata, selectable CPU/GPU backend identity, resource limits and safe local execution semantics.
 - [x] Added distributed CPU, distributed GPU and cloud/HPC scheduler adapters behind a vendor-neutral enqueue boundary; adapters never claim worker completion and have no broker authority.
 - [x] Added deterministic unit coverage for research scheduler routing, backend matching and preservation of RAW status until worker execution is actually observed.
@@ -108,4 +108,4 @@
 Persist research-job checksums, hardware/environment metadata and resource usage with immutable results, keeping execution and approval strictly outside the compute layer.
 
 ## CI note
-GitHub Actions run `411` for commit `579a0a4c7887168b32bcbc68e9658be4bbafcbf4` completed successfully. The `quality` job passed both **Ruff lint** and **Pytest**. The scheduler adapter changes are now committed on `main`; a fresh CI run will be required after the next implementation commit before certifying that change.
+GitHub Actions run `414` for commit `3a29317d8a945b61714dff6f64cb90d9a009ba9f` failed because of one unused `Callable` import in `research/scheduler.py`; Pytest was skipped. Commit `5118ff8616989c65f5d086ae695af689eb33ba8a` fixes that lint defect on `main`. Fresh GitHub Actions verification is required before certifying the scheduler changes or claiming CI green.
