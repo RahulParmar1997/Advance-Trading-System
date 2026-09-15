@@ -14,6 +14,8 @@
 - [x] Initial PostgreSQL operational migration for orders, fills, and positions.
 - [x] Migration version tracking and idempotent PostgreSQL migration runner contract.
 - [x] Migration runner unit coverage for pending and already-applied migrations.
+- [x] Concrete asyncpg PostgreSQL driver/pool integration with connection lifecycle and transaction context.
+- [x] PostgreSQL lifecycle/transaction unit coverage using injected fakes.
 - [x] Changes committed directly to `main`.
 
 ## Done on `main`
@@ -79,6 +81,8 @@
 - [x] PostgreSQL operational adapter with injected driver lifecycle.
 - [x] Initial PostgreSQL schema migration for operational order/fill/position state.
 - [x] Migration version tracking and idempotent migration runner contract.
+- [x] Concrete asyncpg driver integration with pooled connection lifecycle.
+- [x] Transaction context with commit/rollback semantics delegated to the PostgreSQL driver.
 
 ## Pending work
 
@@ -87,7 +91,7 @@
 - [x] PostgreSQL operational adapter boundary.
 - [x] Initial PostgreSQL operational migration.
 - [x] Migration runner/version tracking contract.
-- [ ] Concrete PostgreSQL driver integration.
+- [x] Concrete PostgreSQL driver integration.
 - [ ] Concrete ClickHouse analytics adapter/schema.
 - [ ] Concrete Redis hot-state adapter.
 - [ ] Concrete Parquet/object-storage adapter and dataset layout.
@@ -108,7 +112,7 @@
 - Redis, ClickHouse and Parquet/object storage must never become execution authority or replace PostgreSQL operational truth.
 
 ## Current next task
-Implement the concrete PostgreSQL driver integration behind the existing adapter and migration boundary, with connection lifecycle, transaction safety, and no credentials in source.
+Implement the concrete ClickHouse analytics adapter and schema boundary without allowing analytical storage to become execution authority.
 
 ## CI note
 The latest GitHub Actions state is not verified green. Do not claim the quality gate is healthy until the Ruff failure is repaired and a subsequent run passes both Ruff and pytest.
