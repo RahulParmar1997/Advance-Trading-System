@@ -5,6 +5,7 @@ from hashlib import sha256
 from typing import Mapping, Sequence
 
 from advance_system.scanner.dsl import ScanResult, ScannerEngine, ScannerRule
+from advance_system.scanner.results import ScannerResult, build_scanner_result
 
 
 @dataclass(frozen=True, slots=True)
@@ -13,6 +14,7 @@ class Candidate:
     rule: str
     matched: bool
     evidence: tuple[str, ...]
+    result: ScannerResult | None = None
 
 
 class ScannerPipeline:
@@ -28,17 +30,16 @@ class ScannerPipeline:
         return digest[:24]
 
     def scan(self, rules: Sequence[ScannerRule], context: Mapping[str, object]) -> list[Candidate]:
-        # Rule order is explicit: callers should provide inexpensive gates first.
-        # A failed rule does not prevent later independent rules from evaluating.
         seen: set[str] = set()
         candidates: list[Candidate] = []
         for rule in rules:
-            result: ScanResult = self.engine.evaluate(rule, context)
-            if not result.matched:
+            raw: ScanResult = self.engine.evaluate(rule, context)
+            if not raw.matched:
                 continue
             candidate_id = self.candidate_id(rule, context)
             if candidate_id in seen:
                 continue
             seen.add(candidate_id)
-            candidates.append(Candidate(candidate_id, result.rule, True, result.reasons))
+            result = build_scanner_result(raw, context)
+            candidates.append(Candidate(candidate_id, raw.rule, True, raw.reasons, result))
         return candidates
