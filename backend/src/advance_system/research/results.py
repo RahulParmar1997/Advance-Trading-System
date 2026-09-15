@@ -8,6 +8,7 @@ from typing import Protocol
 from uuid import UUID
 
 from advance_system.research.compute import ComputeBackend, ResearchJob, ResearchStatus
+from advance_system.storage.parquet import ObjectStore
 
 
 @dataclass(frozen=True, slots=True)
@@ -181,6 +182,32 @@ class ResearchResultManifest:
         }
         return (json.dumps(payload, sort_keys=True, separators=(",", ":")) + "\n").encode("utf-8")
 
+    @classmethod
+    def from_bytes(cls, raw: bytes) -> ResearchResultManifest:
+        try:
+            data = json.loads(raw.decode("utf-8"))
+            manifest = cls(
+                job_id=UUID(data["job_id"]),
+                dataset_version=data["dataset_version"],
+                strategy_version=data["strategy_version"],
+                feature_version=data["feature_version"],
+                configuration_version=data["configuration_version"],
+                git_commit_sha=data["git_commit_sha"],
+                random_seed=data["random_seed"],
+                backend=ComputeBackend(data["backend"]),
+                status=ResearchStatus(data["status"]),
+                result_sha256=data["result_sha256"],
+                result_size_bytes=data["result_size_bytes"],
+                hardware=HardwareMetadata(**data["hardware"]),
+                environment=EnvironmentMetadata(**data["environment"]),
+                resource_usage=ResourceUsage(**data["resource_usage"]),
+                created_at=datetime.fromisoformat(data["created_at"]),
+            )
+            manifest.validate()
+            return manifest
+        except (KeyError, TypeError, ValueError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+            raise ValueError("invalid research result manifest") from exc
+
 
 class ResearchResultStore(Protocol):
     async def write(self, manifest: ResearchResultManifest, result: bytes) -> None:
@@ -218,3 +245,56 @@ class InMemoryResearchResultStore:
         if len(result) != manifest.result_size_bytes:
             raise ValueError("stored research result failed size validation")
         return manifest, bytes(result)
+
+
+class ObjectStoreResearchResultStore:
+    """Concrete immutable research-result persistence over the existing ObjectStore boundary."""
+
+    def __init__(self, object_store: ObjectStore, *, root: str = "research-results") -> None:
+        if not root or root.strip("/") != root or "//" in root:
+            raise ValueError("research result root must be a non-empty relative object prefix")
+        self._object_store = object_store
+        self._root = root
+
+    async def write(self, manifest: ResearchResultManifest, result: bytes) -> None:
+        manifest.validate()
+        if not isinstance(result, bytes) or not result:
+            raise ValueError("research result must be non-empty bytes")
+        if hashlib.sha256(result).hexdigest() != manifest.result_sha256:
+            raise ValueError("research result checksum does not match manifest")
+        if len(result) != manifest.result_size_bytes:
+            raise ValueError("research result size does not match manifest")
+
+        result_key = self._key(manifest.job_id, "result.bin")
+        manifest_key = self._key(manifest.job_id, "manifest.json")
+        created = await self._object_store.write_if_absent(result_key, bytes(result))
+        if not created:
+            existing = await self._object_store.read(result_key)
+            if hashlib.sha256(existing).hexdigest() != manifest.result_sha256 or len(existing) != manifest.result_size_bytes:
+                raise ValueError("immutable research result already exists with different content")
+
+        manifest_created = await self._object_store.write_if_absent(manifest_key, manifest.to_bytes())
+        if not manifest_created:
+            existing_manifest = ResearchResultManifest.from_bytes(await self._object_store.read(manifest_key))
+            if existing_manifest != manifest:
+                raise ValueError("immutable research result already exists with different manifest")
+
+    async def read(self, job_id: UUID) -> tuple[ResearchResultManifest, bytes]:
+        manifest = ResearchResultManifest.from_bytes(
+            await self._object_store.read(self._key(job_id, "manifest.json"))
+        )
+        result = await self._object_store.read(self._key(job_id, "result.bin"))
+        if hashlib.sha256(result).hexdigest() != manifest.result_sha256:
+            raise ValueError("stored research result failed checksum validation")
+        if len(result) != manifest.result_size_bytes:
+            raise ValueError("stored research result failed size validation")
+        return manifest, bytes(result)
+
+    async def healthcheck(self) -> bool:
+        try:
+            return await self._object_store.healthcheck()
+        except Exception:
+            return False
+
+    def _key(self, job_id: UUID, name: str) -> str:
+        return f"{self._root}/job={job_id}/{name}"
