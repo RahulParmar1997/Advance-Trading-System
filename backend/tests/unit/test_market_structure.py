@@ -15,8 +15,9 @@ def test_confirmed_swing_high_and_low():
         candle(0, "10", "8", "9"),
         candle(1, "11", "8.5", "10"),
         candle(2, "15", "9", "14"),
-        candle(3, "12", "7", "8"),
-        candle(4, "11", "6", "7"),
+        candle(3, "12", "8", "8"),
+        candle(4, "11", "7", "7"),
+        candle(5, "10", "8", "9"),
     ]
     swings = SwingDetector(left=1, right=1).detect(candles)
     assert any(s.kind is SwingType.HIGH and s.price == Decimal("15") for s in swings)
@@ -34,7 +35,7 @@ def test_swing_labels_are_deterministic():
     ]
     swings = SwingDetector(left=1, right=1).detect(candles)
     labels = MarketStructureEngine().classify_swings(swings)
-    assert labels == ["HH", "L", "LL", "HH"] or labels == ["H", "L", "LL", "HH"]
+    assert labels == ["H", "L", "HH", "LL"]
 
 
 def test_break_of_structure_emits_directional_signal():
