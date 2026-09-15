@@ -55,6 +55,14 @@ def test_sign_of_weakness_requires_wide_high_volume_breakdown() -> None:
     assert observation.event is WyckoffEvent.SIGN_OF_WEAKNESS
 
 
+def test_absorption_requires_high_effort_and_small_result() -> None:
+    candles = history() + [candle(5, "99.25", "100.75", "100", 250)]
+    observation = WyckoffEngine().observe(candles)
+    assert observation.event is WyckoffEvent.ABSORPTION
+    assert observation.features is not None
+    assert observation.features.effort_result_ratio < Decimal("0.50")
+
+
 def test_insufficient_history_is_explicit() -> None:
     observation = WyckoffEngine().observe(history()[:5])
     assert observation.event is WyckoffEvent.INSUFFICIENT_DATA
