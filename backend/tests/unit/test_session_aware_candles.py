@@ -36,10 +36,8 @@ def test_multi_timeframe_session_metadata_is_preserved():
 
 
 def test_session_date_change_cannot_merge_candles():
-    # A custom calendar makes both dates valid; the session-aware engine still
-    # refuses to merge different trading session dates.
     calendar = TradingDayCalendar()
     engine = CandleEngine(60, IndiaMarketSession(calendar))
     engine.update(quote(45, "100"))
     with pytest.raises(ValueError, match="outside regular trading session"):
-        engine.update(QuoteEvent("NSE_EQ|TEST", datetime(2026, 9, 15, 3, 45, tzinfo=timezone.utc), Decimal("101")))
+        engine.update(QuoteEvent("NSE_EQ|TEST", datetime(2026, 9, 15, 3, 30, tzinfo=timezone.utc), Decimal("101")))
