@@ -38,7 +38,7 @@ async def test_clickhouse_adapter_executes_and_closes() -> None:
     await store.execute("SELECT * FROM market_events WHERE instrument = {instrument}", ("NSE_EQ|TEST",))
 
     assert connection.calls == [
-        ("SELECT * FROM market_events WHERE instrument = {instrument}", (("NSE_EQ|TEST",),))
+        ("SELECT * FROM market_events WHERE instrument = {instrument}", ("NSE_EQ|TEST",))
     ]
     assert connection.closed is True
 
