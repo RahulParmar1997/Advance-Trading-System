@@ -13,4 +13,6 @@ RUN python -m pip install --no-cache-dir --upgrade pip \
 
 USER nobody
 
-CMD ["python", "-c", "print('Advance Trading System backend image ready; application entrypoint is deployment-specific')"]
+EXPOSE 8000
+
+CMD ["python", "-m", "advance_system.observability.server"]
