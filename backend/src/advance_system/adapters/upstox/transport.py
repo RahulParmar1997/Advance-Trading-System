@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from datetime import timedelta
 from typing import Protocol
 
-from advance_system.adapters.upstox.market_data import UpstoxQuote, UpstoxMarketDataClient
+from advance_system.adapters.upstox.market_data import UpstoxMarketDataClient, UpstoxQuote
 from advance_system.ingestion.adapters import Instrument
 
 
