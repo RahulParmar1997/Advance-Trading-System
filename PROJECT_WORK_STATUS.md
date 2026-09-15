@@ -6,15 +6,14 @@
 **Last updated:** 2026-09-15
 
 ## Current status
-The repository has a substantial deterministic PAPER/research foundation. Upstox transport/protobuf boundaries remain isolated behind adapters. Instrument-master ingestion has a concrete Upstox BOD JSON source, authoritative exchange status is enforced by the RiskEngine, and the official Upstox V3 protobuf schema is vendored/pinned behind the decoder boundary. Multi-timeframe candles are session-aware when configured with the India market-session calendar. Feature analytics include deterministic displacement, candle-volume profile and an explicit trade-print order-flow boundary. Futures/options analytics now has deterministic contract metadata and option-chain validation based only on authoritative fields supplied by the instrument source.
+The repository has a substantial deterministic PAPER/research foundation. Upstox transport/protobuf boundaries remain isolated behind adapters. Instrument-master ingestion has a concrete Upstox BOD JSON source, authoritative exchange status is enforced by the RiskEngine, and the official Upstox V3 protobuf schema is vendored/pinned behind the decoder boundary. Multi-timeframe candles are session-aware when configured with the India market-session calendar. Feature analytics include deterministic displacement, candle-volume profile, explicit trade-print order flow, and derivatives analytics.
 
 ## Latest completed work
-- [x] Added deterministic `DerivativeContract`, `DerivativeType` and `OptionType` contracts.
-- [x] Added safe parsing for underlying, expiry, strike, lot size and tick size.
-- [x] Added validation separating futures from options and requiring option strike/type metadata.
-- [x] Added deterministic `OptionChain` construction keyed by underlying and expiry.
-- [x] Added duplicate, mismatch and malformed-metadata protections.
-- [x] Added unit coverage for futures/options parsing and option-chain validation.
+- [x] Added deterministic derivative contract metadata and option-chain validation.
+- [x] Added European Black-Scholes option price and Greeks: delta, gamma, vega, theta/day and rho.
+- [x] Added deterministic bounded-bisection implied-volatility solver with explicit inputs and fail-closed bounds.
+- [x] Added deterministic futures basis analytics.
+- [x] Added unit coverage for call/put Greeks, IV recovery, invalid inputs and futures basis.
 - [x] Added `PROJECT_MEMORY.md` as the persistent project memory/handoff store.
 - [x] Changes committed directly to `main`.
 
@@ -55,6 +54,8 @@ The repository has a substantial deterministic PAPER/research foundation. Upstox
 - [x] Deterministic candle-volume profile.
 - [x] Explicit trade-print order-flow boundary.
 - [x] Deterministic futures/options contract metadata and option-chain validation.
+- [x] Deterministic Black-Scholes Greeks / implied-volatility analytics.
+- [x] Deterministic futures basis analytics.
 
 ### Trading / risk / execution
 - [x] Trade Type and versioned Strategy framework.
@@ -77,7 +78,7 @@ The repository has a substantial deterministic PAPER/research foundation. Upstox
 - [x] Candle-volume profile analytics.
 - [x] Explicit order-flow analytics boundary.
 - [x] Futures/options contract metadata and option-chain foundation.
-- [ ] Option Greeks/IV analytics only when authoritative quote/contract inputs support calculation.
+- [x] Option Greeks/IV analytics with explicit Black-Scholes assumptions.
 - [ ] Breadth, sector rotation and institutional-flow intelligence.
 - [ ] Richer regime/session context integration.
 
@@ -122,4 +123,4 @@ The repository has a substantial deterministic PAPER/research foundation. Upstox
 `Market Event → Normalization → Validation → Candle → Features → Market State → Strategy → Opportunity → Probability/EV → RiskEngine → OMS → Paper Fill → Position → P&L → Journal`
 
 ## Current next task
-Implement option Greeks / implied-volatility analytics only where authoritative option quotes, strike, expiry and underlying inputs are available. Keep calculations deterministic, explicit about assumptions, and fail closed on missing/invalid inputs. Keep all work directly on `main`.
+Implement breadth, sector-rotation and institutional-flow intelligence using authoritative constituent/market data only. Keep calculations deterministic and explicitly distinguish observed breadth/flow inputs from derived indicators. Keep all work directly on `main`.
