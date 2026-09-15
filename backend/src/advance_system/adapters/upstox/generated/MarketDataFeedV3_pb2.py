@@ -1,3 +1,4 @@
+# ruff: noqa
 # -*- coding: utf-8 -*-
 # Generated-compatible vendored artifact for the pinned Upstox V3 schema.
 # Source: MarketDataFeedV3.proto (Upstox official SDK)
