@@ -8,12 +8,10 @@
 ## Latest completed work
 - [x] Durable append-only JSONL journal backend with startup integrity validation and checkpoints.
 - [x] Next.js/React/TypeScript frontend foundation with dark-first terminal shell and observational landing dashboard.
-- [x] Read-only `/market-overview`, `/scanner` and `/derivatives` dashboard routes with explicit typed contracts.
-- [x] Read-only `/paper-trading` terminal with typed order lifecycle/state contract and no order mutation capability.
-- [x] Read-only `/portfolio` dashboard with typed position, exposure, P&L and risk-state contracts.
-- [x] Read-only `/journal` dashboard with typed audit-event and decision-evidence contracts.
-- [x] Read-only `/research` dashboard with backtest run metadata, performance metrics and validation contracts.
-- [x] Research UI keeps backtest/validation outputs separate from execution authority and does not fabricate results.
+- [x] Read-only `/market-overview`, `/scanner`, `/derivatives`, `/paper-trading`, `/portfolio`, `/journal`, and `/research` routes with explicit typed contracts.
+- [x] Phase 9 storage configuration and PostgreSQL/ClickHouse/Redis/Parquet boundary contracts.
+- [x] Concrete PostgreSQL operational adapter with injected connection factory and fail-closed health check.
+- [x] Initial PostgreSQL operational migration for orders, fills, and positions.
 - [x] Changes committed directly to `main`.
 
 ## Done on `main`
@@ -61,41 +59,36 @@
 - [x] Event-driven backtester with costs, slippage, fees, latency, partial fills and liquidity limits.
 - [x] Walk-forward/OOS, Monte Carlo and cost/capacity/regime sensitivity foundations.
 - [x] Pattern DNA similarity and leakage-safe ML dataset/calibration primitives.
-- [x] Historical probability calibration fit from explicit labeled outcomes, restricted to a chronological training cutoff and out-of-sample application.
-- [x] OOS probability validation metrics computed only from samples strictly after the calibration cutoff; fitted models remain immutable.
+- [x] Historical probability calibration and strict OOS validation.
 - [x] Append-only audit evidence contract with content-addressed immutable records and explicit non-execution authority.
 - [x] Durable JSONL journal backend with append-only persistence and startup corruption/duplicate detection.
 
 ### Frontend
 - [x] Next.js/React/TypeScript application foundation.
-- [x] App Router root layout, metadata and dark-first global shell.
-- [x] Initial market-intelligence terminal landing dashboard.
-- [x] Read-only `/market-overview` route with typed market-state contract.
-- [x] Terminal navigation shell.
-- [x] Read-only `/scanner` dashboard with typed candidate contract.
-- [x] Read-only `/derivatives` dashboard with option-chain and futures-basis presentation contracts.
-- [x] Read-only `/paper-trading` terminal with typed order state/lifecycle contract.
-- [x] Read-only `/portfolio` dashboard with position, exposure, P&L and risk-state contracts.
-- [x] Read-only `/journal` dashboard with audit-event and decision-evidence presentation contracts.
-- [x] Read-only `/research` dashboard with backtest and validation presentation contracts.
+- [x] Dark-first terminal shell and navigation.
+- [x] Read-only market overview, scanner, derivatives, PAPER trading, portfolio, journal and research dashboards.
 - [x] No direct broker/execution action from frontend.
+
+### Infrastructure
+- [x] Explicit storage configuration contract for PostgreSQL, ClickHouse, Redis and Parquet/object storage.
+- [x] Storage adapter protocols with vendor-neutral boundaries.
+- [x] Environment-only endpoint configuration with no hard-coded credentials.
+- [x] Storage source-of-truth and execution-authority rules documented.
+- [x] PostgreSQL operational adapter with injected driver lifecycle.
+- [x] Initial PostgreSQL schema migration for operational order/fill/position state.
 
 ## Pending work
 
-### Phase 8 — Frontend
-- [x] Next.js/React/TypeScript foundation.
-- [x] Market overview.
-- [x] Navigation and scanner dashboard.
-- [x] Derivatives dashboard.
-- [x] Read-only PAPER trading terminal.
-- [x] Portfolio and position dashboard.
-- [x] Journal dashboard.
-- [x] Backtest and research UI.
-
 ### Phase 9 — Infrastructure
-- [ ] PostgreSQL, ClickHouse, Redis and Parquet/object storage.
+- [x] Storage configuration and vendor-neutral boundaries.
+- [x] PostgreSQL operational adapter boundary.
+- [x] Initial PostgreSQL operational migration.
+- [ ] Migration runner/version tracking.
+- [ ] Concrete ClickHouse analytics adapter/schema.
+- [ ] Concrete Redis hot-state adapter.
+- [ ] Concrete Parquet/object-storage adapter and dataset layout.
 - [ ] Docker/deployment configuration.
-- [ ] Monitoring, runbooks, migrations and reverse proxy.
+- [ ] Monitoring, runbooks and reverse proxy.
 
 ## Non-negotiable architecture rules
 - AI never bypasses RiskEngine or places uncontrolled orders.
@@ -108,9 +101,10 @@
 - Audit evidence is observational only and must never authorize, submit or mutate an order.
 - Journal records are audit/state history only; they are not execution commands.
 - Frontend actions must not directly invoke broker execution.
+- Redis, ClickHouse and Parquet/object storage must never become execution authority or replace PostgreSQL operational truth.
 
 ## Current next task
-Begin Phase 9 infrastructure foundation with explicit PostgreSQL/ClickHouse/Redis/Parquet storage boundaries, configuration contracts, and no hard-coded credentials.
+Implement migration version tracking and an idempotent PostgreSQL migration runner behind the storage boundary.
 
 ## CI note
 The latest GitHub Actions state is not verified green. Do not claim the quality gate is healthy until the Ruff failure is repaired and a subsequent run passes both Ruff and pytest.
