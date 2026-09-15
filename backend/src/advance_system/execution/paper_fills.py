@@ -5,7 +5,7 @@ from decimal import Decimal
 
 from advance_system.oms.idempotency import PaperOrderGateway
 from advance_system.oms.state_machine import OmsState
-from advance_system.portfolio.positions import Position, PositionBook
+from advance_system.portfolio.positions import PositionBook
 
 
 @dataclass(frozen=True, slots=True)
