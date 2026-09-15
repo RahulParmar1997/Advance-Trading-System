@@ -9,7 +9,7 @@ from advance_system.market.structure import SwingPoint, SwingType
 def candle(i: int, price: int) -> Candle:
     start = datetime(2026, 1, 2, 9, 15, tzinfo=timezone.utc) + timedelta(minutes=i)
     value = Decimal(price)
-    return Candle("NSE_EQ|TEST", start, start + timedelta(minutes=1), value, value + 1, value - 1, value, 100)
+    return Candle("NSE_EQ|TEST", start, start + timedelta(minutes=1), value, value + Decimal("0.5"), value - Decimal("0.5"), value, 100)
 
 
 def test_insufficient_data_is_safe_default():
