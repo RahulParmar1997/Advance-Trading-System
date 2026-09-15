@@ -56,4 +56,4 @@
 Fresh CI verification; after CI is green, implement the production `/metrics` endpoint and end-to-end monitoring validation.
 
 ## CI note
-Run 439 for commit `dccf31d5e7fd1a3cc0acd428be134107d845d319` failed at Ruff and skipped Pytest. The import-order correction has now been committed as `1db8ed39b7d964418874b3166959699e91992fc4`. Fresh Actions verification is required before certifying CI-green.
+Run 440 for commit `1db8ed39b7d964418874b3166959699e91992fc4` failed Ruff because the import order was still incorrect: Ruff explicitly requires `ResearchStatus` before `ResourceLimits`. The corrected import ordering is now committed as `3fb85c2d43864121011d862943907af9fe76ce9d`. Fresh Actions verification is required before certifying CI-green.
