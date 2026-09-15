@@ -14,7 +14,8 @@
 - [x] Out-of-sample probability validation with Brier score, log loss and classification accuracy.
 - [x] Immutable append-only audit evidence persistence for scanner, scoring, probability and risk decision records.
 - [x] Audit records are content-addressed, execution-authority-free, and expose no order/execution capability.
-- [x] Unit coverage for scanner evidence, explanations, orchestration, scoring, calibration/validation and audit persistence controls.
+- [x] Upstox broker reconciliation adapter boundary with authoritative order/fill translation and identity validation.
+- [x] Unit coverage for scanner evidence, explanations, orchestration, scoring, calibration/validation, audit persistence, and broker reconciliation parsing.
 - [x] Changes committed directly to `main`.
 
 ## Done on `main`
@@ -56,24 +57,20 @@
 - [x] RiskEngine with hard safety gates and auditable decisions.
 - [x] Canonical OMS lifecycle and controlled RiskEngine → PAPER OMS flow.
 - [x] PAPER fills, position book, reconciliation, journal and RiskSnapshot integration.
+- [x] Upstox reconciliation adapter translating authoritative order/fill responses into broker-neutral contracts.
 
-### Research
+### Research / audit
 - [x] Event-driven backtester with costs, slippage, fees, latency, partial fills and liquidity limits.
 - [x] Walk-forward/OOS, Monte Carlo and cost/capacity/regime sensitivity foundations.
 - [x] Pattern DNA similarity and leakage-safe ML dataset/calibration primitives.
 - [x] Historical probability calibration fit from explicit labeled outcomes, restricted to a chronological training cutoff and out-of-sample application.
 - [x] OOS validation metrics computed only from samples strictly after the calibration cutoff; fitted models remain immutable.
+- [x] Append-only audit evidence contract with content-addressed immutable records and explicit non-execution authority.
 
 ## Pending work
 
-### Phase 5 — Trading decision engine
-- [x] Evidence-based scoring.
-- [x] Historical probability calibration.
-- [x] OOS probability validation.
-- [x] Explanation/audit evidence persistence.
-
 ### Phase 6 — Risk / execution
-- [ ] Broker reconciliation adapter implementation.
+- [x] Broker reconciliation adapter implementation.
 - [ ] Stronger durable journal backend.
 
 ### Phase 8 — Frontend
@@ -96,7 +93,7 @@
 - Audit evidence is observational only and must never authorize, submit or mutate an order.
 
 ## Current next task
-Implement the broker reconciliation adapter behind a broker-neutral interface, preserving the existing controlled RiskEngine → OMS execution boundary.
+Implement the stronger durable journal backend, preserving append-only audit semantics and keeping journal records separate from execution authority.
 
 ## CI note
 The latest GitHub Actions state is not verified green. Do not claim the quality gate is healthy until the Ruff failure is repaired and a subsequent run passes both Ruff and pytest.
