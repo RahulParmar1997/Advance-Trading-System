@@ -12,8 +12,8 @@
 - [x] Deterministic futures basis analytics.
 - [x] Deterministic market breadth, sector breadth/rotation and explicit institutional-flow aggregation.
 - [x] Explicit market-context integration joining completed-candle regime state with authoritative session state.
-- [x] Unit coverage for market-context chronology, instrument/session consistency and regime/session joining.
-- [x] `PROJECT_MEMORY.md` persistent project memory/handoff store.
+- [x] Deterministic Wyckoff event features from completed candles and explicit volume inputs.
+- [x] Unit coverage for Wyckoff event detection, chronology, look-ahead, OHLC and volume safety.
 - [x] Changes committed directly to `main`.
 
 ## Done on `main`
@@ -62,18 +62,8 @@
 
 ## Pending work
 
-### Phase 3 — Market state / analytics
-- [x] Multi-timeframe/session-aware candle aggregation.
-- [x] Expanded feature engine and displacement confirmation.
-- [x] Candle-volume profile analytics.
-- [x] Explicit order-flow analytics boundary.
-- [x] Futures/options contract metadata and option-chain foundation.
-- [x] Option Greeks/IV analytics with explicit Black-Scholes assumptions.
-- [x] Breadth, sector rotation and institutional-flow intelligence.
-- [x] Richer regime/session context integration.
-
 ### Phase 4 — Intelligence / scanning
-- [ ] Wyckoff features.
+- [x] Wyckoff features from completed candles/explicit volume with chronology and look-ahead protections.
 - [ ] Richer scanner result contracts and explanations.
 - [ ] Multi-symbol / multi-timeframe scanner orchestration.
 
@@ -106,7 +96,7 @@
 - PAPER remains the default.
 
 ## Current next task
-Implement deterministic Wyckoff features from completed candles/explicit volume inputs, with chronology and look-ahead protections. Keep all work directly on `main`.
+Implement richer scanner result contracts and explanations that expose deterministic evidence without inventing probabilities or broker observations. Keep all work directly on `main`.
 
 ## CI note
-The latest GitHub Actions run after the context implementation still fails at Ruff before pytest. The repository does not claim a green CI state until the lint gate is repaired and verified.
+The latest known GitHub Actions state is not verified green. Do not claim the quality gate is healthy until the Ruff failure is repaired and a subsequent run passes both Ruff and pytest.
