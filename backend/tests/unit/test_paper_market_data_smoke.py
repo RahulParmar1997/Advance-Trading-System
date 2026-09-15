@@ -7,7 +7,7 @@ from advance_system.domain.market_status import MarketStatus
 from advance_system.execution.paper_workflow import PaperExecutionWorkflow
 from advance_system.ingestion.adapters import Instrument, QuoteIngestionPipeline
 from advance_system.ingestion.normalizer import RawQuote
-from advance_system.ingestion.quality import DataQualityService
+from advance_system.ingestion.quality import QuoteQualityGate
 from advance_system.market.candle_engine import CandleEngine
 from advance_system.oms.state_machine import OmsOrder, OmsState
 from advance_system.risk.engine import RiskContext, RiskEngine, RiskPolicy, RiskSnapshot
@@ -53,13 +53,13 @@ async def test_market_data_to_paper_order_vertical_slice():
     instrument = Instrument("NSE_EQ|TEST", "NSE", "TEST", "EQUITY")
     adapter = FakePaperAdapter()
     pipeline = QuoteIngestionPipeline(adapter)
-    quality = DataQualityService(max_age=timedelta(minutes=2))
+    quality = QuoteQualityGate(max_age=timedelta(minutes=2))
     candles = CandleEngine(interval_seconds=60)
     emitted = []
     now = datetime(2026, 1, 2, 9, 16, 1, tzinfo=timezone.utc)
 
     async for event in pipeline.stream([instrument]):
-        observation = quality.observe(event, now=now)
+        observation = quality.evaluate(event, now=now)
         assert observation.accepted
         completed = candles.update(event)
         if completed is not None:
