@@ -11,13 +11,19 @@ def c(i: int, o: str, h: str, low: str, close: str) -> Candle:
 
 
 def test_equal_highs_and_lows_are_liquidity_levels():
-    candles = [c(0, "10", "12", "8", "11"), c(1, "11", "12", "9", "10"), c(2, "10", "11", "8", "9")]
+    candles = [
+        c(0, "10", "12", "8", "11"),
+        c(1, "11", "12", "9", "10"),
+        c(2, "10", "11", "8", "9"),
+        c(3, "9", "10", "9", "9.5"),
+    ]
     detector = LiquidityDetector()
     highs = detector.equal_highs(candles)
     lows = detector.equal_lows(candles)
     assert highs[0].kind is LiquidityType.BUY_SIDE
     assert highs[0].price == Decimal("12")
     assert lows[0].kind is LiquidityType.SELL_SIDE
+    assert lows[0].price == Decimal("8")
 
 
 def test_three_candle_fvg_detection():
