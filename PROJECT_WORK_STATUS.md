@@ -21,6 +21,8 @@
 - [x] ClickHouse adapter unit coverage.
 - [x] Concrete Redis hot-state adapter with TTL, lifecycle, fail-closed health check, and source-of-truth protection.
 - [x] Redis adapter unit coverage and hot-state boundary documentation.
+- [x] Concrete immutable Parquet/object-storage adapter with content-addressed manifests and explicit dataset versioning.
+- [x] Research dataset layout documentation and immutable write/read integrity tests.
 - [x] Changes committed directly to `main`.
 
 ## Done on `main`
@@ -71,6 +73,7 @@
 - [x] Historical probability calibration and strict OOS validation.
 - [x] Append-only audit evidence contract with content-addressed immutable records and explicit non-execution authority.
 - [x] Durable JSONL journal backend with append-only persistence and startup corruption/duplicate detection.
+- [x] Immutable Parquet research dataset persistence with explicit dataset/version/partition addressing.
 
 ### Frontend
 - [x] Next.js/React/TypeScript application foundation.
@@ -92,6 +95,8 @@
 - [x] Initial ClickHouse analytics schema for market events and features.
 - [x] Concrete Redis hot-state adapter with TTL and lifecycle controls.
 - [x] Redis source-of-truth prohibition and hot-state usage documentation.
+- [x] Concrete immutable Parquet/object-storage adapter with injected vendor-neutral object boundary.
+- [x] Content-addressed dataset manifests and no-overwrite semantics.
 
 ## Pending work
 
@@ -103,7 +108,7 @@
 - [x] Concrete PostgreSQL driver integration.
 - [x] Concrete ClickHouse analytics adapter/schema.
 - [x] Concrete Redis hot-state adapter.
-- [ ] Concrete Parquet/object-storage adapter and dataset layout.
+- [x] Concrete Parquet/object-storage adapter and dataset layout.
 - [ ] Docker/deployment configuration.
 - [ ] Monitoring, runbooks and reverse proxy.
 
@@ -121,7 +126,7 @@
 - Redis, ClickHouse and Parquet/object storage must never become execution authority or replace PostgreSQL operational truth.
 
 ## Current next task
-Implement the concrete Parquet/object-storage adapter with immutable research dataset layout and explicit dataset versioning.
+Implement Docker/deployment configuration with PAPER-safe defaults and explicit service boundaries.
 
 ## CI note
 The latest GitHub Actions state is not verified green. Do not claim the quality gate is healthy until the Ruff failure is repaired and a subsequent run passes both Ruff and pytest.
