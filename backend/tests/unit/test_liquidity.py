@@ -5,9 +5,9 @@ from advance_system.market.candle_engine import Candle
 from advance_system.market.liquidity import LiquidityDetector, LiquidityType
 
 
-def c(i: int, o: str, h: str, l: str, close: str) -> Candle:
+def c(i: int, o: str, h: str, low: str, close: str) -> Candle:
     start = datetime(2026, 1, 2, 9, 15, tzinfo=timezone.utc) + timedelta(minutes=i)
-    return Candle("NSE_EQ|TEST", start, start + timedelta(minutes=1), Decimal(o), Decimal(h), Decimal(l), Decimal(close), 0)
+    return Candle("NSE_EQ|TEST", start, start + timedelta(minutes=1), Decimal(o), Decimal(h), Decimal(low), Decimal(close), 0)
 
 
 def test_equal_highs_and_lows_are_liquidity_levels():
