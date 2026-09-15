@@ -6,6 +6,9 @@
 **Last updated:** 2026-09-15
 
 ## Latest completed work
+- [x] Connected immutable COMPUTED research-result provenance to the existing OOS validation and explicit research-approval workflow.
+- [x] Added fail-closed OOS→RESEARCH_APPROVED transitions, provenance binding, and timezone-aware approval evidence with no execution authority.
+- [x] Added deterministic unit coverage for OOS validation entry, explicit approval, provenance mismatch, duplicate approval and timestamp validation.
 - [x] Added cancellation/timeout enforcement around actual research worker execution with cooperative task cancellation and fail-closed wall-clock limits.
 - [x] Added deterministic unit coverage for successful worker completion, timeout cancellation, explicit cancellation, and unknown-job cancellation.
 - [x] Added concrete immutable ObjectStore-backed research-result persistence using the existing vendor-neutral ObjectStore boundary.
@@ -82,6 +85,7 @@
 - [x] Immutable research-result provenance and write-once integrity boundary.
 - [x] Concrete ObjectStore-backed research-result persistence adapter with fail-closed integrity checks.
 - [x] Research worker timeout/cancellation enforcement with no execution authority.
+- [x] OOS validation → explicit research approval workflow bound to immutable result provenance, with no execution authority.
 
 ### Frontend / infrastructure
 - [x] Read-only dark-first trading terminal routes and no direct broker execution from frontend.
@@ -91,9 +95,6 @@
 - [x] Prometheus configuration and observational monitoring runbook.
 
 ## Pending work
-
-### Research / HPC
-- [ ] Connect validated research results to the existing OOS/research-approval workflow without execution authority.
 
 ### Infrastructure / operations
 - [ ] Production `/metrics` endpoint and end-to-end monitoring validation.
@@ -115,7 +116,7 @@
 - Research compute must never place orders, mutate positions/balances or bypass RiskEngine → OMS.
 
 ## Current next task
-Connect validated research results to the existing OOS/research-approval workflow without execution authority.
+Production `/metrics` endpoint and end-to-end monitoring validation, unless a higher-risk CI/execution blocker appears first.
 
 ## CI note
-The latest main commit has no published GitHub status checks yet. The existing verified run `417` for commit `61505e375f22c59de42610f6ee4f0e9c8b14080f` completed successfully with Ruff and Pytest; result-provenance run `420` failed one Ruff import-order error and was corrected on main. Run `427` for the latest status update was observed in progress; fresh GitHub Actions verification is required before certifying the new worker changes as CI-green.
+Fresh CI verification is required after the latest research approval changes. Earlier run 429 failed at Ruff with 2 errors; those were corrected. Run 433 was queued/in progress after the latest worker import fix. Do not certify CI-green until GitHub Actions confirms Ruff and Pytest success for the current main commit.
