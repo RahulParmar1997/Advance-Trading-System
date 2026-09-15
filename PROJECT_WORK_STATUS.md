@@ -3,17 +3,18 @@
 **Repository:** `RahulParmar1997/Advance-Trading-System`
 **Working branch:** `main` ONLY
 **Execution policy:** PAPER-first; no uncontrolled live execution
-**Last updated:** 2026-09-14
+**Last updated:** 2026-09-15
 
 ## Current status
-The repository has a substantial deterministic PAPER/research foundation. Upstox transport/protobuf boundaries remain isolated behind adapters. Instrument-master ingestion has a concrete Upstox BOD JSON source, authoritative exchange status is enforced by the RiskEngine, and the official Upstox V3 protobuf schema is vendored/pinned behind the decoder boundary. Multi-timeframe candles are now session-aware when configured with the India market-session calendar.
+The repository has a substantial deterministic PAPER/research foundation. Upstox transport/protobuf boundaries remain isolated behind adapters. Instrument-master ingestion has a concrete Upstox BOD JSON source, authoritative exchange status is enforced by the RiskEngine, and the official Upstox V3 protobuf schema is vendored/pinned behind the decoder boundary. Multi-timeframe candles are session-aware when configured with the India market-session calendar. The feature engine now includes deterministic displacement confirmation using only prior completed candles.
 
 ## Latest completed work
-- [x] Session-aware candle engine using the existing India market-session contract.
-- [x] Candle session date/phase metadata is captured deterministically.
-- [x] Quotes outside the regular trading session are rejected fail-closed.
-- [x] Multi-timeframe candle engines propagate the same session boundary rules independently.
-- [x] Tests added for session metadata and out-of-session rejection.
+- [x] Expanded `FeatureEngine` with body-to-range and range-to-prior-average metrics.
+- [x] Added explicit displacement thresholds and lookback configuration.
+- [x] Added bullish/bearish displacement classification only when both body and range thresholds pass.
+- [x] Prevented look-ahead by requiring all reference candles to strictly precede the completed candle.
+- [x] Enforced single-instrument and complete session metadata invariants for session-aware candles.
+- [x] Added unit coverage for bullish, bearish, insufficient-history, look-ahead, instrument-mixing and session-metadata cases.
 - [x] Changes committed directly to `main`.
 
 ## Done on `main`
@@ -48,6 +49,7 @@ The repository has a substantial deterministic PAPER/research foundation. Upstox
 - [x] RiskEngine market-status freshness and fail-closed gate.
 - [x] Market structure, liquidity, FVG, order-block and regime primitives.
 - [x] Unified `MarketState` foundation.
+- [x] Deterministic displacement feature engine.
 
 ### Trading / risk / execution
 - [x] Trade Type and versioned Strategy framework.
@@ -77,7 +79,7 @@ The repository has a substantial deterministic PAPER/research foundation. Upstox
 ### Phase 3 — Market state / analytics
 - [x] Multi-timeframe candle aggregation foundation.
 - [x] Session-aware candle boundaries and session metadata.
-- [ ] Expanded feature engine and displacement confirmation.
+- [x] Expanded feature engine and displacement confirmation.
 - [ ] Volume profile/order flow where feed data supports it.
 - [ ] Futures/options analytics.
 - [ ] Breadth, sector rotation and institutional-flow intelligence.
@@ -124,4 +126,4 @@ The repository has a substantial deterministic PAPER/research foundation. Upstox
 `Market Event → Normalization → Validation → Candle → Features → Market State → Strategy → Opportunity → Probability/EV → RiskEngine → OMS → Paper Fill → Position → P&L → Journal`
 
 ## Current next task
-Expand the feature engine with deterministic displacement confirmation, using completed session-aware candles only. Keep all work directly on `main`.
+Implement volume-profile / order-flow analytics where the available normalized feed data supports it. Keep all work directly on `main`.
