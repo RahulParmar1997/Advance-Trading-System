@@ -6,6 +6,7 @@
 **Last updated:** 2026-09-15
 
 ## Latest completed work
+- [x] Fixed the GitHub Actions Ruff import-order failure in `test_research_results.py`; Pytest had been skipped by the failing quality step.
 - [x] Connected immutable COMPUTED research-result provenance to the existing OOS validation and explicit research-approval workflow.
 - [x] Added fail-closed OOS→RESEARCH_APPROVED transitions, provenance binding, and timezone-aware approval evidence with no execution authority.
 - [x] Added deterministic unit coverage for OOS validation entry, explicit approval, provenance mismatch, duplicate approval and timestamp validation.
@@ -18,81 +19,16 @@
 - [x] Added immutable research-result provenance contracts covering result SHA-256, size, dataset/strategy/feature/config versions, Git SHA, seed, backend, hardware, environment, resource usage and timezone-aware creation time.
 - [x] Added fail-closed validation requiring COMPUTED status, observed metadata, non-negative resource usage and compliance with job resource limits.
 - [x] Added deterministic write-once/integrity-checked in-memory research-result persistence coverage; no validation, OOS approval or broker authority is exposed.
-- [x] Added deterministic unit coverage for checksum correctness, metadata requirements, resource limits, overwrite rejection, integrity checks and status non-promotion.
 - [x] Added a research-only compute job boundary with reproducibility metadata, selectable CPU/GPU backend identity, resource limits and safe local execution semantics.
 - [x] Added distributed CPU, distributed GPU and cloud/HPC scheduler adapters behind a vendor-neutral enqueue boundary; adapters never claim worker completion and have no broker authority.
-- [x] Added deterministic unit coverage for research scheduler routing, backend matching and preservation of RAW status until worker execution is actually observed.
 - [x] Durable append-only JSONL journal backend with startup integrity validation and checkpoints.
 - [x] Next.js/React/TypeScript frontend foundation with dark-first terminal shell and observational landing dashboard.
-- [x] Read-only `/market-overview`, `/scanner`, `/derivatives`, `/paper-trading`, `/portfolio`, `/journal`, and `/research` routes with explicit typed contracts.
-- [x] Phase 9 storage configuration and PostgreSQL/ClickHouse/Redis/Parquet boundary contracts.
-- [x] Concrete PostgreSQL operational adapter with injected connection factory and fail-closed health check.
-- [x] Initial PostgreSQL operational migration for orders, fills, and positions.
-- [x] Migration version tracking and idempotent PostgreSQL migration runner contract.
-- [x] Concrete asyncpg PostgreSQL driver/pool integration with connection lifecycle and transaction context.
-- [x] Concrete ClickHouse analytics adapter and initial market-events/features schema.
-- [x] Concrete Redis hot-state adapter with TTL, lifecycle, fail-closed health check, and source-of-truth protection.
-- [x] Concrete immutable Parquet/object-storage adapter with content-addressed manifests and explicit dataset versioning.
+- [x] Read-only trading terminal routes and explicit typed contracts.
+- [x] PostgreSQL operational source-of-truth boundary, ClickHouse analytics, Redis hot state and immutable Parquet/object storage boundaries.
 - [x] Docker/deployment stack, reverse proxy, monitoring configuration and operational runbook.
 - [x] Upstox V3 protobuf boundary, market-data validation and deterministic analytics foundations.
 - [x] Event-driven backtesting with costs, latency, partial fills and liquidity limits.
 - [x] RiskEngine hard gate and canonical OMS → PAPER execution flow.
-
-## Done on `main`
-
-### Repository / quality
-- [x] Implementation ledger and persistent project memory.
-- [x] Backend Python package, pytest/Ruff and GitHub Actions quality workflow.
-- [x] Domain contract version registry and explicit contract versions.
-- [x] Structured JSON logging with recursive secret redaction.
-- [x] Deterministic health/readiness checks.
-
-### Market data / instruments
-- [x] Canonical broker-neutral QuoteEvent and normalization boundary.
-- [x] Candle engine, ordering protection, volume delta and multi-timeframe/session-aware aggregation.
-- [x] Deterministic data-quality service.
-- [x] Versioned/content-addressed instrument-master snapshots and monotonic publication.
-- [x] Upstox instrument-master adapter and BOD JSON parser boundary.
-- [x] Upstox V3 protobuf schema/decoder boundary.
-- [x] Real `websockets` transport with injectable connector/decoder.
-
-### Market state / analytics
-- [x] India market-session calendar/gate and authoritative market-status contract/source.
-- [x] RiskEngine market-status freshness and fail-closed gate.
-- [x] Market structure, liquidity, FVG, order-block and regime primitives.
-- [x] Unified MarketState foundation.
-- [x] Deterministic displacement, candle-volume profile and explicit trade-print order-flow analytics.
-- [x] Deterministic derivatives/Greeks/IV/basis/breadth/sector rotation/FII-DII analytics.
-- [x] MarketContextEngine and deterministic Wyckoff features with chronology/look-ahead protections.
-
-### Trading / risk / execution
-- [x] Trade Type and versioned Strategy framework.
-- [x] Opportunity, probability and EV primitives.
-- [x] RiskEngine with hard safety gates and auditable decisions.
-- [x] Canonical OMS lifecycle and controlled RiskEngine → PAPER OMS flow.
-- [x] PAPER fills, position book, reconciliation, journal and RiskSnapshot integration.
-- [x] Upstox reconciliation adapter translating authoritative order/fill responses into broker-neutral contracts.
-
-### Research / audit / HPC
-- [x] Event-driven backtester with costs, slippage, fees, latency, partial fills and liquidity limits.
-- [x] Walk-forward/OOS, Monte Carlo and cost/capacity/regime sensitivity foundations.
-- [x] Pattern DNA similarity and leakage-safe ML dataset/calibration primitives.
-- [x] Historical probability calibration and strict OOS validation.
-- [x] Append-only audit evidence and durable journal persistence.
-- [x] Immutable Parquet research dataset persistence.
-- [x] Research compute job metadata/resource-control boundary.
-- [x] Distributed CPU/GPU and cloud/HPC scheduler adapter boundary with no execution authority.
-- [x] Immutable research-result provenance and write-once integrity boundary.
-- [x] Concrete ObjectStore-backed research-result persistence adapter with fail-closed integrity checks.
-- [x] Research worker timeout/cancellation enforcement with no execution authority.
-- [x] OOS validation → explicit research approval workflow bound to immutable result provenance, with no execution authority.
-
-### Frontend / infrastructure
-- [x] Read-only dark-first trading terminal routes and no direct broker execution from frontend.
-- [x] PostgreSQL operational source-of-truth boundary and migration/transaction controls.
-- [x] ClickHouse analytics, Redis hot state and immutable Parquet storage boundaries.
-- [x] Docker Compose deployment stack, non-root/read-only backend container and reverse proxy.
-- [x] Prometheus configuration and observational monitoring runbook.
 
 ## Pending work
 
@@ -119,4 +55,4 @@
 Production `/metrics` endpoint and end-to-end monitoring validation, unless a higher-risk CI/execution blocker appears first.
 
 ## CI note
-Fresh CI verification is required after the latest research approval changes. Earlier run 429 failed at Ruff with 2 errors; those were corrected. Run 433 was queued/in progress after the latest worker import fix. Do not certify CI-green until GitHub Actions confirms Ruff and Pytest success for the current main commit.
+GitHub Actions run 436 for commit `7aebbde895010465401f6e54bc2c6447c4bfc712` failed Ruff on `backend/tests/unit/test_research_results.py` import ordering; Pytest was skipped. The import-order issue is corrected in the next main commit. Fresh Actions verification is required before certifying CI-green.
