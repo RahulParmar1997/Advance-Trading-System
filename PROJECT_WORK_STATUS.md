@@ -7,6 +7,10 @@
 
 ## Latest completed work
 - [x] Fixed scheduler Ruff blocker: removed unused `Callable` import from the research scheduler boundary.
+- [x] Added immutable research-result provenance contracts covering result SHA-256, size, dataset/strategy/feature/config versions, Git SHA, seed, backend, hardware, environment, resource usage and timezone-aware creation time.
+- [x] Added fail-closed validation requiring COMPUTED status, observed metadata, non-negative resource usage and compliance with job resource limits.
+- [x] Added deterministic write-once/integrity-checked in-memory research-result persistence coverage; no validation, OOS approval or broker authority is exposed.
+- [x] Added deterministic unit coverage for checksum correctness, metadata requirements, resource limits, overwrite rejection, integrity checks and status non-promotion.
 - [x] Added a research-only compute job boundary with reproducibility metadata, selectable CPU/GPU backend identity, resource limits and safe local execution semantics.
 - [x] Added distributed CPU, distributed GPU and cloud/HPC scheduler adapters behind a vendor-neutral enqueue boundary; adapters never claim worker completion and have no broker authority.
 - [x] Added deterministic unit coverage for research scheduler routing, backend matching and preservation of RAW status until worker execution is actually observed.
@@ -70,6 +74,7 @@
 - [x] Immutable Parquet research dataset persistence.
 - [x] Research compute job metadata/resource-control boundary.
 - [x] Distributed CPU/GPU and cloud/HPC scheduler adapter boundary with no execution authority.
+- [x] Immutable research-result provenance and write-once integrity boundary (test/in-memory persistence implementation).
 
 ### Frontend / infrastructure
 - [x] Read-only dark-first trading terminal routes and no direct broker execution from frontend.
@@ -81,7 +86,7 @@
 ## Pending work
 
 ### Research / HPC
-- [ ] Persist research-job checksums, hardware/environment metadata and resource usage with immutable results.
+- [ ] Add concrete object-storage persistence adapter for research-result manifests/results using the existing immutable ObjectStore boundary.
 - [ ] Add cancellation/timeout enforcement around actual worker execution.
 - [ ] Connect validated research results to the existing OOS/research-approval workflow without execution authority.
 
@@ -105,7 +110,7 @@
 - Research compute must never place orders, mutate positions/balances or bypass RiskEngine → OMS.
 
 ## Current next task
-Persist research-job checksums, hardware/environment metadata and resource usage with immutable results, keeping execution and approval strictly outside the compute layer.
+Add the concrete immutable ObjectStore-backed research-result persistence adapter, then add worker cancellation/timeout enforcement without introducing execution authority.
 
 ## CI note
-GitHub Actions run `414` for commit `3a29317d8a945b61714dff6f64cb90d9a009ba9f` failed because of one unused `Callable` import in `research/scheduler.py`; Pytest was skipped. Commit `5118ff8616989c65f5d086ae695af689eb33ba8a` fixes that lint defect on `main`. Fresh GitHub Actions verification is required before certifying the scheduler changes or claiming CI green.
+GitHub Actions run `417` for commit `61505e375f22c59de42610f6ee4f0e9c8b14080f` completed successfully with both Ruff and Pytest. Run `420` for commit `ec43d9dae37c039e7882fff3dd0c642bb5bf3fb9` failed on one Ruff import-order error in the new test; that was corrected on `main`. Run `423` for commit `c0e829a5fe78f5637c9146edfcc1c9cb64e41b2d` is currently in progress; it must complete successfully before CI can be certified green for the result-provenance implementation.
