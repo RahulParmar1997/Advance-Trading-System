@@ -3,7 +3,7 @@ from datetime import date, datetime, timezone
 import pytest
 
 from advance_system.market.instrument_master import InstrumentMaster, InstrumentRecord
-from advance_system.market.session import MarketSession, TradingDayCalendar
+from advance_system.market.session import IndiaMarketSession, TradingDayCalendar
 
 
 def test_instrument_master_rejects_unknown_and_inactive_symbols():
@@ -20,14 +20,13 @@ def test_instrument_master_rejects_unknown_and_inactive_symbols():
 
 
 def test_nse_session_uses_india_time_and_excludes_close():
-    session = MarketSession()
-    assert session.is_open(datetime(2026, 1, 2, 3, 45, tzinfo=timezone.utc))
-    assert not session.is_open(datetime(2026, 1, 2, 10, 0, tzinfo=timezone.utc))
-    assert not session.is_open(datetime(2026, 1, 2, 3, 30, tzinfo=timezone.utc))
+    session = IndiaMarketSession(TradingDayCalendar())
+    assert session.status_at(datetime(2026, 1, 2, 3, 45, tzinfo=timezone.utc)).is_open
+    assert not session.status_at(datetime(2026, 1, 2, 10, 0, tzinfo=timezone.utc)).is_open
+    assert not session.status_at(datetime(2026, 1, 2, 3, 30, tzinfo=timezone.utc)).is_open
 
 
 def test_calendar_is_injectable():
     holiday = date(2026, 1, 2)
     calendar = TradingDayCalendar({holiday})
-    at = datetime(2026, 1, 2, 4, 0, tzinfo=timezone.utc)
-    assert not calendar.is_trading_day(at)
+    assert not calendar.is_trading_day(holiday)
