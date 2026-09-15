@@ -6,7 +6,7 @@
 **Last updated:** 2026-09-15
 
 ## Current status
-The repository has a substantial deterministic PAPER/research foundation. Upstox transport/protobuf boundaries remain isolated behind adapters. Instrument-master ingestion has a concrete Upstox BOD JSON source, authoritative exchange status is enforced by the RiskEngine, and the official Upstox V3 protobuf schema is vendored/pinned behind the decoder boundary. Multi-timeframe candles are session-aware when configured with the India market-session calendar. The feature engine includes deterministic displacement confirmation using only prior completed candles. Volume analytics now has a conservative candle-volume profile and an explicit trade-print order-flow boundary.
+The repository has a substantial deterministic PAPER/research foundation. Upstox transport/protobuf boundaries remain isolated behind adapters. Instrument-master ingestion has a concrete Upstox BOD JSON source, authoritative exchange status is enforced by the RiskEngine, and the official Upstox V3 protobuf schema is vendored/pinned behind the decoder boundary. Multi-timeframe candles are session-aware when configured with the India market-session calendar. The feature engine includes deterministic displacement confirmation using only prior completed candles. Volume analytics has a conservative candle-volume profile and an explicit trade-print order-flow boundary. A persistent project memory/handoff file now records the architecture, completed milestones, roadmap and rules for future `NEXT` work.
 
 ## Latest completed work
 - [x] Added deterministic candle-volume profile analytics with configurable price buckets.
@@ -17,12 +17,14 @@ The repository has a substantial deterministic PAPER/research foundation. Upstox
 - [x] Bid/ask aggressor inference is conservative: exact ask = BUY, exact bid = SELL, otherwise UNKNOWN.
 - [x] No tick-level order-flow claims are made from the existing cumulative QuoteEvent volume field.
 - [x] Added unit coverage for volume profile and order-flow aggregation/inference.
+- [x] Added `PROJECT_MEMORY.md` as the persistent project memory/handoff store.
 - [x] Changes committed directly to `main`.
 
 ## Done on `main`
 
 ### Repository / quality
 - [x] `PROJECT_WORK_STATUS.md` implementation ledger.
+- [x] `PROJECT_MEMORY.md` persistent project memory and handoff.
 - [x] Backend Python package, pytest and Ruff configuration.
 - [x] CI workflow for pushes to `main` and pull requests.
 - [x] Domain contract version registry and explicit contract versions.
