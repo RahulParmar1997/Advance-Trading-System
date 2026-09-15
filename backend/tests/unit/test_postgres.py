@@ -1,17 +1,41 @@
 from __future__ import annotations
 
+from contextlib import asynccontextmanager
+
 import pytest
 
 from advance_system.storage.contracts import StorageConfig
 from advance_system.storage.postgres import PostgresOperationalStore
 
 
+class FakeTransaction:
+    def __init__(self) -> None:
+        self.entered = False
+        self.exited = False
+
+    async def __aenter__(self) -> "FakeTransaction":
+        self.entered = True
+        return self
+
+    async def __aexit__(self, exc_type: object, exc: object, traceback: object) -> bool:
+        self.exited = True
+        return False
+
+
 class FakeConnection:
     def __init__(self) -> None:
         self.calls: list[tuple[str, tuple[object, ...]]] = []
+        self.closed = False
+        self.tx = FakeTransaction()
 
     async def execute(self, statement: str, *parameters: object) -> None:
         self.calls.append((statement, parameters))
+
+    def transaction(self) -> FakeTransaction:
+        return self.tx
+
+    async def close(self) -> None:
+        self.closed = True
 
 
 @pytest.fixture
@@ -25,7 +49,7 @@ def config() -> StorageConfig:
 
 
 @pytest.mark.asyncio
-async def test_postgres_adapter_delegates_parameterized_statement(config: StorageConfig) -> None:
+async def test_postgres_adapter_delegates_parameterized_statement_and_closes(config: StorageConfig) -> None:
     connection = FakeConnection()
 
     async def factory() -> FakeConnection:
@@ -35,6 +59,59 @@ async def test_postgres_adapter_delegates_parameterized_statement(config: Storag
     await store.execute("SELECT * FROM orders WHERE order_id = $1", ("order-1",))
 
     assert connection.calls == [("SELECT * FROM orders WHERE order_id = $1", (("order-1",),))]
+    assert connection.closed is True
+
+
+@pytest.mark.asyncio
+async def test_postgres_transaction_commits_and_closes(config: StorageConfig) -> None:
+    connection = FakeConnection()
+
+    async def factory() -> FakeConnection:
+        return connection
+
+    store = PostgresOperationalStore(config, factory)
+    async with store.transaction() as tx:
+        await tx.execute("UPDATE positions SET quantity = $1", 10)
+
+    assert connection.tx.entered is True
+    assert connection.tx.exited is True
+    assert connection.closed is True
+    assert connection.calls == [("UPDATE positions SET quantity = $1", (10,))]
+
+
+@pytest.mark.asyncio
+async def test_postgres_transaction_closes_on_failure(config: StorageConfig) -> None:
+    connection = FakeConnection()
+
+    async def factory() -> FakeConnection:
+        return connection
+
+    store = PostgresOperationalStore(config, factory)
+    with pytest.raises(RuntimeError, match="rollback"):
+        async with store.transaction() as tx:
+            await tx.execute("UPDATE orders SET state = $1", "FAILED")
+            raise RuntimeError("rollback")
+
+    assert connection.tx.exited is True
+    assert connection.closed is True
+
+
+@pytest.mark.asyncio
+async def test_postgres_transaction_requires_transaction_capability(config: StorageConfig) -> None:
+    class NoTransactionConnection:
+        async def execute(self, statement: str, *parameters: object) -> None:
+            pass
+
+        async def close(self) -> None:
+            pass
+
+    async def factory() -> NoTransactionConnection:
+        return NoTransactionConnection()
+
+    store = PostgresOperationalStore(config, factory)
+    with pytest.raises(TypeError, match="transactions"):
+        async with store.transaction():
+            pass
 
 
 @pytest.mark.asyncio
@@ -42,6 +119,9 @@ async def test_postgres_healthcheck_fails_closed(config: StorageConfig) -> None:
     class BrokenConnection:
         async def execute(self, statement: str, *parameters: object) -> None:
             raise RuntimeError("database unavailable")
+
+        async def close(self) -> None:
+            pass
 
     async def factory() -> BrokenConnection:
         return BrokenConnection()
