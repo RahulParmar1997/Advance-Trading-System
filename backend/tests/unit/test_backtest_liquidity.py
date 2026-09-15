@@ -22,9 +22,8 @@ def test_no_liquidity_is_rejected() -> None:
 
 def test_historical_liquidity_causes_partial_fill() -> None:
     result = EventDrivenBacktester().run([event(0, HistoricalLiquidity(4)), event(1)], BuyOnce(), starting_cash=Decimal("10000"))
-    assert len(result.fills) == 1
-    assert result.fills[0].quantity == 4
-    assert result.ending_position == 4
+    assert [fill.quantity for fill in result.fills] == [4, 6]
+    assert result.ending_position == 10
 
 
 def test_participation_cap_is_observable_at_execution_event() -> None:
