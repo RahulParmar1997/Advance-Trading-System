@@ -11,7 +11,8 @@
 - [x] Multi-symbol / multi-timeframe scanner orchestration with explicit scope identity and deterministic ordering.
 - [x] Evidence-based scanner scoring using explicit evidence and deterministic non-probabilistic weights.
 - [x] Leakage-safe historical probability calibration from labeled historical outcomes.
-- [x] Unit coverage for scanner evidence, explanations, orchestration, scoring and calibration leakage controls.
+- [x] Out-of-sample probability validation with Brier score, log loss and classification accuracy.
+- [x] Unit coverage for scanner evidence, explanations, orchestration, scoring and calibration/validation leakage controls.
 - [x] Changes committed directly to `main`.
 
 ## Done on `main`
@@ -59,13 +60,14 @@
 - [x] Walk-forward/OOS, Monte Carlo and cost/capacity/regime sensitivity foundations.
 - [x] Pattern DNA similarity and leakage-safe ML dataset/calibration primitives.
 - [x] Historical probability calibration fit from explicit labeled outcomes, restricted to a chronological training cutoff and out-of-sample application.
+- [x] OOS validation metrics computed only from samples strictly after the calibration cutoff; fitted models remain immutable.
 
 ## Pending work
 
 ### Phase 5 — Trading decision engine
 - [x] Evidence-based scoring.
 - [x] Historical probability calibration.
-- [ ] OOS probability validation.
+- [x] OOS probability validation.
 - [ ] Explanation/audit evidence persistence.
 
 ### Phase 6 — Risk / execution
@@ -91,7 +93,7 @@
 - PAPER remains the default.
 
 ## Current next task
-Implement OOS probability validation metrics against unseen labeled outcomes. Validation must be chronological, separate from calibration fitting, and must not alter the fitted calibration model.
+Implement explanation/audit evidence persistence for scanner, scoring, probability and risk decisions without allowing persisted evidence to become an execution authority.
 
 ## CI note
 The latest GitHub Actions state is not verified green. Do not claim the quality gate is healthy until the Ruff failure is repaired and a subsequent run passes both Ruff and pytest.
