@@ -5,7 +5,11 @@ from collections.abc import Iterable
 from datetime import datetime
 from typing import Protocol
 
-from advance_system.domain.instruments import InstrumentMasterRecord, InstrumentMasterRepository, InstrumentMasterSnapshot
+from advance_system.domain.instruments import (
+    InstrumentMasterRecord,
+    InstrumentMasterRepository,
+    InstrumentMasterSnapshot,
+)
 
 
 class InstrumentMasterSource(Protocol):
