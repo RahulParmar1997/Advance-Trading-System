@@ -43,70 +43,31 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 - Deterministic sector rotation ranking from constituent returns and optional explicit benchmark return.
 - Explicit FII/DII institutional-flow aggregation from observed flow records; no inference from price/volume.
 - Explicit MarketContextEngine joining completed-candle regime classification with market-session metadata and rejecting chronology/session/instrument inconsistencies.
-- Deterministic Wyckoff-style event features from completed candles and explicit candle volume, including Spring, Upthrust, Sign of Strength, Sign of Weakness and effort/result absorption observations.
-- Rich scanner result contract with explicit evidence and deterministic explanations; pipeline integration exposes the richer result without probability, risk approval or broker status.
-- Multi-symbol / multi-timeframe scanner orchestration with explicit `ScanScope` identity, context consistency validation and deterministic scope ordering.
-- Deterministic evidence-based scanner scoring using explicit weighted evidence; scores are not probabilities or expected values.
-- Historical probability calibration from explicit timestamped labeled outcomes, trained only through a fixed historical cutoff and restricted to out-of-sample application.
-- OOS probability validation metrics: Brier score, log loss and threshold accuracy, computed only from samples strictly after the calibration cutoff without mutating the fitted model.
+- Deterministic Wyckoff-style event features from completed candles and explicit candle volume.
+- Rich scanner result contract with explicit evidence and deterministic explanations.
+- Multi-symbol / multi-timeframe scanner orchestration with explicit scope identity and deterministic ordering.
+- Deterministic evidence-based scanner scoring.
+- Historical probability calibration and leakage-safe OOS validation.
 - Immutable append-only audit evidence persistence for scanner, scoring, probability and risk decisions.
 - Upstox broker reconciliation adapter translating authoritative order/fill responses into broker-neutral snapshots and fills with identity and timestamp validation.
 
+## Durable journal backend
+`journal/durable.py` provides `JsonlAuditJournal` and `JournalCheckpoint`. The journal is append-only and persists one validated `AuditEvent` per JSONL record. Startup reload validates every record and rejects malformed or duplicate entries fail-closed. Appends flush the record before updating in-memory indexes. Checkpoints expose event count and last event id without adding execution capability. This backend is intended for PAPER/local durability and remains separate from broker execution authority; a database-backed production journal can replace it behind the same conceptual boundary.
+
 ## Audit evidence persistence
-`audit/evidence.py` defines `AuditEvidenceRecord`, `AuditDecisionKind`, `AuditEvidenceStore` and `InMemoryAuditEvidenceStore`. Records are frozen, validated, content-addressed with a SHA-256 record id, and append-only. The four supported decision kinds are scanner, score, probability and risk. Evidence is observational provenance only: `execution_authority` is required to remain false, and the store exposes read/append operations but no order or execution capability. Duplicate content is idempotent. This is a persistence boundary; a durable database-backed implementation remains separate future work.
+`audit/evidence.py` defines immutable, content-addressed audit records for scanner, score, probability and risk decisions. Audit evidence is observational provenance only and cannot authorize or submit orders.
 
 ## Broker reconciliation adapter
-`reconciliation/upstox.py` defines `UpstoxReconciliationAdapter` behind the minimal injected `UpstoxOrderApi` protocol. It fetches authoritative order details and fills, translates them into broker-neutral `BrokerOrderSnapshot` and `BrokerFill` contracts, validates positive quantities/prices and timezone-aware timestamps, and rejects fill/order identity mismatches. The adapter contains no order-submission or mutation method, so reconciliation cannot bypass the controlled RiskEngine → OMS execution boundary.
-
-## Current analytics capability
-### Breadth / sectors
-`breadth.py` consumes explicit constituent observations containing instrument, sector, timestamp, previous close, close and volume. It derives advance/decline counts, breadth percentage, net breadth, up/down volume and ratios. Sector breadth and rotation are deterministic; rotation can compare sector average constituent return with an explicitly supplied benchmark return. Mixed timestamps and duplicate instruments are rejected.
-
-### Institutional flow
-Institutional flow is represented as explicit observed FII/DII net-value inputs. The aggregator only sums those observations. It does not infer institutional activity from price, candle volume or order flow.
-
-### Volume profile
-Use completed trade/volume observations only. Price buckets are explicit/configurable. Expose volume-at-price, POC and value-area boundaries. Do not infer tick-level trade distribution from candle range without an explicit approximation contract.
-
-### Order flow
-Use explicit trade prints/aggressor information when available. BUY/SELL/UNKNOWN must be represented explicitly. Never claim buyer/seller aggression when the feed does not support it.
-
-### Options
-`derivative_analytics.py` provides deterministic European Black-Scholes price/Greeks and bounded implied-volatility solving. Inputs explicitly require spot, strike, time-to-expiry, risk-free rate and volatility; dividend yield is optional. The solver rejects prices below intrinsic value or outside its supported volatility range. These are model analytics, not broker-observed probabilities.
-
-### Futures
-`futures_basis()` reports absolute and percentage futures-vs-spot basis from explicit prices. It does not infer carry, funding or fair value without those inputs.
-
-### Market context
-`context.py` provides `MarketContextEngine`, which joins `MarketSessionStatus` with `RegimeObservation`. It requires completed candle timestamps to be timezone-aware and chronological, rejects mixed instruments and mixed session dates, and prevents an observation timestamp from preceding the latest completed candle. This keeps session/regime state explicit and safe for downstream scanners/strategies.
-
-### Wyckoff
-`wyckoff.py` compares the latest completed candle only with a strictly prior lookback window. It derives spread, body, closing location, prior range high/low, volume ratio, spread ratio and a normalized effort/result ratio. Event classification is deterministic: Spring and Upthrust require range rejection with elevated volume; Signs of Strength/Weakness require directional range breaks with wide spread, favorable close location and elevated volume; absorption requires elevated volume with a small normalized spread result. No future candle is consulted and zero/invalid volume is rejected.
-
-### Scanner results
-`scanner/results.py` provides immutable `Evidence` and `ScannerResult` contracts. Evidence records field, operator, expected value, observed context value, match state and source. Results may carry explicit instrument and timezone-aware observation time. Explanations are generated only from matched rule evidence. Probability, expected value, risk decisions and broker observations are intentionally outside this contract.
-
-### Scanner orchestration
-`scanner/orchestrator.py` provides `ScanScope(instrument, timeframe_seconds, observed_at)` and `ScannerOrchestrator`. Each scope is validated, its context identity is checked for consistency, missing identity fields are injected explicitly, and scopes are processed in deterministic order before invoking the existing scanner pipeline.
-
-### Evidence scoring
-`scanner/scoring.py` provides `EvidenceWeight`, `ScoreResult` and `EvidenceScorer`. Scores sum only weights attached to explicitly matched evidence fields. Weight fields are unique and non-negative, output is bounded by maximum configured weight, and explanations explicitly distinguish the score from probability/EV.
-
-### Historical probability calibration
-`research/calibration.py` provides `HistoricalOutcome`, `CalibrationBucket`, `HistoricalCalibrationModel` and `HistoricalProbabilityCalibrator`. Calibration is an empirical mapping from explicit historical predicted probabilities to realized boolean outcomes. Fitting uses only observations at or before a timezone-aware training cutoff; applying a fitted model requires a strictly later observation timestamp. Empty probability buckets are not backfilled or smoothed, so the system does not invent probabilities for unsupported historical regions.
-
-### OOS probability validation
-`HistoricalProbabilityCalibrator.validate_oos()` accepts a fitted immutable calibration model plus separately supplied labeled outcomes. Every validation observation must be strictly after the model's training cutoff. It reports Brier score, log loss and 0.5-threshold accuracy. Validation does not refit, smooth or mutate the calibration model, and it fails closed for empty, invalid or in-sample validation data.
+`reconciliation/upstox.py` defines `UpstoxReconciliationAdapter` behind an injected `UpstoxOrderApi`. It translates authoritative broker order details/fills into broker-neutral contracts and rejects identity/timestamp/quantity errors. It has no order-submission capability.
 
 ## Pending roadmap
-1. Durable journal backend.
-2. Next.js/React/TypeScript trading terminal and dashboards.
-3. PostgreSQL, ClickHouse, Redis, Parquet/object storage and deployment/observability infrastructure.
+1. Next.js/React/TypeScript trading terminal and dashboards.
+2. PostgreSQL, ClickHouse, Redis, Parquet/object storage and deployment/observability infrastructure.
 
 ## Next implementation rule
 When the user says **NEXT**, inspect the repository and implement the next unchecked roadmap item directly on `main`. Add deterministic tests, update `PROJECT_WORK_STATUS.md`, and update this memory file so the next session can resume without reconstructing project state.
 
-## Safety / quality rules for every next step
+## Safety / quality rules
 - No fabricated broker fields, market data, probabilities or execution status.
 - Prefer explicit capability/availability contracts over unsupported inference.
 - Validate timestamps, instruments, quantities and session metadata.
