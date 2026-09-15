@@ -76,7 +76,8 @@ def _escape(value: str) -> str:
 
 
 def _format_value(value: float) -> str:
-    return str(int(value)) if value.is_integer() else repr(value)
+    numeric_value = float(value)
+    return str(int(numeric_value)) if numeric_value.is_integer() else repr(numeric_value)
 
 
 class MetricsHandler(BaseHTTPRequestHandler):
