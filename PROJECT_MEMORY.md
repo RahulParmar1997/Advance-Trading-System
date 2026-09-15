@@ -43,6 +43,7 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 - Deterministic sector rotation ranking from constituent returns and optional explicit benchmark return.
 - Explicit FII/DII institutional-flow aggregation from observed flow records; no inference from price/volume.
 - Explicit MarketContextEngine joining completed-candle regime classification with market-session metadata and rejecting chronology/session/instrument inconsistencies.
+- Deterministic Wyckoff-style event features from completed candles and explicit candle volume, including Spring, Upthrust, Sign of Strength, Sign of Weakness and effort/result absorption observations.
 - Trade Type and versioned Strategy framework.
 - Opportunity, probability and EV primitives.
 - Canonical OMS lifecycle and controlled RiskEngine → PAPER OMS flow.
@@ -73,17 +74,19 @@ Use explicit trade prints/aggressor information when available. BUY/SELL/UNKNOWN
 ### Market context
 `context.py` provides `MarketContextEngine`, which joins `MarketSessionStatus` with `RegimeObservation`. It requires completed candle timestamps to be timezone-aware and chronological, rejects mixed instruments and mixed session dates, and prevents an observation timestamp from preceding the latest completed candle. This keeps session/regime state explicit and safe for downstream scanners/strategies.
 
+### Wyckoff
+`wyckoff.py` compares the latest completed candle only with a strictly prior lookback window. It derives spread, body, closing location, prior range high/low, volume ratio, spread ratio and a normalized effort/result ratio. Event classification is deterministic: Spring and Upthrust require range rejection with elevated volume; Signs of Strength/Weakness require directional range breaks with wide spread, favorable close location and elevated volume; absorption requires elevated volume with a small normalized spread result. No future candle is consulted and zero/invalid volume is rejected.
+
 ## Pending roadmap
-1. Wyckoff features.
-2. Richer scanner result contracts and explanations.
-3. Multi-symbol / multi-timeframe scanner orchestration.
-4. Evidence-based scoring.
-5. Historical/OOS probability calibration and validation.
-6. Explanation/audit evidence persistence.
-7. Broker reconciliation adapter implementation.
-8. Durable journal backend.
-9. Next.js/React/TypeScript trading terminal and dashboards.
-10. PostgreSQL, ClickHouse, Redis, Parquet/object storage and deployment/observability infrastructure.
+1. Richer scanner result contracts and explanations.
+2. Multi-symbol / multi-timeframe scanner orchestration.
+3. Evidence-based scoring.
+4. Historical/OOS probability calibration and validation.
+5. Explanation/audit evidence persistence.
+6. Broker reconciliation adapter implementation.
+7. Durable journal backend.
+8. Next.js/React/TypeScript trading terminal and dashboards.
+9. PostgreSQL, ClickHouse, Redis, Parquet/object storage and deployment/observability infrastructure.
 
 ## Next implementation rule
 When the user says **NEXT**, inspect the repository and implement the next unchecked roadmap item directly on `main`. Add deterministic tests, update `PROJECT_WORK_STATUS.md`, and update this memory file so the next session can resume without reconstructing project state.
@@ -99,4 +102,4 @@ When the user says **NEXT**, inspect the repository and implement the next unche
 - Do not claim CI is green unless the GitHub Actions result has actually been verified.
 
 ## CI note
-The latest GitHub Actions run after the market-context implementation still fails at Ruff before pytest. The lint gate has been narrowed to retain E/F/I correctness checks while ignoring E501 line-length noise, but CI must still be repaired and verified green before claiming the quality gate is healthy.
+The latest GitHub Actions state is not verified green. The repository must repair and verify the Ruff failure before claiming the quality gate is healthy.
