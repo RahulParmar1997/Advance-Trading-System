@@ -6,6 +6,10 @@
 **Last updated:** 2026-09-15
 
 ## Latest completed work
+- [x] Backend quality gate verified green on GitHub Actions run 411 after research compute changes.
+- [x] Added a research-only compute job boundary with reproducibility metadata, selectable CPU/GPU backend identity, resource limits and safe local execution semantics.
+- [x] Added distributed CPU, distributed GPU and cloud/HPC scheduler adapters behind a vendor-neutral enqueue boundary; adapters never claim worker completion and have no broker authority.
+- [x] Added deterministic unit coverage for research scheduler routing, backend matching and preservation of RAW status until worker execution is actually observed.
 - [x] Durable append-only JSONL journal backend with startup integrity validation and checkpoints.
 - [x] Next.js/React/TypeScript frontend foundation with dark-first terminal shell and observational landing dashboard.
 - [x] Read-only `/market-overview`, `/scanner`, `/derivatives`, `/paper-trading`, `/portfolio`, `/journal`, and `/research` routes with explicit typed contracts.
@@ -13,34 +17,14 @@
 - [x] Concrete PostgreSQL operational adapter with injected connection factory and fail-closed health check.
 - [x] Initial PostgreSQL operational migration for orders, fills, and positions.
 - [x] Migration version tracking and idempotent PostgreSQL migration runner contract.
-- [x] Migration runner unit coverage for pending and already-applied migrations.
 - [x] Concrete asyncpg PostgreSQL driver/pool integration with connection lifecycle and transaction context.
-- [x] PostgreSQL lifecycle/transaction unit coverage using injected fakes.
-- [x] Concrete ClickHouse analytics adapter with injected connection lifecycle and fail-closed health check.
-- [x] Initial ClickHouse market-events and feature analytics schema.
-- [x] ClickHouse adapter unit coverage.
+- [x] Concrete ClickHouse analytics adapter and initial market-events/features schema.
 - [x] Concrete Redis hot-state adapter with TTL, lifecycle, fail-closed health check, and source-of-truth protection.
-- [x] Redis adapter unit coverage and hot-state boundary documentation.
 - [x] Concrete immutable Parquet/object-storage adapter with content-addressed manifests and explicit dataset versioning.
-- [x] Research dataset layout documentation and immutable write/read integrity tests.
-- [x] Docker backend/frontend images and local PostgreSQL/ClickHouse/Redis deployment stack.
-- [x] PAPER-safe container defaults, non-root runtime, read-only backend filesystem and health-gated dependencies.
-- [x] Next.js standalone production output for the frontend image.
-- [x] Docker build exclusions for secrets, caches and local dependencies.
-- [x] Reverse-proxy configuration with security headers and isolated health endpoint.
-- [x] Prometheus monitoring configuration and operational deployment/incident runbook.
-- [x] Monitoring remains observational and does not create broker execution authority.
-- [x] Ruff quality gate passes.
-- [x] Upstox V3 protobuf decoder boundary restored to the expected generated message surface.
-- [x] Backtest partial-fill execution repaired so configured fill caps can produce deterministic split fills without inventing future market data.
-- [x] Integrated backtests accept explicit authoritative market status and pass observed market-volume information into the RiskEngine participation gate.
-- [x] PAPER fill tests exercise the canonical OMS path through `CANDIDATE → QUALIFIED → RISK_CHECK → ORDER_PENDING` before fills.
-- [x] Storage adapter tests aligned with actual parameter forwarding and fully qualified immutable object keys.
-- [x] Market-session, market-context, liquidity, FVG, swing, probability, calibration, regime and volume-profile tests aligned with deterministic contracts.
-- [x] Upstox feed mapping validates LTP before requiring a fallback message timestamp.
-- [x] Backend quality gate verified green on GitHub Actions.
-- [x] Added a research-only compute job boundary with reproducibility metadata, selectable CPU/GPU backend identity, resource limits and safe local execution semantics.
-- [x] Added deterministic unit coverage for research compute metadata, resource limits and rejection of unsupported remote execution by the local executor.
+- [x] Docker/deployment stack, reverse proxy, monitoring configuration and operational runbook.
+- [x] Upstox V3 protobuf boundary, market-data validation and deterministic analytics foundations.
+- [x] Event-driven backtesting with costs, latency, partial fills and liquidity limits.
+- [x] RiskEngine hard gate and canonical OMS → PAPER execution flow.
 
 ## Done on `main`
 
@@ -66,14 +50,8 @@
 - [x] Market structure, liquidity, FVG, order-block and regime primitives.
 - [x] Unified MarketState foundation.
 - [x] Deterministic displacement, candle-volume profile and explicit trade-print order-flow analytics.
-- [x] Deterministic futures/options metadata and option-chain validation.
-- [x] Deterministic Black-Scholes Greeks / implied-volatility analytics.
-- [x] Deterministic futures basis analytics.
-- [x] Deterministic market breadth and sector breadth analytics.
-- [x] Deterministic sector rotation ranking with optional explicit benchmark return.
-- [x] Explicit institutional FII/DII flow aggregation; no flow inference from price/volume.
-- [x] MarketContextEngine joining completed-candle regime classification with session metadata and fail-closed consistency checks.
-- [x] Deterministic Wyckoff features with chronology/look-ahead protections.
+- [x] Deterministic derivatives/Greeks/IV/basis/breadth/sector rotation/FII-DII analytics.
+- [x] MarketContextEngine and deterministic Wyckoff features with chronology/look-ahead protections.
 
 ### Trading / risk / execution
 - [x] Trade Type and versioned Strategy framework.
@@ -83,48 +61,26 @@
 - [x] PAPER fills, position book, reconciliation, journal and RiskSnapshot integration.
 - [x] Upstox reconciliation adapter translating authoritative order/fill responses into broker-neutral contracts.
 
-### Research / audit
+### Research / audit / HPC
 - [x] Event-driven backtester with costs, slippage, fees, latency, partial fills and liquidity limits.
 - [x] Walk-forward/OOS, Monte Carlo and cost/capacity/regime sensitivity foundations.
 - [x] Pattern DNA similarity and leakage-safe ML dataset/calibration primitives.
 - [x] Historical probability calibration and strict OOS validation.
-- [x] Append-only audit evidence contract with content-addressed immutable records and explicit non-execution authority.
-- [x] Durable JSONL journal backend with append-only persistence and startup corruption/duplicate detection.
-- [x] Immutable Parquet research dataset persistence with explicit dataset/version/partition addressing.
-- [x] Research compute job metadata and resource-control boundary.
+- [x] Append-only audit evidence and durable journal persistence.
+- [x] Immutable Parquet research dataset persistence.
+- [x] Research compute job metadata/resource-control boundary.
+- [x] Distributed CPU/GPU and cloud/HPC scheduler adapter boundary with no execution authority.
 
-### Frontend
-- [x] Next.js/React/TypeScript application foundation.
-- [x] Dark-first terminal shell and navigation.
-- [x] Read-only market overview, scanner, derivatives, PAPER trading, portfolio, journal and research dashboards.
-- [x] No direct broker/execution action from frontend.
-- [x] Standalone Next.js production build configuration.
-
-### Infrastructure
-- [x] Explicit storage configuration contract for PostgreSQL, ClickHouse, Redis and Parquet/object storage.
-- [x] Storage adapter protocols with vendor-neutral boundaries.
-- [x] Environment-only endpoint configuration with no hard-coded credentials.
-- [x] Storage source-of-truth and execution-authority rules documented.
-- [x] PostgreSQL operational adapter with injected driver lifecycle.
-- [x] Initial PostgreSQL schema migration for operational order/fill/position state.
-- [x] Migration version tracking and idempotent PostgreSQL migration runner contract.
-- [x] Concrete asyncpg driver integration with pooled connection lifecycle.
-- [x] Transaction context with commit/rollback semantics delegated to the PostgreSQL driver.
-- [x] Concrete ClickHouse analytics adapter with injected connection lifecycle.
-- [x] Initial ClickHouse analytics schema for market events and features.
-- [x] Concrete Redis hot-state adapter with TTL and lifecycle controls.
-- [x] Redis source-of-truth prohibition and hot-state usage documentation.
-- [x] Concrete immutable Parquet/object-storage adapter with injected vendor-neutral object boundary.
-- [x] Content-addressed dataset manifests and no-overwrite semantics.
-- [x] Docker Compose deployment stack for PostgreSQL, ClickHouse, Redis, backend and frontend.
-- [x] Backend container runs as non-root with read-only root filesystem.
-- [x] Reverse proxy configuration and deployment runbook.
-- [x] Prometheus monitoring configuration with application scrape gated until `/metrics` exists.
+### Frontend / infrastructure
+- [x] Read-only dark-first trading terminal routes and no direct broker execution from frontend.
+- [x] PostgreSQL operational source-of-truth boundary and migration/transaction controls.
+- [x] ClickHouse analytics, Redis hot state and immutable Parquet storage boundaries.
+- [x] Docker Compose deployment stack, non-root/read-only backend container and reverse proxy.
+- [x] Prometheus configuration and observational monitoring runbook.
 
 ## Pending work
 
 ### Research / HPC
-- [ ] Add execution adapters for distributed CPU/GPU and cloud/HPC schedulers behind the compute boundary.
 - [ ] Persist research-job checksums, hardware/environment metadata and resource usage with immutable results.
 - [ ] Add cancellation/timeout enforcement around actual worker execution.
 - [ ] Connect validated research results to the existing OOS/research-approval workflow without execution authority.
@@ -149,7 +105,7 @@
 - Research compute must never place orders, mutate positions/balances or bypass RiskEngine → OMS.
 
 ## Current next task
-Verify the GitHub Actions run triggered by the research compute boundary, then continue the research/HPC safety layer only after the quality gate is verified.
+Persist research-job checksums, hardware/environment metadata and resource usage with immutable results, keeping execution and approval strictly outside the compute layer.
 
 ## CI note
-The previous verified green run was GitHub Actions run `406` for commit `88cdcf51314fac74bda24d2532dbb464b65fcea9`, with both Ruff and Pytest successful. The research compute changes are now committed to `main` and require a fresh CI verification before being certified.
+GitHub Actions run `411` for commit `579a0a4c7887168b32bcbc68e9658be4bbafcbf4` completed successfully. The `quality` job passed both **Ruff lint** and **Pytest**. The scheduler adapter changes are now committed on `main`; a fresh CI run will be required after the next implementation commit before certifying that change.
