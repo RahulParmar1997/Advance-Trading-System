@@ -10,7 +10,8 @@
 - [x] Next.js/React/TypeScript frontend foundation with dark-first terminal shell and observational landing dashboard.
 - [x] Read-only `/market-overview`, `/scanner` and `/derivatives` dashboard routes with explicit typed contracts.
 - [x] Read-only `/paper-trading` terminal with typed order lifecycle/state contract and no order mutation capability.
-- [x] PAPER UI does not fabricate orders, fills or positions and keeps execution behind backend RiskEngine → OMS.
+- [x] Read-only `/portfolio` dashboard with typed position, exposure, P&L and risk-state contracts.
+- [x] Portfolio UI does not infer holdings/P&L and keeps execution behind backend RiskEngine → OMS.
 - [x] Changes committed directly to `main`.
 
 ## Done on `main`
@@ -72,6 +73,7 @@
 - [x] Read-only `/scanner` dashboard with typed candidate contract.
 - [x] Read-only `/derivatives` dashboard with option-chain and futures-basis presentation contracts.
 - [x] Read-only `/paper-trading` terminal with typed order state/lifecycle contract.
+- [x] Read-only `/portfolio` dashboard with position, exposure, P&L and risk-state contracts.
 - [x] No direct broker/execution action from frontend.
 
 ## Pending work
@@ -82,7 +84,7 @@
 - [x] Navigation and scanner dashboard.
 - [x] Derivatives dashboard.
 - [x] Read-only PAPER trading terminal.
-- [ ] Portfolio and position dashboard.
+- [x] Portfolio and position dashboard.
 - [ ] Journal, backtest and research UI.
 
 ### Phase 9 — Infrastructure
@@ -103,7 +105,7 @@
 - Frontend actions must not directly invoke broker execution.
 
 ## Current next task
-Implement the portfolio and position dashboard using backend read-only position, exposure and P&L contracts.
+Implement the journal dashboard with read-only audit-event and decision-evidence presentation, preserving append-only/non-execution semantics.
 
 ## CI note
 The latest GitHub Actions state is not verified green. Do not claim the quality gate is healthy until the Ruff failure is repaired and a subsequent run passes both Ruff and pytest.
