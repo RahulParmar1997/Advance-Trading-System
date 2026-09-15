@@ -6,17 +6,15 @@
 **Last updated:** 2026-09-15
 
 ## Current status
-The repository has a substantial deterministic PAPER/research foundation. Upstox transport/protobuf boundaries remain isolated behind adapters. Instrument-master ingestion has a concrete Upstox BOD JSON source, authoritative exchange status is enforced by the RiskEngine, and the official Upstox V3 protobuf schema is vendored/pinned behind the decoder boundary. Multi-timeframe candles are session-aware when configured with the India market-session calendar. The feature engine includes deterministic displacement confirmation using only prior completed candles. Volume analytics has a conservative candle-volume profile and an explicit trade-print order-flow boundary. A persistent project memory/handoff file now records the architecture, completed milestones, roadmap and rules for future `NEXT` work.
+The repository has a substantial deterministic PAPER/research foundation. Upstox transport/protobuf boundaries remain isolated behind adapters. Instrument-master ingestion has a concrete Upstox BOD JSON source, authoritative exchange status is enforced by the RiskEngine, and the official Upstox V3 protobuf schema is vendored/pinned behind the decoder boundary. Multi-timeframe candles are session-aware when configured with the India market-session calendar. Feature analytics include deterministic displacement, candle-volume profile and an explicit trade-print order-flow boundary. Futures/options analytics now has deterministic contract metadata and option-chain validation based only on authoritative fields supplied by the instrument source.
 
 ## Latest completed work
-- [x] Added deterministic candle-volume profile analytics with configurable price buckets.
-- [x] Added point-of-control and value-area calculations.
-- [x] Prevented volume profiles from mixing instruments or session dates.
-- [x] Added explicit `TradePrint` and `Aggressor` contracts for order-flow data.
-- [x] Order-flow aggregation uses only explicit trade-side information and preserves UNKNOWN volume.
-- [x] Bid/ask aggressor inference is conservative: exact ask = BUY, exact bid = SELL, otherwise UNKNOWN.
-- [x] No tick-level order-flow claims are made from the existing cumulative QuoteEvent volume field.
-- [x] Added unit coverage for volume profile and order-flow aggregation/inference.
+- [x] Added deterministic `DerivativeContract`, `DerivativeType` and `OptionType` contracts.
+- [x] Added safe parsing for underlying, expiry, strike, lot size and tick size.
+- [x] Added validation separating futures from options and requiring option strike/type metadata.
+- [x] Added deterministic `OptionChain` construction keyed by underlying and expiry.
+- [x] Added duplicate, mismatch and malformed-metadata protections.
+- [x] Added unit coverage for futures/options parsing and option-chain validation.
 - [x] Added `PROJECT_MEMORY.md` as the persistent project memory/handoff store.
 - [x] Changes committed directly to `main`.
 
@@ -56,6 +54,7 @@ The repository has a substantial deterministic PAPER/research foundation. Upstox
 - [x] Deterministic displacement feature engine.
 - [x] Deterministic candle-volume profile.
 - [x] Explicit trade-print order-flow boundary.
+- [x] Deterministic futures/options contract metadata and option-chain validation.
 
 ### Trading / risk / execution
 - [x] Trade Type and versioned Strategy framework.
@@ -71,24 +70,14 @@ The repository has a substantial deterministic PAPER/research foundation. Upstox
 
 ## Pending work
 
-### Phase 2 — Market data
-- [x] Production-safe secret-backed token store.
-- [x] Real WebSocket transport.
-- [x] Upstox V3 protobuf decoder boundary.
-- [x] Vendor/pin Upstox V3 protobuf schema/artifact.
-- [x] Instrument-master ingestion/update foundation.
-- [x] Concrete Upstox BOD JSON instrument-master source.
-- [x] Production Upstox exchange market-status source.
-- [x] Wire authoritative Upstox status into the RiskEngine market-open gate.
-- [x] Add market-status freshness/staleness protection and fail-closed behavior.
-
 ### Phase 3 — Market state / analytics
 - [x] Multi-timeframe candle aggregation foundation.
 - [x] Session-aware candle boundaries and session metadata.
 - [x] Expanded feature engine and displacement confirmation.
 - [x] Candle-volume profile analytics.
 - [x] Explicit order-flow analytics boundary.
-- [ ] Futures/options analytics.
+- [x] Futures/options contract metadata and option-chain foundation.
+- [ ] Option Greeks/IV analytics only when authoritative quote/contract inputs support calculation.
 - [ ] Breadth, sector rotation and institutional-flow intelligence.
 - [ ] Richer regime/session context integration.
 
@@ -133,4 +122,4 @@ The repository has a substantial deterministic PAPER/research foundation. Upstox
 `Market Event → Normalization → Validation → Candle → Features → Market State → Strategy → Opportunity → Probability/EV → RiskEngine → OMS → Paper Fill → Position → P&L → Journal`
 
 ## Current next task
-Implement futures/options analytics from authoritative instrument-master and feed fields, beginning with deterministic option-contract metadata and safe underlying/expiry/strike parsing. Keep all work directly on `main`.
+Implement option Greeks / implied-volatility analytics only where authoritative option quotes, strike, expiry and underlying inputs are available. Keep calculations deterministic, explicit about assumptions, and fail closed on missing/invalid inputs. Keep all work directly on `main`.
