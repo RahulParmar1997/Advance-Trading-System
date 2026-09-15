@@ -78,6 +78,9 @@ class IntegratedBacktestPipeline:
                 explanation=(decision.reason,),
             )
             snapshot = RiskSnapshot(available_liquidity=starting_cash)
+            estimated_market_volume = Decimal("0")
+            if event.liquidity is not None and event.liquidity.market_volume is not None:
+                estimated_market_volume = event.price * Decimal(event.liquidity.market_volume)
             risk_context = RiskContext(
                 now=event.timestamp,
                 market_open=market_open,
@@ -85,6 +88,7 @@ class IntegratedBacktestPipeline:
                 snapshot=snapshot,
                 probability=probability,
                 order_notional=event.price * quantity,
+                estimated_market_volume=estimated_market_volume,
                 market_status=market_status,
                 expected_exchange=market_status.exchange if market_status is not None else None,
             )
