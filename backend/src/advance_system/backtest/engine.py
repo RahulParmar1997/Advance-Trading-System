@@ -120,51 +120,69 @@ class EventDrivenBacktester:
                 continue
 
             execution_time = event.timestamp + policy.latency
-            execution_event = next((candidate for candidate in ordered[index:] if candidate.timestamp >= execution_time), None)
+            execution_event = next(
+                (candidate for candidate in ordered[index:] if candidate.timestamp >= execution_time),
+                None,
+            )
             if execution_event is None:
                 rejected += 1
                 continue
 
-            quantity = abs(delta)
-            liquidity = execution_event.liquidity or HistoricalLiquidity(quantity)
-            fill_qty, liquidity_rejection = rejection_policy.fill_quantity(
-                delta, liquidity, participation_rate=policy.participation_rate
-            )
-            if liquidity_rejection is not None:
-                rejected += 1
-                continue
+            remaining = abs(delta)
+            cursor = ordered.index(execution_event, index)
+            execution_index = cursor
+            while remaining > 0 and execution_event is not None:
+                liquidity = execution_event.liquidity or HistoricalLiquidity(remaining)
+                fill_qty, liquidity_rejection = rejection_policy.fill_quantity(
+                    delta if delta > 0 else -remaining,
+                    liquidity,
+                    participation_rate=policy.participation_rate,
+                )
+                if policy.max_fill_quantity is not None:
+                    fill_qty = min(fill_qty, policy.max_fill_quantity)
 
-            if fill_qty < quantity and fill_qty == 0:
-                rejected += 1
-                continue
+                if liquidity_rejection is not None or fill_qty <= 0:
+                    rejected += 1
+                    break
 
-            direction = Decimal("1") if delta > 0 else Decimal("-1")
-            execution_price = execution_event.price * (Decimal("1") + direction * policy.slippage_bps / Decimal("10000"))
-            notional = execution_price * fill_qty
-            fee = notional * policy.fee_bps / Decimal("10000")
-            if delta > 0 and cash < notional + fee:
-                rejected += 1
-                continue
-            if delta > 0:
-                cash -= notional + fee
-            else:
-                cash += notional - fee
+                direction = Decimal("1") if delta > 0 else Decimal("-1")
+                execution_price = execution_event.price * (
+                    Decimal("1") + direction * policy.slippage_bps / Decimal("10000")
+                )
+                notional = execution_price * fill_qty
+                fee = notional * policy.fee_bps / Decimal("10000")
+                if delta > 0 and cash < notional + fee:
+                    rejected += 1
+                    break
+                if delta > 0:
+                    cash -= notional + fee
+                else:
+                    cash += notional - fee
 
-            old_position = position
-            signed_qty = fill_qty if delta > 0 else -fill_qty
-            if old_position == 0 or (old_position > 0 and signed_qty > 0) or (old_position < 0 and signed_qty < 0):
-                total = abs(old_position) + fill_qty
-                average = ((abs(old_position) * average) + fill_qty * execution_price) / Decimal(total)
-            else:
-                closing = min(abs(old_position), fill_qty)
-                direction_old = Decimal("1") if old_position > 0 else Decimal("-1")
-                realized += (execution_price - average) * closing * direction_old - fee
-                if old_position + signed_qty == 0:
-                    average = Decimal("0")
-                elif abs(signed_qty) > abs(old_position):
-                    average = execution_price
-            position += signed_qty
-            fills.append(BacktestFill(execution_event.timestamp, event.instrument, fill_qty, execution_price, fee))
+                old_position = position
+                signed_qty = fill_qty if delta > 0 else -fill_qty
+                if old_position == 0 or (old_position > 0 and signed_qty > 0) or (old_position < 0 and signed_qty < 0):
+                    total = abs(old_position) + fill_qty
+                    average = ((abs(old_position) * average) + fill_qty * execution_price) / Decimal(total)
+                else:
+                    closing = min(abs(old_position), fill_qty)
+                    direction_old = Decimal("1") if old_position > 0 else Decimal("-1")
+                    realized += (execution_price - average) * closing * direction_old - fee
+                    if old_position + signed_qty == 0:
+                        average = Decimal("0")
+                    elif abs(signed_qty) > abs(old_position):
+                        average = execution_price
+                position += signed_qty
+                fills.append(BacktestFill(execution_event.timestamp, event.instrument, fill_qty, execution_price, fee))
+                remaining -= fill_qty
+
+                if remaining <= 0:
+                    break
+                execution_index += 1
+                execution_event = ordered[execution_index] if execution_index < len(ordered) else None
+                if execution_event is None:
+                    rejected += 1
+                    break
 
             equity = cash + Decimal(position) * event.price
             equity_peak = max(equity_peak, equity)
