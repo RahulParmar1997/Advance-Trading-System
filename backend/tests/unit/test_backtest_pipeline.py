@@ -7,6 +7,7 @@ from advance_system.domain.market_status import MarketStatus
 from advance_system.oms.state_machine import OmsState
 from advance_system.risk.engine import RiskEngine, RiskPolicy
 from advance_system.strategy.engine import BreakoutContinuationV1
+from advance_system.backtest.rejections import HistoricalLiquidity
 
 
 def permissive_risk() -> RiskEngine:
@@ -30,7 +31,7 @@ def permissive_risk() -> RiskEngine:
 
 def test_integrated_pipeline_reaches_order_pending_without_lookahead() -> None:
     ts = datetime(2026, 1, 1, 9, 15, tzinfo=timezone.utc)
-    events = [BacktestEvent(ts, "NSE_EQ|TEST", Decimal("100"))]
+    events = [BacktestEvent(ts, "NSE_EQ|TEST", Decimal("100"), HistoricalLiquidity(1000, market_volume=1000))]
     result = IntegratedBacktestPipeline(BreakoutContinuationV1(), permissive_risk()).run(
         events,
         trade_type="BREAKOUT",
