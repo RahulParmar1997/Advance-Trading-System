@@ -1,16 +1,16 @@
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
 import pytest
-
 from advance_system.domain.orders import Order, OrderSide, OrderStatus
+from advance_system.oms.engine import PaperOMS
+
+from advance_system.domain.market_events import QuoteEvent
 from advance_system.ingestion.adapters import Instrument, QuoteIngestionPipeline
 from advance_system.ingestion.normalizer import RawQuote
 from advance_system.ingestion.quality import DataQualityService
 from advance_system.market.candle_engine import CandleEngine
-from advance_system.oms.engine import PaperOMS
 from advance_system.risk.engine import RiskEngine
-from advance_system.domain.market_events import QuoteEvent
 
 
 class FakePaperAdapter:

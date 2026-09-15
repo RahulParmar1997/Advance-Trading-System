@@ -13,7 +13,6 @@ from advance_system.market.breadth import (
     build_sector_rotation,
 )
 
-
 OBSERVED_AT = datetime(2026, 9, 15, 10, 0, tzinfo=timezone.utc)
 
 

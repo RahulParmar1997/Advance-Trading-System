@@ -5,8 +5,7 @@ import pytest
 
 from advance_system.journal.audit import AuditEvent, InMemoryAuditJournal
 from advance_system.portfolio.manager import PositionManager
-from advance_system.reconciliation.contracts import BrokerFill, FillSide, BrokerOrderSnapshot, ReconciliationEngine
-
+from advance_system.reconciliation.contracts import BrokerFill, BrokerOrderSnapshot, FillSide, ReconciliationEngine
 
 NOW = datetime(2026, 9, 14, 10, 0, tzinfo=timezone.utc)
 

@@ -4,8 +4,7 @@ from decimal import Decimal
 import pytest
 
 from advance_system.market.candle_engine import Candle
-from advance_system.market.wyckoff import WyckoffEvent, WyckoffEngine
-
+from advance_system.market.wyckoff import WyckoffEngine, WyckoffEvent
 
 BASE = datetime(2026, 1, 5, 9, 15, tzinfo=timezone.utc)
 

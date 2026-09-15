@@ -3,8 +3,7 @@ from datetime import datetime, timezone
 import pytest
 
 from advance_system.scanner.dsl import AllOf, Condition, Field, Operator, ScannerRule
-from advance_system.scanner.orchestrator import ScanScope, ScannerOrchestrator
-
+from advance_system.scanner.orchestrator import ScannerOrchestrator, ScanScope
 
 UTC = timezone.utc
 

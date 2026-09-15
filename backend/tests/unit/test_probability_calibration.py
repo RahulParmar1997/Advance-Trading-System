@@ -5,7 +5,6 @@ import pytest
 
 from advance_system.research.calibration import HistoricalOutcome, HistoricalProbabilityCalibrator
 
-
 UTC = timezone.utc
 
 

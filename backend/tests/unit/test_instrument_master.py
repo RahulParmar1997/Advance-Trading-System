@@ -2,7 +2,11 @@ from datetime import datetime, timezone
 
 import pytest
 
-from advance_system.domain.instruments import InstrumentMasterRecord, InstrumentMasterRepository, InstrumentMasterSnapshot
+from advance_system.domain.instruments import (
+    InstrumentMasterRecord,
+    InstrumentMasterRepository,
+    InstrumentMasterSnapshot,
+)
 from advance_system.ingestion.instrument_master import (
     InstrumentMasterUpdater,
     UpstoxInstrumentMasterSource,

@@ -6,7 +6,6 @@ import pytest
 from advance_system.scanner.results import Evidence, ScannerResult
 from advance_system.scanner.scoring import EvidenceScorer, EvidenceWeight
 
-
 UTC = timezone.utc
 
 

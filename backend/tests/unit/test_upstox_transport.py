@@ -6,7 +6,12 @@ from decimal import Decimal
 import pytest
 
 from advance_system.adapters.upstox.market_data import UpstoxQuote
-from advance_system.adapters.upstox.transport import HeartbeatLoop, ReconnectPolicy, UpstoxTransport, UpstoxWebSocketClient
+from advance_system.adapters.upstox.transport import (
+    HeartbeatLoop,
+    ReconnectPolicy,
+    UpstoxTransport,
+    UpstoxWebSocketClient,
+)
 from advance_system.ingestion.adapters import Instrument
 
 

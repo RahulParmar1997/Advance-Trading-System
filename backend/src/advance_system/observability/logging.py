@@ -4,7 +4,6 @@ import json
 import logging
 from typing import Any
 
-
 _SENSITIVE_KEYS = frozenset(
     {
         "access_token",

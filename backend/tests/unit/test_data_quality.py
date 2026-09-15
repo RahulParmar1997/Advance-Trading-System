@@ -4,7 +4,6 @@ from decimal import Decimal
 from advance_system.domain.market_events import QuoteEvent
 from advance_system.ingestion.quality import DataQualityCode, QuoteQualityGate
 
-
 BASE = datetime(2026, 1, 2, 9, 15, tzinfo=timezone.utc)
 
 

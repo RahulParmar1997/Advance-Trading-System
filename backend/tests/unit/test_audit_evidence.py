@@ -4,7 +4,6 @@ import pytest
 
 from advance_system.audit import AuditDecisionKind, AuditEvidenceRecord, InMemoryAuditEvidenceStore
 
-
 OBSERVED_AT = datetime(2026, 9, 15, 9, 30, tzinfo=timezone.utc)
 
 

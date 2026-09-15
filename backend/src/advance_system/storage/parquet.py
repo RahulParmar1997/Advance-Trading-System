@@ -10,7 +10,6 @@ from urllib.parse import urlparse
 
 from advance_system.storage.contracts import StorageConfig
 
-
 _PATH_PART = re.compile(r"^[A-Za-z0-9._-]+$")
 _PARTITION_PART = re.compile(r"^[A-Za-z0-9._=-]+$")
 
