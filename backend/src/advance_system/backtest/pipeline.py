@@ -6,6 +6,7 @@ from decimal import Decimal
 from typing import Mapping
 
 from advance_system.backtest.engine import BacktestEvent, BacktestFill, EventDrivenBacktester
+from advance_system.domain.market_status import MarketStatus
 from advance_system.oms.state_machine import OmsOrder, OmsState, OrderStateMachine
 from advance_system.opportunity.engine import Opportunity, OpportunityEngine
 from advance_system.risk.engine import RiskContext, RiskEngine, RiskSnapshot
@@ -49,6 +50,7 @@ class IntegratedBacktestPipeline:
         market_open: bool = True,
         probability: Decimal | None = None,
         market_context: Mapping[str, object] | None = None,
+        market_status: MarketStatus | None = None,
     ) -> IntegratedBacktestResult:
         if quantity <= 0:
             raise ValueError("quantity must be positive")
@@ -83,6 +85,8 @@ class IntegratedBacktestPipeline:
                 snapshot=snapshot,
                 probability=probability,
                 order_notional=event.price * quantity,
+                market_status=market_status,
+                expected_exchange=market_status.exchange if market_status is not None else None,
             )
             risk = self._risk.check(opportunity, risk_context)
             if not risk.allowed:
