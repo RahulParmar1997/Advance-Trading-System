@@ -35,7 +35,10 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 - Market structure, liquidity, FVG, order-block and regime primitives.
 - Unified MarketState foundation.
 - Displacement feature engine using only prior completed candles.
-- Volume-profile and order-flow analytics added where feed capabilities support them.
+- Volume-profile and order-flow analytics with explicit feed-capability boundaries.
+- Futures/options contract metadata and option-chain validation.
+- Deterministic Black-Scholes option Greeks and implied-volatility solver.
+- Deterministic futures basis analytics.
 - Trade Type and versioned Strategy framework.
 - Opportunity, probability and EV primitives.
 - Canonical OMS lifecycle and controlled RiskEngine → PAPER OMS flow.
@@ -51,19 +54,24 @@ Use completed trade/volume observations only. Price buckets are explicit/configu
 ### Order flow
 Use explicit trade prints/aggressor information when available. BUY/SELL/UNKNOWN must be represented explicitly. Never claim buyer/seller aggression when the feed does not support it.
 
+### Options
+`derivative_analytics.py` provides deterministic European Black-Scholes price/Greeks and bounded implied-volatility solving. Inputs explicitly require spot, strike, time-to-expiry, risk-free rate and volatility; dividend yield is optional. The solver rejects prices below intrinsic value or outside its supported volatility range. These are model analytics, not broker-observed probabilities.
+
+### Futures
+`futures_basis()` reports absolute and percentage futures-vs-spot basis from explicit prices. It does not infer carry, funding or fair value without those inputs.
+
 ## Pending roadmap
-1. Futures/options analytics.
-2. Breadth, sector rotation and institutional-flow intelligence.
-3. Richer regime/session context integration.
-4. Wyckoff features.
-5. Richer scanner result contracts and explanations.
-6. Multi-symbol / multi-timeframe scanner orchestration.
-7. Evidence-based scoring and historical/OOS probability calibration.
-8. Explanation/audit evidence persistence.
-9. Broker reconciliation adapter implementation.
-10. Durable journal backend.
-11. Next.js/React/TypeScript trading terminal and dashboards.
-12. PostgreSQL, ClickHouse, Redis, Parquet/object storage and deployment/observability infrastructure.
+1. Breadth, sector rotation and institutional-flow intelligence.
+2. Richer regime/session context integration.
+3. Wyckoff features.
+4. Richer scanner result contracts and explanations.
+5. Multi-symbol / multi-timeframe scanner orchestration.
+6. Evidence-based scoring and historical/OOS probability calibration.
+7. Explanation/audit evidence persistence.
+8. Broker reconciliation adapter implementation.
+9. Durable journal backend.
+10. Next.js/React/TypeScript trading terminal and dashboards.
+11. PostgreSQL, ClickHouse, Redis, Parquet/object storage and deployment/observability infrastructure.
 
 ## Next implementation rule
 When the user says **NEXT**, inspect the repository and implement the next unchecked roadmap item directly on `main`. Add deterministic tests, update `PROJECT_WORK_STATUS.md`, and update this memory file so the next session can resume without reconstructing project state.
