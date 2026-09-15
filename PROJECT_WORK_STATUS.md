@@ -6,7 +6,7 @@
 **Last updated:** 2026-09-15
 
 ## Latest completed work
-- [x] Fixed the GitHub Actions Ruff import-order failure in `test_research_results.py`; Pytest had been skipped by the failing quality step.
+- [x] Corrected the remaining GitHub Actions Ruff import-order failure in `test_research_results.py` and pushed the fix directly to `main`.
 - [x] Connected immutable COMPUTED research-result provenance to the existing OOS validation and explicit research-approval workflow.
 - [x] Added fail-closed OOS→RESEARCH_APPROVED transitions, provenance binding, and timezone-aware approval evidence with no execution authority.
 - [x] Added deterministic unit coverage for OOS validation entry, explicit approval, provenance mismatch, duplicate approval and timestamp validation.
@@ -33,6 +33,7 @@
 ## Pending work
 
 ### Infrastructure / operations
+- [ ] Fresh GitHub Actions verification after the latest Ruff correction.
 - [ ] Production `/metrics` endpoint and end-to-end monitoring validation.
 - [ ] Full deployment/integration validation against configured PostgreSQL, ClickHouse and Redis services.
 
@@ -52,7 +53,7 @@
 - Research compute must never place orders, mutate positions/balances or bypass RiskEngine → OMS.
 
 ## Current next task
-Production `/metrics` endpoint and end-to-end monitoring validation, unless a higher-risk CI/execution blocker appears first.
+Fresh CI verification; after CI is green, implement the production `/metrics` endpoint and end-to-end monitoring validation.
 
 ## CI note
-GitHub Actions run 436 for commit `7aebbde895010465401f6e54bc2c6447c4bfc712` failed Ruff on `backend/tests/unit/test_research_results.py` import ordering; Pytest was skipped. The import-order issue is corrected in the next main commit. Fresh Actions verification is required before certifying CI-green.
+Run 439 for commit `dccf31d5e7fd1a3cc0acd428be134107d845d319` failed at Ruff and skipped Pytest. The import-order correction has now been committed as `1db8ed39b7d964418874b3166959699e91992fc4`. Fresh Actions verification is required before certifying CI-green.
