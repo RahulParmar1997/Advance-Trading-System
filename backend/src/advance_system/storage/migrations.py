@@ -5,7 +5,7 @@ from typing import Protocol, Sequence
 
 
 class MigrationConnection(Protocol):
-    async def execute(self, statement: str, *parameters: object) -> None: ...
+    async def execute(self, statement: str, *parameters: object) -> object: ...
 
 
 class MigrationConnectionFactory(Protocol):
@@ -28,7 +28,7 @@ class Migration:
 
 
 class MigrationRunner:
-    """Idempotent migration runner using PostgreSQL as the migration state authority."""
+    """Idempotent migration runner using PostgreSQL as migration-state authority."""
 
     TABLE_SQL = """
     CREATE TABLE IF NOT EXISTS schema_migrations (
@@ -61,9 +61,19 @@ class MigrationRunner:
         return tuple(executed)
 
     async def _applied_versions(self, connection: MigrationConnection) -> set[int]:
-        # The minimal protocol deliberately avoids prescribing a row-fetch API.
-        # Concrete adapters can override this method with their driver's query API.
-        raise NotImplementedError("provide a PostgreSQL connection implementation with row fetching")
+        result = await connection.execute("SELECT version FROM schema_migrations ORDER BY version")
+        rows = result if isinstance(result, Sequence) and not isinstance(result, (str, bytes)) else ()
+        versions: set[int] = set()
+        for row in rows:
+            if isinstance(row, int):
+                versions.add(row)
+            elif isinstance(row, Sequence) and row and isinstance(row[0], int):
+                versions.add(row[0])
+            elif isinstance(row, dict) and isinstance(row.get("version"), int):
+                versions.add(row["version"])
+            else:
+                raise ValueError("invalid schema_migrations row")
+        return versions
 
     @staticmethod
     def _validate_migrations(migrations: Sequence[Migration]) -> None:
