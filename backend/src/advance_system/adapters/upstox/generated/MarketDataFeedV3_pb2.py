@@ -1,21 +1,157 @@
 # -*- coding: utf-8 -*-
-# Generated from the pinned Upstox MarketDataFeedV3.proto.
-# DO NOT EDIT manually; regenerate from the pinned proto when upgrading.
+# Vendored schema-compatible Upstox V3 protobuf boundary.
+# Schema source: upstox/upstox-python MarketDataFeedV3.proto
 from google.protobuf import descriptor as _descriptor
+from google.protobuf import descriptor_pb2 as _descriptor_pb2
 from google.protobuf import descriptor_pool as _descriptor_pool
 from google.protobuf.internal import builder as _builder
 from google.protobuf import symbol_database as _symbol_database
 from google.protobuf import wrappers_pb2 as google_dot_protobuf_dot_wrappers__pb2
 
+_PACKAGE = "com.upstox.marketdatafeederv3udapi.rpc.proto"
 _sym_db = _symbol_database.Default()
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x16MarketDataFeedV3.proto\x12,com.upstox.marketdatafeederv3udapi.rpc.proto\x1a\x1egoogle/protobuf/wrappers.proto\"d\n\x04LTPC\x12\x0b\n\x03ltp\x18\x01 \x01(\x01\x12\x0b\n\x03ltt\x18\x02 \x01(\x03\x12\x0b\n\x03ltq\x18\x03 \x01(\x03\x12\n\n\x02cp\x18\x04 \x01(\x01\x12)\n\x03iep\x18\x05 \x01(\x0b2\x1c.google.protobuf.DoubleValue\"W\n\x0bMarketLevel\x12H\n\x0bbidAskQuote\x18\x01 \x03(\x0b23.com.upstox.marketdatafeederv3udapi.rpc.proto.Quote\"N\n\nMarketOHLC\x12@\n\x04ohlc\x18\x01 \x03(\x0b22.com.upstox.marketdatafeederv3udapi.rpc.proto.OHLC\"?\n\x05Quote\x12\x0c\n\x04bidQ\x18\x01 \x01(\x03\x12\x0c\n\x04bidP\x18\x02 \x01(\x01\x12\x0c\n\x04askQ\x18\x03 \x01(\x03\x12\x0c\n\x04askP\x18\x04 \x01(\x01)\"V\n\x0cOptionGreeks\x12\r\n\x05delta\x18\x01 \x01(\x01\x12\r\n\x05theta\x18\x02 \x01(\x01\x12\r\n\x05gamma\x18\x03 \x01(\x01\x12\x0c\n\x04vega\x18\x04 \x01(\x01\x12\x0b\n\x03rho\x18\x05 \x01(\x01)\"i\n\x04OHLC\x12\x10\n\x08interval\x18\x01 \x01(\t\x12\x0c\n\x04open\x18\x02 \x01(\x01\x12\x0c\n\x04high\x18\x03 \x01(\x01\x12\x0b\n\x03low\x18\x04 \x01(\x01\x12\r\n\x05close\x18\x05 \x01(\x01\x12\x0b\n\x03vol\x18\x06 \x01(\x03\x12\n\n\x02ts\x18\x07 \x01(\x03)\"\xe9\x03\n\x0eMarketFullFeed\x12@\n\x04ltpc\x18\x01 \x01(\x0b22.com.upstox.marketdatafeederv3udapi.rpc.proto.LTPC\x12N\n\x0bmarketLevel\x18\x02 \x01(\x0b29.com.upstox.marketdatafeederv3udapi.rpc.proto.MarketLevel\x12P\n\x0coptionGreeks\x18\x03 \x01(\x0b2:.com.upstox.marketdatafeederv3udapi.rpc.proto.OptionGreeks\x12L\n\nmarketOHLC\x18\x04 \x01(\x0b28.com.upstox.marketdatafeederv3udapi.rpc.proto.MarketOHLC\x12\x0b\n\x03atp\x18\x05 \x01(\x01\x12\x0b\n\x03vtt\x18\x06 \x01(\x03\x12\n\n\x02oi\x18\x07 \x01(\x01\x12\n\n\x02iv\x18\x08 \x01(\x01\x12\x0b\n\x03tbq\x18\t \x01(\x01\x12\x0b\n\x03tsq\x18\n \x01(\x01\x12\x0b\n\x03iep\x18\x0b \x01(\x01\x12\n\n\x02rp\x18\x0c \x01(\x01\x12\x0b\n\x03ieq\x18\r \x01(\x03\x12\x10\n\x08iiqTotal\x18\x0e \x01(\x03\x12\x0c\n\x04iiqM\x18\x0f \x01(\x03\x12\x13\n\x0bcasEligible\x18\x10 \x01(\x08)\"\x9f\x01\n\rIndexFullFeed\x12@\n\x04ltpc\x18\x01 \x01(\x0b22.com.upstox.marketdatafeederv3udapi.rpc.proto.LTPC\x12L\n\nmarketOHLC\x18\x02 \x01(\x0b28.com.upstox.marketdatafeederv3udapi.rpc.proto.MarketOHLC)\"\xbd\x01\n\x08FullFeed\x12P\n\x08marketFF\x18\x01 \x01(\x0b2<.com.upstox.marketdatafeederv3udapi.rpc.proto.MarketFullFeedH\x00\x12N\n\x07indexFF\x18\x02 \x01(\x0b2;.com.upstox.marketdatafeederv3udapi.rpc.proto.IndexFullFeedH\x00B\x0f\n\rFullFeedUnion)\"\x98\x02\n\x14FirstLevelWithGreeks\x12@\n\x04ltpc\x18\x01 \x01(\x0b22.com.upstox.marketdatafeederv3udapi.rpc.proto.LTPC\x12G\n\nfirstDepth\x18\x02 \x01(\x0b23.com.upstox.marketdatafeederv3udapi.rpc.proto.Quote\x12P\n\x0coptionGreeks\x18\x03 \x01(\x0b2:.com.upstox.marketdatafeederv3udapi.rpc.proto.OptionGreeks\x12\x0b\n\x03vtt\x18\x04 \x01(\x03\x12\n\n\x02oi\x18\x05 \x01(\x01\x12\n\n\x02iv\x18\x06 \x01(\x01)\"\xd7\x02\n\x04Feed\x12B\n\x04ltpc\x18\x01 \x01(\x0b22.com.upstox.marketdatafeederv3udapi.rpc.proto.LTPCH\x00\x12J\n\x08fullFeed\x18\x02 \x01(\x0b26.com.upstox.marketdatafeederv3udapi.rpc.proto.FullFeedH\x00\x12b\n\x14firstLevelWithGreeks\x18\x03 \x01(\x0b2B.com.upstox.marketdatafeederv3udapi.rpc.proto.FirstLevelWithGreeksH\x00\x12N\n\x0brequestMode\x18\x04 \x01(\x0e29.com.upstox.marketdatafeederv3udapi.rpc.proto.RequestModeB\x0b\n\tFeedUnion)\"1\n\nStatusInfo\x12\x0e\n\x06status\x18\x01 \x01(\t\x12\x13\n\x0bupdatedTime\x18\x02 \x01(\x03)\"\xa5\x05\n\nMarketInfo\x12b\n\rsegmentStatus\x18\x01 \x03(\x0b2K.com.upstox.marketdatafeederv3udapi.rpc.proto.MarketInfo.SegmentStatusEntry\x12f\n\x0fcasMarketStatus\x18\x02 \x03(\x0b2M.com.upstox.marketdatafeederv3udapi.rpc.proto.MarketInfo.CasMarketStatusEntry\x12p\n\x14preOpenSessionStatus\x18\x03 \x03(\x0b2R.com.upstox.marketdatafeederv3udapi.rpc.proto.MarketInfo.PreOpenSessionStatusEntry\x1ap\n\x12SegmentStatusEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12I\n\x05value\x18\x02 \x01(\x0e2:.com.upstox.marketdatafeederv3udapi.rpc.proto.MarketStatus:\x028\x01\x1ap\n\x14CasMarketStatusEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12G\n\x05value\x18\x02 \x01(\x0b28.com.upstox.marketdatafeederv3udapi.rpc.proto.StatusInfo:\x028\x01\x1au\n\x19PreOpenSessionStatusEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12G\n\x05value\x18\x02 \x01(\x0b28.com.upstox.marketdatafeederv3udapi.rpc.proto.StatusInfo:\x028\x01)\"\xe9\x02\n\x0cFeedResponse\x12@\n\x04type\x18\x01 \x01(\x0e22.com.upstox.marketdatafeederv3udapi.rpc.proto.Type\x12T\n\x05feeds\x18\x02 \x03(\x0b2E.com.upstox.marketdatafeederv3udapi.rpc.proto.FeedResponse.FeedsEntry\x12\x11\n\tcurrentTs\x18\x03 \x01(\x03\x12L\n\nmarketInfo\x18\x04 \x01(\x0b28.com.upstox.marketdatafeederv3udapi.rpc.proto.MarketInfo\x1a`\n\nFeedsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12A\n\x05value\x18\x02 \x01(\x0b22.com.upstox.marketdatafeederv3udapi.rpc.proto.Feed:\x028\x01*8\n\x04Type\x12\x10\n\x0cinitial_feed\x10\x00\x12\r\n\t live_feed\x10\x01\x12\x0f\n\x0bmarket_info\x10\x02*E\n\x0bRequestMode\x12\x08\n\x04ltpc\x10\x00\x12\x0b\n\x07full_d5\x10\x01\x12\x11\n\roption_greeks\x10\x02\x12\x0c\n\x08full_d30\x10\x03*{\n\x0cMarketStatus\x12\x12\n\x0ePRE_OPEN_START\x10\x00\x12\x10\n\x0cPRE_OPEN_END\x10\x01\x12\x0f\n\x0bNORMAL_OPEN\x10\x02\x12\x10\n\x0cNORMAL_CLOSE\x10\x03\x12\x11\n\rCLOSING_START\x10\x04\x12\x0f\n\x0bCLOSING_END\x10\x05b\x06proto3')
+
+def _message(file_proto, name):
+    return file_proto.message_type.add(name=name)
+
+
+def _field(message, name, number, field_type, *, label=1, type_name=None, oneof_index=None):
+    item = message.field.add(name=name, number=number, type=field_type, label=label)
+    if type_name is not None:
+        item.type_name = type_name
+    if oneof_index is not None:
+        item.oneof_index = oneof_index
+    return item
+
+
+def _map_entry(parent, name, value_type, value_type_name):
+    nested = parent.nested_type.add(name=name)
+    nested.options.map_entry = True
+    _field(nested, "key", 1, 9)
+    _field(nested, "value", 2, value_type, type_name=value_type_name)
+    return nested
+
+
+def _build_file_descriptor():
+    file_proto = _descriptor_pb2.FileDescriptorProto(
+        name="MarketDataFeedV3.proto",
+        package=_PACKAGE,
+        syntax="proto3",
+    )
+    file_proto.dependency.append("google/protobuf/wrappers.proto")
+
+    message = _message(file_proto, "LTPC")
+    _field(message, "ltp", 1, 1)
+    _field(message, "ltt", 2, 3)
+    _field(message, "ltq", 3, 3)
+    _field(message, "cp", 4, 1)
+    _field(message, "iep", 5, 11, type_name=".google.protobuf.DoubleValue")
+
+    message = _message(file_proto, "MarketLevel")
+    _field(message, "bidAskQuote", 1, 11, label=3, type_name=f".{_PACKAGE}.Quote")
+
+    message = _message(file_proto, "MarketOHLC")
+    _field(message, "ohlc", 1, 11, label=3, type_name=f".{_PACKAGE}.OHLC")
+
+    message = _message(file_proto, "Quote")
+    _field(message, "bidQ", 1, 3)
+    _field(message, "bidP", 2, 1)
+    _field(message, "askQ", 3, 3)
+    _field(message, "askP", 4, 1)
+
+    message = _message(file_proto, "OptionGreeks")
+    for number, name in enumerate(("delta", "theta", "gamma", "vega", "rho"), 1):
+        _field(message, name, number, 1)
+
+    message = _message(file_proto, "OHLC")
+    _field(message, "interval", 1, 9)
+    for number, name in enumerate(("open", "high", "low", "close"), 2):
+        _field(message, name, number, 1)
+    _field(message, "vol", 6, 3)
+    _field(message, "ts", 7, 3)
+
+    enum = file_proto.enum_type.add(name="Type")
+    for name, number in (("initial_feed", 0), ("live_feed", 1), ("market_info", 2)):
+        enum.value.add(name=name, number=number)
+
+    message = _message(file_proto, "MarketFullFeed")
+    for number, name, type_name in (
+        (1, "ltpc", "LTPC"),
+        (2, "marketLevel", "MarketLevel"),
+        (3, "optionGreeks", "OptionGreeks"),
+        (4, "marketOHLC", "MarketOHLC"),
+    ):
+        _field(message, name, number, 11, type_name=f".{_PACKAGE}.{type_name}")
+    for number, name, field_type in (
+        (5, "atp", 1), (6, "vtt", 3), (7, "oi", 1), (8, "iv", 1),
+        (9, "tbq", 1), (10, "tsq", 1), (11, "iep", 1), (12, "rp", 1),
+        (13, "ieq", 3), (14, "iiqTotal", 3), (15, "iiqM", 3), (16, "casEligible", 8),
+    ):
+        _field(message, name, number, field_type)
+
+    message = _message(file_proto, "IndexFullFeed")
+    _field(message, "ltpc", 1, 11, type_name=f".{_PACKAGE}.LTPC")
+    _field(message, "marketOHLC", 2, 11, type_name=f".{_PACKAGE}.MarketOHLC")
+
+    message = _message(file_proto, "FullFeed")
+    message.oneof_decl.add(name="FullFeedUnion")
+    _field(message, "marketFF", 1, 11, type_name=f".{_PACKAGE}.MarketFullFeed", oneof_index=0)
+    _field(message, "indexFF", 2, 11, type_name=f".{_PACKAGE}.IndexFullFeed", oneof_index=0)
+
+    message = _message(file_proto, "FirstLevelWithGreeks")
+    _field(message, "ltpc", 1, 11, type_name=f".{_PACKAGE}.LTPC")
+    _field(message, "firstDepth", 2, 11, type_name=f".{_PACKAGE}.Quote")
+    _field(message, "optionGreeks", 3, 11, type_name=f".{_PACKAGE}.OptionGreeks")
+    _field(message, "vtt", 4, 3)
+    _field(message, "oi", 5, 1)
+    _field(message, "iv", 6, 1)
+
+    message = _message(file_proto, "Feed")
+    message.oneof_decl.add(name="FeedUnion")
+    _field(message, "ltpc", 1, 11, type_name=f".{_PACKAGE}.LTPC", oneof_index=0)
+    _field(message, "fullFeed", 2, 11, type_name=f".{_PACKAGE}.FullFeed", oneof_index=0)
+    _field(message, "firstLevelWithGreeks", 3, 11, type_name=f".{_PACKAGE}.FirstLevelWithGreeks", oneof_index=0)
+    _field(message, "requestMode", 4, 14, type_name=f".{_PACKAGE}.RequestMode")
+
+    enum = file_proto.enum_type.add(name="RequestMode")
+    for name, number in (("ltpc", 0), ("full_d5", 1), ("option_greeks", 2), ("full_d30", 3)):
+        enum.value.add(name=name, number=number)
+
+    enum = file_proto.enum_type.add(name="MarketStatus")
+    for name, number in (
+        ("PRE_OPEN_START", 0), ("PRE_OPEN_END", 1), ("NORMAL_OPEN", 2),
+        ("NORMAL_CLOSE", 3), ("CLOSING_START", 4), ("CLOSING_END", 5),
+    ):
+        enum.value.add(name=name, number=number)
+
+    message = _message(file_proto, "StatusInfo")
+    _field(message, "status", 1, 9)
+    _field(message, "updatedTime", 2, 3)
+
+    message = _message(file_proto, "MarketInfo")
+    _map_entry(message, "SegmentStatusEntry", 14, f".{_PACKAGE}.MarketStatus")
+    _map_entry(message, "CasMarketStatusEntry", 11, f".{_PACKAGE}.StatusInfo")
+    _map_entry(message, "PreOpenSessionStatusEntry", 11, f".{_PACKAGE}.StatusInfo")
+    _field(message, "segmentStatus", 1, 11, label=3, type_name=f".{_PACKAGE}.MarketInfo.SegmentStatusEntry")
+    _field(message, "casMarketStatus", 2, 11, label=3, type_name=f".{_PACKAGE}.MarketInfo.CasMarketStatusEntry")
+    _field(message, "preOpenSessionStatus", 3, 11, label=3, type_name=f".{_PACKAGE}.MarketInfo.PreOpenSessionStatusEntry")
+
+    message = _message(file_proto, "FeedResponse")
+    _map_entry(message, "FeedsEntry", 11, f".{_PACKAGE}.Feed")
+    _field(message, "type", 1, 14, type_name=f".{_PACKAGE}.Type")
+    _field(message, "feeds", 2, 11, label=3, type_name=f".{_PACKAGE}.FeedResponse.FeedsEntry")
+    _field(message, "currentTs", 3, 3)
+    _field(message, "marketInfo", 4, 11, type_name=f".{_PACKAGE}.MarketInfo")
+    return file_proto
+
+
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(_build_file_descriptor().SerializeToString())
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, "MarketDataFeedV3_pb2", globals())
 
 __all__ = [
     "LTPC", "MarketLevel", "MarketOHLC", "Quote", "OptionGreeks", "OHLC",
     "MarketFullFeed", "IndexFullFeed", "FullFeed", "FirstLevelWithGreeks", "Feed",
-    "StatusInfo", "MarketInfo", "FeedResponse",
-    "Type", "RequestMode", "MarketStatus",
+    "StatusInfo", "MarketInfo", "FeedResponse", "Type", "RequestMode", "MarketStatus",
 ]
