@@ -8,7 +8,8 @@
 ## Latest completed work
 - [x] Durable append-only JSONL journal backend with startup integrity validation and checkpoints.
 - [x] Next.js/React/TypeScript frontend foundation with dark-first terminal shell and observational landing dashboard.
-- [x] Frontend explicitly keeps order execution behind the backend RiskEngine → OMS boundary.
+- [x] First read-only production dashboard route at `/market-overview` with explicit typed market-state contract.
+- [x] Frontend market overview does not fabricate market values and cannot authorize or submit orders.
 - [x] Changes committed directly to `main`.
 
 ## Done on `main`
@@ -57,7 +58,7 @@
 - [x] Walk-forward/OOS, Monte Carlo and cost/capacity/regime sensitivity foundations.
 - [x] Pattern DNA similarity and leakage-safe ML dataset/calibration primitives.
 - [x] Historical probability calibration fit from explicit labeled outcomes, restricted to a chronological training cutoff and out-of-sample application.
-- [x] OOS validation metrics computed only from samples strictly after the calibration cutoff; fitted models remain immutable.
+- [x] OOS probability validation metrics computed only from samples strictly after the calibration cutoff; fitted models remain immutable.
 - [x] Append-only audit evidence contract with content-addressed immutable records and explicit non-execution authority.
 - [x] Durable JSONL journal backend with append-only persistence and startup corruption/duplicate detection.
 
@@ -65,12 +66,14 @@
 - [x] Next.js/React/TypeScript application foundation.
 - [x] App Router root layout, metadata and dark-first global shell.
 - [x] Initial market-intelligence terminal landing dashboard.
+- [x] Read-only `/market-overview` route with typed market-state contract.
 - [x] No direct broker/execution action from frontend.
 
 ## Pending work
 
 ### Phase 8 — Frontend
 - [x] Next.js/React/TypeScript foundation.
+- [x] First market-overview dashboard route.
 - [ ] Trading terminal, dashboards, scanner, derivatives, PAPER trading, portfolio, journal, backtest and research UI.
 
 ### Phase 9 — Infrastructure
@@ -91,7 +94,7 @@
 - Frontend actions must not directly invoke broker execution.
 
 ## Current next task
-Implement the first production dashboard route: market overview with explicit backend-read-only data contracts, while keeping all order execution behind RiskEngine → OMS.
+Implement the trading-terminal navigation shell and first scanner dashboard using backend read-only contracts, with no direct execution capability.
 
 ## CI note
 The latest GitHub Actions state is not verified green. Do not claim the quality gate is healthy until the Ruff failure is repaired and a subsequent run passes both Ruff and pytest.
