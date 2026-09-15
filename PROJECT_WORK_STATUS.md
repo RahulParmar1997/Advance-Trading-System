@@ -30,6 +30,8 @@
 - [x] Reverse-proxy configuration with security headers and isolated health endpoint.
 - [x] Prometheus monitoring configuration and operational deployment/incident runbook.
 - [x] Monitoring remains observational and does not create broker execution authority.
+- [x] Ruff quality gate repaired: latest run reports `All checks passed!` for `ruff check src tests`.
+- [x] CI test collection repaired for protobuf dependency, current session API, paper workflow API, and finite websocket smoke behavior.
 - [x] Changes committed directly to `main`.
 
 ## Done on `main`
@@ -123,7 +125,7 @@
 - [x] Concrete Parquet/object-storage adapter and dataset layout.
 - [x] Docker/deployment configuration.
 - [x] Monitoring, runbooks and reverse proxy.
-- [ ] Repair and verify the existing CI quality gate.
+- [ ] Finish backend test-suite repair and verify CI green.
 
 ## Non-negotiable architecture rules
 - AI never bypasses RiskEngine or places uncontrolled orders.
@@ -140,7 +142,7 @@
 - Monitoring must remain observational and must not become an execution control plane.
 
 ## Current next task
-Repair and verify the GitHub Actions quality gate: resolve Ruff failures, run the full backend test suite, and only then mark CI green.
+Finish backend test-suite repair and verify the GitHub Actions quality gate. The latest run has Ruff green but pytest has 44 failures; do not mark CI green until the full suite passes.
 
 ## CI note
-The latest GitHub Actions state is not verified green. Do not claim the quality gate is healthy until Ruff and pytest both pass in a subsequent workflow run.
+Latest verified state: Ruff passes; pytest reports 255 passed / 44 failed. Primary failure groups are stale test fixtures/contracts (risk market-status requirements, session boundaries, OMS lifecycle), adapter call-shape expectations, and a few analytics/decoder expectations. Do not claim the quality gate is healthy yet.
