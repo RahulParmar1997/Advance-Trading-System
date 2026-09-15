@@ -32,6 +32,8 @@
 - [x] Monitoring remains observational and does not create broker execution authority.
 - [x] Ruff quality gate repaired: latest run reports `All checks passed!` for `ruff check src tests`.
 - [x] CI test collection repaired for protobuf dependency, current session API, paper workflow API, and finite websocket smoke behavior.
+- [x] Upstox V3 protobuf decoder boundary restored to the expected generated message surface.
+- [x] Backtest partial-fill execution repaired so configured fill caps can produce deterministic split fills without inventing future market data.
 - [x] Changes committed directly to `main`.
 
 ## Done on `main`
@@ -142,7 +144,7 @@
 - Monitoring must remain observational and must not become an execution control plane.
 
 ## Current next task
-Finish backend test-suite repair and verify the GitHub Actions quality gate. The latest run has Ruff green but pytest has 44 failures; do not mark CI green until the full suite passes.
+Continue backend test-suite repair and verify the GitHub Actions quality gate. Do not mark CI green until the full suite passes.
 
 ## CI note
-Latest verified state: Ruff passes; pytest reports 255 passed / 44 failed. Primary failure groups are stale test fixtures/contracts (risk market-status requirements, session boundaries, OMS lifecycle), adapter call-shape expectations, and a few analytics/decoder expectations. Do not claim the quality gate is healthy yet.
+Latest previously verified state: Ruff passes; pytest reports 255 passed / 44 failed. Subsequent commits repaired protobuf and several stale test contracts; a fresh CI run is required to establish the new failure count.
