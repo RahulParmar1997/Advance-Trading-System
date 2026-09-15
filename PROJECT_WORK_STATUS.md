@@ -8,9 +8,9 @@
 ## Latest completed work
 - [x] Deterministic Wyckoff event features from completed candles and explicit volume inputs.
 - [x] Rich scanner result contract with explicit evidence, context identity and deterministic explanations.
-- [x] Scanner pipeline now exposes the richer result without adding probability, risk approval or broker status.
 - [x] Multi-symbol / multi-timeframe scanner orchestration with explicit scope identity and deterministic ordering.
-- [x] Unit coverage for scanner evidence, explanations, scope validation and orchestration.
+- [x] Evidence-based scanner scoring using explicit evidence and deterministic non-probabilistic weights.
+- [x] Unit coverage for scanner evidence, explanations, orchestration and scoring.
 - [x] Changes committed directly to `main`.
 
 ## Done on `main`
@@ -54,19 +54,14 @@
 - [x] PAPER fills, position book, reconciliation, journal and RiskSnapshot integration.
 
 ### Research
-- [x] Event-driven backtester with chronology, slippage, fees, latency, partial fills and liquidity limits.
+- [x] Event-driven backtester with costs, slippage, fees, latency, partial fills and liquidity limits.
 - [x] Walk-forward/OOS, Monte Carlo and cost/capacity/regime sensitivity foundations.
 - [x] Pattern DNA similarity and leakage-safe ML dataset/calibration primitives.
 
 ## Pending work
 
-### Phase 4 — Intelligence / scanning
-- [x] Wyckoff features from completed candles/explicit volume with chronology and look-ahead protections.
-- [x] Richer scanner result contracts and explanations.
-- [x] Multi-symbol / multi-timeframe scanner orchestration.
-
 ### Phase 5 — Trading decision engine
-- [ ] Evidence-based scoring.
+- [x] Evidence-based scoring.
 - [ ] Historical probability calibration.
 - [ ] OOS probability validation.
 - [ ] Explanation/audit evidence persistence.
@@ -94,7 +89,7 @@
 - PAPER remains the default.
 
 ## Current next task
-Implement evidence-based scanner/opportunity scoring using explicit observed evidence only, with deterministic weights and no fabricated probabilities. Keep all work directly on `main`.
+Implement historical probability calibration from labeled historical outcomes, keeping calibration data separate from in-sample scanner scoring and preventing look-ahead/leakage. Keep all work directly on `main`.
 
 ## CI note
 The latest known GitHub Actions state is not verified green. Do not claim the quality gate is healthy until the Ruff failure is repaired and a subsequent run passes both Ruff and pytest.
