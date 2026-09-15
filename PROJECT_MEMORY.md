@@ -47,6 +47,7 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 - Rich scanner result contract with explicit evidence and deterministic explanations; pipeline integration exposes the richer result without probability, risk approval or broker status.
 - Multi-symbol / multi-timeframe scanner orchestration with explicit `ScanScope` identity, context consistency validation and deterministic scope ordering.
 - Deterministic evidence-based scanner scoring using explicit weighted evidence; scores are not probabilities or expected values.
+- Historical probability calibration from explicit timestamped labeled outcomes, trained only through a fixed historical cutoff and restricted to out-of-sample application.
 - Trade Type and versioned Strategy framework.
 - Opportunity, probability and EV primitives.
 - Canonical OMS lifecycle and controlled RiskEngine → PAPER OMS flow.
@@ -89,8 +90,11 @@ Use explicit trade prints/aggressor information when available. BUY/SELL/UNKNOWN
 ### Evidence scoring
 `scanner/scoring.py` provides `EvidenceWeight`, `ScoreResult` and `EvidenceScorer`. Scores sum only weights attached to explicitly matched evidence fields. Weight fields are unique and non-negative, output is bounded by maximum configured weight, and explanations explicitly distinguish the score from probability/EV.
 
+### Historical probability calibration
+`research/calibration.py` provides `HistoricalOutcome`, `CalibrationBucket`, `HistoricalCalibrationModel` and `HistoricalProbabilityCalibrator`. Calibration is an empirical mapping from explicit historical predicted probabilities to realized boolean outcomes. Fitting uses only observations at or before a timezone-aware training cutoff; applying a fitted model requires a strictly later observation timestamp. Empty probability buckets are not backfilled or smoothed, so the system does not invent probabilities for unsupported historical regions.
+
 ## Pending roadmap
-1. Historical/OOS probability calibration and validation.
+1. OOS probability validation.
 2. Explanation/audit evidence persistence.
 3. Broker reconciliation adapter implementation.
 4. Durable journal backend.
