@@ -39,6 +39,9 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 - Futures/options contract metadata and option-chain validation.
 - Deterministic Black-Scholes option Greeks and implied-volatility solver.
 - Deterministic futures basis analytics.
+- Deterministic breadth and sector analytics from explicit constituent observations.
+- Deterministic sector rotation ranking from constituent returns and optional explicit benchmark return.
+- Explicit FII/DII institutional-flow aggregation from observed flow records; no inference from price/volume.
 - Trade Type and versioned Strategy framework.
 - Opportunity, probability and EV primitives.
 - Canonical OMS lifecycle and controlled RiskEngine → PAPER OMS flow.
@@ -48,6 +51,12 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 - Pattern DNA similarity and leakage-safe ML dataset/calibration primitives.
 
 ## Current analytics capability
+### Breadth / sectors
+`breadth.py` consumes explicit constituent observations containing instrument, sector, timestamp, previous close, close and volume. It derives advance/decline counts, breadth percentage, net breadth, up/down volume and ratios. Sector breadth and rotation are deterministic; rotation can compare sector average constituent return with an explicitly supplied benchmark return. Mixed timestamps and duplicate instruments are rejected.
+
+### Institutional flow
+Institutional flow is represented as explicit observed FII/DII net-value inputs. The aggregator only sums those observations. It does not infer institutional activity from price, candle volume or order flow.
+
 ### Volume profile
 Use completed trade/volume observations only. Price buckets are explicit/configurable. Expose volume-at-price, POC and value-area boundaries. Do not infer tick-level trade distribution from candle range without an explicit approximation contract.
 
@@ -61,12 +70,12 @@ Use explicit trade prints/aggressor information when available. BUY/SELL/UNKNOWN
 `futures_basis()` reports absolute and percentage futures-vs-spot basis from explicit prices. It does not infer carry, funding or fair value without those inputs.
 
 ## Pending roadmap
-1. Breadth, sector rotation and institutional-flow intelligence.
-2. Richer regime/session context integration.
-3. Wyckoff features.
-4. Richer scanner result contracts and explanations.
-5. Multi-symbol / multi-timeframe scanner orchestration.
-6. Evidence-based scoring and historical/OOS probability calibration.
+1. Richer regime/session context integration.
+2. Wyckoff features.
+3. Richer scanner result contracts and explanations.
+4. Multi-symbol / multi-timeframe scanner orchestration.
+5. Evidence-based scoring.
+6. Historical/OOS probability calibration and validation.
 7. Explanation/audit evidence persistence.
 8. Broker reconciliation adapter implementation.
 9. Durable journal backend.
