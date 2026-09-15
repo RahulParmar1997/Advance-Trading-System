@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 
-from advance_system.observability.metrics import MetricsRegistry, MetricSample, create_metrics_server
+from advance_system.observability.metrics import MetricSample, MetricsRegistry, create_metrics_server
 
 
 def main() -> None:
