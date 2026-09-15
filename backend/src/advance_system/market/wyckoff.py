@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime
 from decimal import Decimal
 from enum import StrEnum
 from typing import Sequence
@@ -45,7 +46,7 @@ class WyckoffConfig:
 @dataclass(frozen=True, slots=True)
 class WyckoffFeatures:
     instrument: str
-    observed_at: object
+    observed_at: datetime
     spread: Decimal
     body: Decimal
     closing_location: Decimal
@@ -61,7 +62,7 @@ class WyckoffFeatures:
 @dataclass(frozen=True, slots=True)
 class WyckoffObservation:
     instrument: str
-    observed_at: object
+    observed_at: datetime
     event: WyckoffEvent
     features: WyckoffFeatures | None
     evidence: tuple[str, ...] = ()
@@ -93,13 +94,13 @@ class WyckoffEngine:
         average_volume = sum((Decimal(c.volume) for c in prior), Decimal("0")) / Decimal(len(prior))
         spread = current.high - current.low
         body = abs(current.close - current.open)
-        if spread <= 0 or average_spread <= 0 or average_volume <= 0:
-            raise ValueError("Wyckoff requires positive prior spread and volume")
+        if spread <= 0 or average_spread <= 0 or average_volume <= 0 or current.volume <= 0:
+            raise ValueError("Wyckoff requires positive current/prior spread and volume")
 
         closing_location = (current.close - current.low) / spread
         volume_ratio = Decimal(current.volume) / average_volume
         spread_ratio = spread / average_spread
-        effort_result_ratio = spread / Decimal(current.volume) if current.volume > 0 else Decimal("0")
+        effort_result_ratio = spread_ratio / volume_ratio
         prior_high = max(c.high for c in prior)
         prior_low = min(c.low for c in prior)
 
@@ -137,9 +138,8 @@ class WyckoffEngine:
         if current.close < f.prior_range_low and current.close < current.open and wide and bearish_close and high_volume:
             return WyckoffEvent.SIGN_OF_WEAKNESS, ["wide bearish spread", "close broke prior range low", "volume was elevated"]
 
-        small_result = f.spread_ratio <= Decimal("1") and f.effort_result_ratio <= cfg.max_absorption_result_ratio / f.average_prior_volume
-        if high_volume and small_result:
-            return WyckoffEvent.ABSORPTION, ["volume was elevated", "spread was small relative to prior effort"]
+        if high_volume and f.spread_ratio <= Decimal("1") and f.effort_result_ratio <= cfg.max_absorption_result_ratio:
+            return WyckoffEvent.ABSORPTION, ["volume was elevated", "spread result was small relative to effort"]
         return WyckoffEvent.NONE, []
 
     @staticmethod
