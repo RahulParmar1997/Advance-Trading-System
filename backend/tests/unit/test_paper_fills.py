@@ -6,9 +6,15 @@ from advance_system.oms.state_machine import OmsOrder, OmsState
 from advance_system.portfolio.positions import PositionBook
 
 
+def pending_order(gateway: PaperOrderGateway, order_id: str, client_key: str) -> None:
+    gateway.submit(OmsOrder(order_id, "NSE_EQ|TEST", 10), client_key=client_key)
+    for state in (OmsState.CANDIDATE, OmsState.QUALIFIED, OmsState.RISK_CHECK, OmsState.ORDER_PENDING):
+        gateway.transition(order_id, state)
+
+
 def test_full_paper_fill_updates_position_and_state() -> None:
     gateway = PaperOrderGateway()
-    gateway.submit(OmsOrder("o-1", "NSE_EQ|TEST", 10), client_key="k-1")
+    pending_order(gateway, "o-1", "k-1")
     positions = PositionBook()
     fill = PaperFillSimulator(gateway, positions).fill("o-1", Decimal("100"))
     assert fill.quantity == 10
@@ -20,7 +26,7 @@ def test_full_paper_fill_updates_position_and_state() -> None:
 
 def test_partial_then_full_fill_and_unrealized_pnl() -> None:
     gateway = PaperOrderGateway()
-    gateway.submit(OmsOrder("o-2", "NSE_EQ|TEST", 10), client_key="k-2")
+    pending_order(gateway, "o-2", "k-2")
     positions = PositionBook()
     simulator = PaperFillSimulator(gateway, positions)
     simulator.fill("o-2", Decimal("100"), quantity=4)
