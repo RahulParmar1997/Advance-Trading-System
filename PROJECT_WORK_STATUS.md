@@ -9,6 +9,7 @@
 - [x] Implemented an observational Prometheus `/metrics` registry and read-only HTTP endpoint using only the Python standard library.
 - [x] Added deterministic metric rendering, label escaping/validation, counter/gauge semantics and read-only HTTP method enforcement.
 - [x] Wired the backend container to serve metrics on port 8000 and published that port in Docker Compose; the endpoint has no broker, OMS or RiskEngine authority.
+- [x] Added unit coverage for rendering, escaping, validation, HTTP response/content type and read-only behavior.
 - [x] Verified GitHub Actions Run 444 on commit `25c7732d502b046df185c477cd3eb595ff4461df`: Ruff and Pytest both passed successfully.
 - [x] Corrected the remaining GitHub Actions Ruff import-order/spacing failures in `test_research_results.py` and pushed the fixes directly to `main`.
 - [x] Connected immutable COMPUTED research-result provenance to the existing OOS validation and explicit research-approval workflow.
@@ -37,7 +38,7 @@
 ## Pending work
 
 ### Infrastructure / operations
-- [ ] Fresh GitHub Actions verification for the new `/metrics` implementation and Docker wiring.
+- [ ] Fresh GitHub Actions verification for the new `/metrics` implementation and Docker wiring (Run 450 failed only at Ruff import ordering; fix committed below, fresh run pending).
 - [ ] End-to-end monitoring validation against the deployed monitoring stack.
 - [ ] Full deployment/integration validation against configured PostgreSQL, ClickHouse and Redis services.
 
@@ -57,7 +58,7 @@
 - Research compute must never place orders, mutate positions/balances or bypass RiskEngine → OMS.
 
 ## Current next task
-Verify the new `/metrics` implementation through GitHub Actions, then validate the monitoring stack end-to-end before moving to broader PostgreSQL/ClickHouse/Redis deployment integration.
+Verify the corrected `/metrics` implementation through GitHub Actions, then validate the monitoring stack end-to-end before moving to broader PostgreSQL/ClickHouse/Redis deployment integration.
 
 ## CI note
-Latest completed verification before the metrics changes is GitHub Actions Run 444 (`34964845295`) for commit `25c7732d502b046df185c477cd3eb595ff4461df`; both Ruff lint and Pytest passed. A new Actions run is required to certify the metrics changes.
+Run 444 (`34964845295`) on commit `25c7732d502b046df185c477cd3eb595ff4461df` passed Ruff and Pytest. Run 450 (`34965061859`) on the first metrics wiring commit failed Ruff before Pytest: two I001 import-order errors in `observability/server.py` and `tests/unit/test_metrics.py`. Both were corrected directly on `main`; the latest correction commit is `b5702b16beefbd4893e51f1cff801fd468f64481`, and fresh Actions verification is pending.
