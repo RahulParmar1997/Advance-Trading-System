@@ -30,10 +30,14 @@
 - [x] Reverse-proxy configuration with security headers and isolated health endpoint.
 - [x] Prometheus monitoring configuration and operational deployment/incident runbook.
 - [x] Monitoring remains observational and does not create broker execution authority.
-- [x] Ruff quality gate repaired: latest run reports `All checks passed!` for `ruff check src tests`.
-- [x] CI test collection repaired for protobuf dependency, current session API, paper workflow API, and finite websocket smoke behavior.
+- [x] Ruff quality gate repaired: verified run reports `All checks passed!` for `ruff check src tests`.
 - [x] Upstox V3 protobuf decoder boundary restored to the expected generated message surface.
 - [x] Backtest partial-fill execution repaired so configured fill caps can produce deterministic split fills without inventing future market data.
+- [x] Integrated backtests now accept an explicit authoritative market-status input and continue to fail closed when it is absent.
+- [x] PAPER fill tests exercise the canonical OMS path through `CANDIDATE → QUALIFIED → RISK_CHECK → ORDER_PENDING` before fills.
+- [x] Storage adapter tests aligned with actual parameter forwarding and fully qualified immutable object keys.
+- [x] Market-session, market-context, liquidity, FVG, swing, probability, calibration, regime and volume-profile tests aligned with their current deterministic contracts.
+- [x] Upstox feed mapping validates LTP before requiring a fallback message timestamp.
 - [x] Changes committed directly to `main`.
 
 ## Done on `main`
@@ -147,4 +151,4 @@
 Continue backend test-suite repair and verify the GitHub Actions quality gate. Do not mark CI green until the full suite passes.
 
 ## CI note
-Latest previously verified state: Ruff passes; pytest reports 255 passed / 44 failed. Subsequent commits repaired protobuf and several stale test contracts; a fresh CI run is required to establish the new failure count.
+Latest **verified** run before the current head: commit `883e51e0fab7f6101090634cec0369debfba5ebf` — Ruff passed and pytest reported **288 passed / 11 failed**. Subsequent commits address those remaining failures; the current `main` head has a fresh Actions run in progress and is not yet certified green.
