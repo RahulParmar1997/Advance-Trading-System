@@ -38,13 +38,15 @@
 - [x] Verified GitHub Actions Run 510 (`35066042755`) on commit `ff2995aca8121e301e3732a8de2fa6736aa27735`: Ruff, unit pytest, Docker Compose configuration validation, and full Docker Compose runtime smoke all passed.
 - [x] Hardened `MigrationRunner` connection lifecycle so every acquired migration connection is closed/released in a `finally` block, including migration failure paths.
 - [x] Extended migration unit coverage to verify connection cleanup on successful, idempotent, and failed runs.
+- [x] Verified GitHub Actions Run 514 (`35066789576`) on commit `55061e174e39650677488401d402c576c7add60c`: Ruff, unit pytest, Docker Compose configuration validation, and full Docker Compose runtime smoke all passed.
+- [x] Hardened `MigrationRunner` to execute schema changes and `schema_migrations` bookkeeping inside one PostgreSQL transaction.
+- [x] Added deterministic rollback coverage proving a partial migration sequence is rolled back and the connection is still closed.
 
 ## Pending work
 
 ### Infrastructure / operations
 - [ ] Runtime end-to-end monitoring validation outside CI against an actually running deployment environment, if a persistent environment is required. The CI smoke test provides real container execution on GitHub-hosted runners but is not a production deployment validation.
 - [ ] Extend application-level integration coverage to the concrete adapter/factory implementations where additional vendor drivers are introduced.
-- [ ] Review and harden migration transaction/atomicity semantics so migration SQL and its `schema_migrations` record cannot leave partially applied state, while preserving PostgreSQL as the operational migration authority.
 
 ## Non-negotiable architecture rules
 - AI never bypasses RiskEngine or places uncontrolled orders.
@@ -62,7 +64,7 @@
 - Research compute must never place orders, mutate positions/balances or bypass RiskEngine → OMS.
 
 ## Current next task
-Review and implement migration transaction/atomicity hardening, with deterministic tests for failure/rollback semantics. Preserve the existing connection lifecycle cleanup and PostgreSQL migration-state authority.
+Continue with the next highest-priority persistence/application integration gap. Preserve PostgreSQL as operational source of truth and keep migration execution transactional and fail-closed.
 
 ## CI note
-Run 510 (`35066042755`) on `ff2995aca8121e301e3732a8de2fa6736aa27735` is the latest verified successful run: Ruff, unit pytest, Compose configuration validation, and full Docker Compose runtime smoke all passed. The migration connection-lifecycle hardening is now committed on `main` and awaits its own Actions verification.
+Run 514 (`35066789576`) on `55061e174e39650677488401d402c576c7add60c` verified the migration connection-lifecycle hardening successfully. The later migration transaction/atomicity hardening is committed on `main` and awaits its own Actions verification.
