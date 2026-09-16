@@ -69,9 +69,41 @@ jobs:
             sleep 2
           done
 
-          docker compose exec -T postgres pg_isready -U advance_trading -d advance_trading
-          docker compose exec -T clickhouse wget -qO- http://127.0.0.1:8123/ping | grep -q '^Ok\.?$'
-          docker compose exec -T redis redis-cli ping | grep -q '^PONG$'
+          for attempt in $(seq 1 30); do
+            if docker compose exec -T postgres pg_isready -U advance_trading -d advance_trading >/dev/null; then
+              break
+            fi
+            if [ "$attempt" -eq 30 ]; then
+              echo 'PostgreSQL application readiness probe failed.' >&2
+              docker compose logs postgres >&2 || true
+              exit 1
+            fi
+            sleep 2
+          done
+
+          for attempt in $(seq 1 30); do
+            if docker compose exec -T clickhouse wget -qO- http://127.0.0.1:8123/ping | grep -q '^Ok\.?$'; then
+              break
+            fi
+            if [ "$attempt" -eq 30 ]; then
+              echo 'ClickHouse application readiness probe failed.' >&2
+              docker compose logs clickhouse >&2 || true
+              exit 1
+            fi
+            sleep 2
+          done
+
+          for attempt in $(seq 1 30); do
+            if docker compose exec -T redis redis-cli ping | grep -q '^PONG$'; then
+              break
+            fi
+            if [ "$attempt" -eq 30 ]; then
+              echo 'Redis application readiness probe failed.' >&2
+              docker compose logs redis >&2 || true
+              exit 1
+            fi
+            sleep 2
+          done
 
           for attempt in $(seq 1 30); do
             if curl --fail --silent 'http://127.0.0.1:19090/api/v1/targets' > /tmp/prometheus-targets.json; then
