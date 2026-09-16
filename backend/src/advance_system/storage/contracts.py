@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Protocol, TYPE_CHECKING, runtime_checkable
+from typing import TYPE_CHECKING, Protocol, runtime_checkable
 from urllib.parse import urlparse
 
 if TYPE_CHECKING:
-    from advance_system.storage.parquet import ResearchDatasetRef
+    from advance_system.storage.parquet import DatasetManifest, ResearchDatasetRef
 
 
 class StorageMode(StrEnum):
@@ -101,11 +101,11 @@ class ParquetStore(Protocol):
         payload: bytes,
         *,
         created_at: object | None = None,
-    ) -> object:
+    ) -> DatasetManifest:
         ...
 
     async def read_dataset(self, ref: ResearchDatasetRef) -> bytes:
         ...
 
-    async def read_manifest(self, ref: ResearchDatasetRef) -> object:
+    async def read_manifest(self, ref: ResearchDatasetRef) -> DatasetManifest:
         ...
