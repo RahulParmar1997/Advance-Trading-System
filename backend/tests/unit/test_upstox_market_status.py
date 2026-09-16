@@ -27,6 +27,25 @@ async def test_market_status_source_maps_exchange_status_and_cas():
     assert client.calls[0][0].endswith("/market/status/NSE")
 
 
+def test_upstox_market_status_maps_to_validated_domain_status():
+    from advance_system.adapters.upstox.market_status import UpstoxMarketStatus
+
+    result = UpstoxMarketStatus("NSE", "NORMAL_OPEN", 1705549500000).to_domain()
+    assert result.exchange == "NSE"
+    assert result.status == "NORMAL_OPEN"
+    assert result.observed_at.tzinfo is not None
+    assert result.is_normal_open
+
+
+def test_upstox_market_status_rejects_future_domain_observation():
+    from advance_system.adapters.upstox.market_status import UpstoxMarketStatus
+    from datetime import datetime, timezone
+
+    future_ms = int(datetime.now(timezone.utc).timestamp() * 1000) + 60_000
+    with pytest.raises(ValueError, match="cannot be in the future"):
+        UpstoxMarketStatus("NSE", "NORMAL_OPEN", future_ms).to_domain()
+
+
 @pytest.mark.asyncio
 async def test_market_status_source_rejects_invalid_response():
     client = FakeHttp(b'{"status":"error","data":{}}')
