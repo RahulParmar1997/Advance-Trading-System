@@ -1,45 +1,50 @@
-type ScannerCandidate = {
-  instrument: string;
-  timeframeSeconds: number;
-  rule: string;
-  matched: boolean;
-  score: number | null;
-  explanation: string;
-};
+import { Navigation } from "../components/navigation";
 
-// Read-only boundary: production values must be supplied by a backend scanner API.
-const candidates: ScannerCandidate[] = [];
+async function getScannerView() {
+  const baseUrl = process.env.ATS_BACKEND_URL ?? "http://backend:8000";
+  try {
+    const response = await fetch(`${baseUrl}/api/v1/scanner`, { cache: "no-store" });
+    if (!response.ok) return { available: false, reason: `backend_http_${response.status}`, data: null };
+    const payload: unknown = await response.json();
+    if (!payload || typeof payload !== "object") return { available: false, reason: "invalid_backend_payload", data: null };
+    const view = payload as { available?: unknown; reason?: unknown; data?: unknown };
+    return {
+      available: view.available === true,
+      reason: typeof view.reason === "string" ? view.reason : "invalid_backend_payload",
+      data: view.available === true ? view.data ?? null : null,
+    };
+  } catch {
+    return { available: false, reason: "backend_unreachable", data: null };
+  }
+}
 
-export default function ScannerPage() {
+export default async function ScannerPage() {
+  const scanner = await getScannerView();
+
   return (
     <main style={{ margin: "0 auto", maxWidth: 1200, padding: 32 }}>
+      <Navigation />
       <header style={{ borderBottom: "1px solid #242a31", paddingBottom: 20 }}>
         <p style={{ margin: 0, fontSize: 12, letterSpacing: 1.4, textTransform: "uppercase" }}>Scanner</p>
         <h1 style={{ margin: "8px 0" }}>Evidence-backed opportunities</h1>
         <p style={{ color: "#9ba6b2", margin: 0 }}>Candidates are observations, not execution instructions.</p>
       </header>
 
-      <section aria-label="Scanner candidates" style={{ marginTop: 24 }}>
-        {candidates.length === 0 ? (
-          <div style={{ border: "1px solid #242a31", borderRadius: 10, padding: 24 }}>
-            <strong>No scanner observations available</strong>
-            <p style={{ color: "#9ba6b2", lineHeight: 1.5, marginBottom: 0 }}>
-              Waiting for an authenticated backend scanner feed. The UI intentionally does not fabricate candidates,
-              probabilities, scores, or market data.
-            </p>
-          </div>
-        ) : (
-          <div style={{ display: "grid", gap: 12 }}>
-            {candidates.map((candidate) => (
-              <article key={`${candidate.instrument}-${candidate.timeframeSeconds}-${candidate.rule}`} style={{ border: "1px solid #242a31", borderRadius: 10, padding: 18 }}>
-                <strong>{candidate.instrument}</strong>
-                <p>{candidate.rule}</p>
-                <small>{candidate.explanation}</small>
-              </article>
-            ))}
-          </div>
-        )}
+      <section aria-label="Scanner observation" style={{ marginTop: 24 }}>
+        <article style={{ background: "#11151a", border: "1px solid #242a31", borderRadius: 10, padding: 24 }}>
+          <p style={{ color: "#697582", fontSize: 12, margin: "0 0 8px", textTransform: "uppercase" }}>Provider state</p>
+          <strong>{scanner.available ? "AVAILABLE" : "UNAVAILABLE"}</strong>
+          <p style={{ color: "#9ba6b2", lineHeight: 1.5 }}>Reason: {scanner.reason}</p>
+          <pre style={{ background: "#0b0e12", borderRadius: 8, overflowX: "auto", padding: 16 }}>{scanner.data === null ? "No scanner observation available." : JSON.stringify(scanner.data, null, 2)}</pre>
+        </article>
       </section>
+
+      <aside style={{ border: "1px solid #3a3030", borderRadius: 10, marginTop: 24, padding: 18 }}>
+        <strong>Execution boundary</strong>
+        <p style={{ color: "#9ba6b2", lineHeight: 1.5, marginBottom: 0 }}>
+          Scanner observations never submit orders. Any candidate must pass the backend strategy, probability/EV and RiskEngine → OMS controls before execution.
+        </p>
+      </aside>
     </main>
   );
 }
