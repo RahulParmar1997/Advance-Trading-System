@@ -37,12 +37,13 @@
 - [x] Inspected the current health boundary and preserved observational-only semantics; health checks have no RiskEngine, OMS, broker or execution authority.
 - [x] Inspected GitHub Actions Run 477 (`35061235488`) on commit `73817beb9d83f9f34ab37a263122ada7410cb8dd`: Ruff and Pytest passed (332 tests), Compose configuration validation passed, and the runtime smoke reached healthy backend/PostgreSQL/ClickHouse/Redis containers before failing at the Prometheus target assertion because the workflow expected job label `advance-trading-backend` while the repository configuration uses `advance-trading-system`.
 - [x] Corrected the runtime smoke Prometheus target assertion to use the configured `advance-trading-system` job label directly on `main` in commit `9962ca7f3eb505aea0acc153994309d8b5f86b04`.
-- [x] Inspected the failed runtime logs and confirmed container build/startup and dependency readiness succeeded; the failure was isolated to the test's stale job-label expectation, not a reported service readiness failure.
+- [x] Inspected GitHub Actions Run 479 (`35061410821`) and found the corrected target assertion was not reached: Prometheus was still `health: starting` when the workflow immediately called `/-/ready`, causing the runtime smoke to exit with code 1 after all container health checks had otherwise become healthy.
+- [x] Hardened the runtime smoke by polling Prometheus `/-/ready` with the same bounded 30-attempt/2-second fail-closed pattern used for backend readiness, including diagnostic service logs on timeout. Committed directly to `main` in `538bf2b979a9a3f0143fb9b908da1e3ce78de0b9`.
 
 ## Pending work
 
 ### Infrastructure / operations
-- [ ] Fresh GitHub Actions verification of the corrected Docker Compose runtime smoke test.
+- [ ] Fresh GitHub Actions verification of the hardened Docker Compose runtime smoke test.
 - [ ] Runtime end-to-end monitoring validation outside CI against an actually running deployment environment, if a persistent environment is required. The CI smoke test provides real container execution on GitHub-hosted runners but is not a production deployment validation.
 - [ ] Full deployment/integration validation against configured PostgreSQL, ClickHouse and Redis application storage operations.
 
@@ -62,7 +63,7 @@
 - Research compute must never place orders, mutate positions/balances or bypass RiskEngine → OMS.
 
 ## Current next task
-Verify the corrected Docker Compose runtime smoke test through GitHub Actions. If it passes, retain the CI evidence and proceed to application-level PostgreSQL/ClickHouse/Redis integration validation; do not treat container readiness alone as proof that application storage operations are working. Runtime deployment outside CI remains environment-dependent.
+Verify the hardened Docker Compose runtime smoke test through GitHub Actions. If it passes, retain the CI evidence and proceed to application-level PostgreSQL/ClickHouse/Redis integration validation; do not treat container readiness alone as proof that application storage operations are working. Runtime deployment outside CI remains environment-dependent.
 
 ## CI note
-Run 477 (`35061235488`) on commit `73817beb9d83f9f34ab37a263122ada7410cb8dd` completed with Ruff and Pytest passing (332 tests), Compose configuration validation passing, and the runtime smoke step failing only at the Prometheus backend job-label assertion. The corrected workflow is on `main` in commit `9962ca7f3eb505aea0acc153994309d8b5f86b04`; a fresh Actions run is required before claiming runtime smoke verification.
+Run 479 (`35061410821`) on commit `54baf67564e1f1ae5a2f86eaeabcee7eabcbceab` completed Ruff, Pytest (332 passed), and Compose configuration validation successfully, but the runtime smoke failed because it queried Prometheus `/-/ready` before Prometheus had finished becoming healthy. The workflow is hardened on `main` in commit `538bf2b979a9a3f0143fb9b908da1e3ce78de0b9`; a fresh Actions run is required before claiming runtime smoke verification.
