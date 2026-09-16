@@ -1,6 +1,7 @@
 const links = [
   ["Overview", "/market-overview"],
   ["Scanner", "/scanner"],
+  ["Risk", "/risk"],
   ["Portfolio", "/portfolio"],
   ["Derivatives", "/derivatives"],
   ["Journal", "/journal"],
