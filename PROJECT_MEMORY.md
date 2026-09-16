@@ -64,6 +64,8 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 - PostgreSQL operational adapter has explicit pooled connection lifecycle with acquired connections returned to the pool exactly once.
 - `AsyncpgConnectionFactory` serializes lazy pool creation so concurrent first callers share one pool instead of racing to create multiple pools.
 - PAPER OMS idempotency fails closed when a client idempotency key is presented with a different order ID; it never silently replays the original order under a mismatched identity.
+- `MigrationRunner` now always closes/releases its acquired PostgreSQL migration connection, including when migration execution fails.
+- Migration tests cover connection cleanup on successful, idempotent and failed runs.
 
 ## Pending roadmap
 1. Next.js/React/TypeScript trading terminal and dashboards.
@@ -83,4 +85,4 @@ When the user says **NEXT**, inspect the repository and implement the next unche
 - Do not claim CI is green unless the GitHub Actions result has actually been verified.
 
 ## CI note
-Run 506 (`35065625581`) on `c6cd5df92e5b3afd89d5837956634aeb9c2a9e86` is the latest verified successful run. The newer PostgreSQL pool-concurrency hardening is committed on `main` and requires fresh GitHub Actions verification.
+Run 510 (`35066042755`) on `ff2995aca8121e301e3732a8de2fa6736aa27735` is the latest verified successful run. It verified Ruff, unit pytest, Compose configuration validation and full Docker Compose runtime smoke. Migration connection-lifecycle hardening is now committed on `main` and requires fresh GitHub Actions verification.
