@@ -15,6 +15,7 @@
 - [x] Wired a pinned Prometheus service into Docker Compose with the repository deployment configuration mounted read-only, persistent Prometheus storage, and configurable host port 9090.
 - [x] Added deterministic deployment-wiring tests confirming the Prometheus service, read-only configuration mount, exposed port, and backend `/metrics` scrape target.
 - [x] Inspected the deployment configuration to confirm Prometheus scrapes `backend:8000/metrics`; the monitoring path remains observational and has no execution authority.
+- [x] Inspected GitHub Actions Run 459 (`35053144090`): Ruff failed with exactly one I001 import-order error in `backend/tests/unit/test_monitoring_deployment.py`; Pytest was skipped. Fixed the test directly on `main` in commit `91ed0c3b219112e98941949ca929ffe36b78b2a4`.
 - [x] Inspected GitHub Actions Run 451 (`34965141139`): Ruff passed and Pytest reported exactly 3 failures / 323 passes, all rooted in integer metric formatting; the failures were corrected directly on `main`.
 - [x] Verified GitHub Actions Run 444 on commit `25c7732d502b046df185c477cd3eb595ff4461df`: Ruff and Pytest both passed successfully.
 - [x] Corrected the remaining GitHub Actions Ruff import-order/spacing failures in `test_research_results.py` and pushed the fixes directly to `main`.
@@ -44,6 +45,7 @@
 ## Pending work
 
 ### Infrastructure / operations
+- [ ] Fresh GitHub Actions verification after monitoring test lint fix `91ed0c3b219112e98941949ca929ffe36b78b2a4`.
 - [ ] End-to-end monitoring validation against an actually running Prometheus/backend stack. Repository wiring and CI tests are verified; runtime deployment has not been executed in this environment.
 - [ ] Full deployment/integration validation against configured PostgreSQL, ClickHouse and Redis services.
 
@@ -63,7 +65,7 @@
 - Research compute must never place orders, mutate positions/balances or bypass RiskEngine → OMS.
 
 ## Current next task
-Run/validate the monitoring stack end-to-end in an environment with Docker available, then move to broader PostgreSQL/ClickHouse/Redis deployment integration.
+Verify the monitoring lint fix through GitHub Actions, then continue toward runtime end-to-end monitoring validation and broader PostgreSQL/ClickHouse/Redis deployment integration.
 
 ## CI note
-Run 456 (`34965510449`) on commit `8734d16a3d043083f4915a5a2b39dce43fb309f0` completed successfully: Ruff lint passed and Pytest passed. This certifies the backend CI workflow for that commit. The subsequent monitoring Compose/test commits (`33fe10521d3e7dec386b116c507c3a094492e167` and `8541d731b2e6ce43381e76dba52a0197831b1aef`) will trigger fresh GitHub Actions verification; no later CI result is claimed here until inspected.
+Run 456 (`34965510449`) on commit `8734d16a3d043083f4915a5a2b39dce43fb309f0` completed successfully: Ruff lint passed and Pytest passed. Run 459 (`35053144090`) on commit `f8f907205642a2761ec0270b40aad9ce55b0f663` failed at Ruff with exactly one I001 import-order error in `backend/tests/unit/test_monitoring_deployment.py`; Pytest was skipped. Commit `91ed0c3b219112e98941949ca929ffe36b78b2a4` fixes that lint issue; fresh Actions verification is required before certifying the latest main state as CI-green.
