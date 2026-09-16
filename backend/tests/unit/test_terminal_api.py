@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from http.server import ThreadingHTTPServer
 from threading import Thread
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
@@ -8,7 +9,6 @@ from urllib.request import Request, urlopen
 from advance_system.observability.api import VIEW_PATHS, TerminalViewResponse, unavailable_view
 from advance_system.observability.metrics import MetricSample, MetricsRegistry
 from advance_system.observability.server import TerminalObservabilityHandler
-from http.server import ThreadingHTTPServer
 
 
 def test_terminal_view_contract_is_versioned_and_does_not_fabricate_data() -> None:
