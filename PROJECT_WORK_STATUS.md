@@ -35,13 +35,16 @@
 - [x] Verified GitHub Actions Run 506 (`35065625581`) on commit `c6cd5df92e5b3afd89d5837956634aeb9c2a9e86`: Ruff passed, 334 unit tests passed with 1 integration test deselected, Compose configuration validation passed, the real PostgreSQL/ClickHouse/Redis storage integration test passed, and the full Docker Compose runtime smoke test passed.
 - [x] Serialized `AsyncpgConnectionFactory` lazy pool initialization with an async lock so concurrent first callers cannot create multiple PostgreSQL pools.
 - [x] Added a deterministic concurrency test proving two simultaneous first calls share one initialized pool.
+- [x] Verified GitHub Actions Run 510 (`35066042755`) on commit `ff2995aca8121e301e3732a8de2fa6736aa27735`: Ruff, unit pytest, Docker Compose configuration validation, and full Docker Compose runtime smoke all passed.
+- [x] Hardened `MigrationRunner` connection lifecycle so every acquired migration connection is closed/released in a `finally` block, including migration failure paths.
+- [x] Extended migration unit coverage to verify connection cleanup on successful, idempotent, and failed runs.
 
 ## Pending work
 
 ### Infrastructure / operations
-- [ ] GitHub Actions verification of the concurrent PostgreSQL pool-initialization hardening and full Docker Compose runtime smoke.
 - [ ] Runtime end-to-end monitoring validation outside CI against an actually running deployment environment, if a persistent environment is required. The CI smoke test provides real container execution on GitHub-hosted runners but is not a production deployment validation.
 - [ ] Extend application-level integration coverage to the concrete adapter/factory implementations where additional vendor drivers are introduced.
+- [ ] Review and harden migration transaction/atomicity semantics so migration SQL and its `schema_migrations` record cannot leave partially applied state, while preserving PostgreSQL as the operational migration authority.
 
 ## Non-negotiable architecture rules
 - AI never bypasses RiskEngine or places uncontrolled orders.
@@ -59,7 +62,7 @@
 - Research compute must never place orders, mutate positions/balances or bypass RiskEngine → OMS.
 
 ## Current next task
-Verify GitHub Actions for the concurrent PostgreSQL pool-initialization hardening. Do not claim CI green until the new run completes successfully. If it passes, continue with the next highest-priority persistence/application integration gap.
+Review and implement migration transaction/atomicity hardening, with deterministic tests for failure/rollback semantics. Preserve the existing connection lifecycle cleanup and PostgreSQL migration-state authority.
 
 ## CI note
-Run 506 (`35065625581`) on `c6cd5df92e5b3afd89d5837956634aeb9c2a9e86` is the latest verified successful run: Ruff passed, 334 unit tests passed, Compose configuration validation passed, storage integration passed, and the full Docker Compose runtime smoke passed. The newer PostgreSQL pool-concurrency hardening is committed on `main` and requires fresh Actions verification.
+Run 510 (`35066042755`) on `ff2995aca8121e301e3732a8de2fa6736aa27735` is the latest verified successful run: Ruff, unit pytest, Compose configuration validation, and full Docker Compose runtime smoke all passed. The migration connection-lifecycle hardening is now committed on `main` and awaits its own Actions verification.
