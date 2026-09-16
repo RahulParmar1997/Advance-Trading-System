@@ -46,15 +46,16 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 - Deterministic tests cover contract versioning, route completeness, JSON shape, mutation rejection, unavailable providers, exact snapshot passthrough and view mismatch fail-closed behavior.
 - An explicit `build_observability_handler` composition boundary accepts a `TerminalSnapshotProvider` dependency. The default server composition supplies no provider, so it remains fail-closed until an authoritative implementation is available.
 - Deterministic composition tests verify injected-provider passthrough and no-provider fail-closed behavior.
-- `ValidatedTerminalSnapshotStore` now requires timezone-aware, non-future observation timestamps and withholds observations beyond its configured freshness age.
+- `ValidatedTerminalSnapshotStore` requires timezone-aware, non-future observation timestamps and withholds observations beyond its configured freshness age.
 - Deterministic tests cover fresh, expired, naive, future-dated, and invalid-freshness cases.
+- `StoreBackedTerminalSnapshotProvider` exposes only fresh observations already accepted by the validated snapshot store; it performs no synthesis or transformation.
 
 ## Provider discovery
-- The repository contains a concrete `UpstoxAdapter` market-data adapter plus Upstox market-status/source components, but no existing application-level `TerminalSnapshotProvider` implementation that safely maps authoritative validated observations into all terminal views.
-- The terminal composition layer therefore does not invent or directly couple to partial broker data. A concrete read-only provider remains the next integration task.
+- The repository contains a concrete `UpstoxAdapter` market-data adapter plus Upstox market-status/source components, but no existing application-level source that safely supplies all four terminal views from authoritative validated observations.
+- The terminal composition layer therefore does not invent or directly couple to partial broker data. The remaining integration task is upstream lifecycle wiring into the validated store.
 
 ## Pending roadmap
-1. Connect the snapshot store to concrete authoritative market/account/portfolio ingestion and inject the resulting provider through the terminal composition boundary.
+1. Connect authoritative market/account/portfolio ingestion lifecycle to `ValidatedTerminalSnapshotStore` and inject `StoreBackedTerminalSnapshotProvider` through the terminal composition boundary.
 2. Runtime end-to-end monitoring validation outside CI if a persistent deployment environment is required.
 3. Additional concrete vendor adapter/factory integration coverage when those drivers are introduced.
 
@@ -67,7 +68,7 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 - Do not claim CI green unless GitHub Actions actually confirms it.
 
 ## Current verification state
-Run 603 (`35086961799`) on `b81c72631620f1f161f92c1080b6782089f065c7` was fully successful, including Ruff, unit pytest, Compose validation, frontend checks and Docker Compose runtime smoke. Future-timestamp hardening commits after Run 603 require fresh GitHub Actions verification; no newer green run is being claimed until the final HEAD is verified.
+Run 603 (`35086961799`) on `b81c72631620f1f161f92c1080b6782089f065c7` was fully successful, including Ruff, unit pytest, Compose validation, frontend checks and Docker Compose runtime smoke. The current provider commits require fresh GitHub Actions verification; no newer green CI run is being claimed until the final HEAD is verified.
 
 ## Next implementation rule
 When the user says **NEXT**, inspect current `main` and latest GitHub Actions state, implement the highest-priority unfinished task directly on `main`, add deterministic tests, update this file and `PROJECT_WORK_STATUS.md`, verify CI, and report the commit SHA and blockers.
