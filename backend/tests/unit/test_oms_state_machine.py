@@ -49,3 +49,12 @@ def test_different_client_key_cannot_reuse_order_id() -> None:
     gateway.submit(make_order(), client_key="key-1")
     with pytest.raises(ValueError, match="duplicate order_id"):
         gateway.submit(make_order(), client_key="key-2")
+
+
+def test_client_key_collision_with_different_order_fails_closed() -> None:
+    gateway = PaperOrderGateway()
+    gateway.submit(make_order(), client_key="opportunity-1")
+    different_order = OmsOrder(order_id="o-2", instrument="NSE_EQ|TEST", quantity=10)
+
+    with pytest.raises(ValueError, match="client_key already bound to a different order_id"):
+        gateway.submit(different_order, client_key="opportunity-1")
