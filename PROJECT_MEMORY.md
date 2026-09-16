@@ -64,9 +64,9 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 - PostgreSQL operational adapter has explicit pooled connection lifecycle with acquired connections returned to the pool exactly once.
 - `AsyncpgConnectionFactory` serializes lazy pool creation so concurrent first callers share one pool instead of racing to create multiple pools.
 - PAPER OMS idempotency fails closed when a client idempotency key is presented with a different order ID; it never silently replays the original order under a mismatched identity.
-- `MigrationRunner` always closes/releases its acquired PostgreSQL migration connection, including failure paths.
-- `MigrationRunner` executes migration SQL and its `schema_migrations` bookkeeping inside one PostgreSQL transaction so partial migration state rolls back atomically.
-- Migration tests cover success, idempotency, connection cleanup and rollback of partial migration sequences.
+- `MigrationRunner` always closes/releases its acquired PostgreSQL migration connection, including migration failure paths.
+- `MigrationRunner` executes migration SQL and `schema_migrations` bookkeeping in one transaction so partial migration application rolls back atomically.
+- Migration tests cover commit, rollback, idempotency and connection cleanup.
 
 ## Pending roadmap
 1. Next.js/React/TypeScript trading terminal and dashboards.
@@ -86,4 +86,4 @@ When the user says **NEXT**, inspect the repository and implement the next unche
 - Do not claim CI is green unless the GitHub Actions result has actually been verified.
 
 ## CI note
-Run 514 (`35066789576`) on `55061e174e39650677488401d402c576c7add60c` verified Ruff, unit pytest, Compose configuration validation and full Docker Compose runtime smoke for the migration connection-lifecycle hardening. The later migration transaction/atomicity hardening is committed on `main` and requires fresh GitHub Actions verification.
+Run 519 (`35067255577`) on `4522dc22ad55b1a65fbee262b1332d322ef5b45f` is the latest verified successful run. It verified Ruff, unit pytest, Docker Compose configuration validation and full Docker Compose runtime smoke. Migration connection lifecycle and transaction atomicity hardening are verified on `main`.
