@@ -56,6 +56,11 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/metrics', timeout=2).read(1)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     read_only: true
     tmpfs:
       - /tmp
@@ -71,7 +76,8 @@ services:
     ports:
       - "${ATS_PROMETHEUS_PORT:-9090}:9090"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
 
   frontend:
     build:
