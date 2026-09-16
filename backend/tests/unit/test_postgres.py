@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import asyncio
+
 import pytest
 
 from advance_system.storage.contracts import StorageConfig
@@ -180,3 +182,54 @@ async def test_asyncpg_factory_returns_connection_to_pool(monkeypatch: pytest.Mo
 
     await factory.close()
     assert pool.closed is True
+
+
+@pytest.mark.asyncio
+async def test_asyncpg_factory_initializes_one_pool_for_concurrent_first_calls(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    connection = FakeConnection()
+    create_started = asyncio.Event()
+    release_create = asyncio.Event()
+    create_calls = 0
+
+    class FakePool:
+        async def acquire(self) -> FakeConnection:
+            return connection
+
+        async def release(self, acquired: object) -> None:
+            pass
+
+        async def close(self) -> None:
+            pass
+
+    pool = FakePool()
+
+    class FakeAsyncpg:
+        @staticmethod
+        async def create_pool(*, dsn: str, min_size: int, max_size: int) -> FakePool:
+            nonlocal create_calls
+            assert dsn == "postgresql://db.example/ats"
+            assert min_size == 1
+            assert max_size == 2
+            create_calls += 1
+            create_started.set()
+            await release_create.wait()
+            return pool
+
+    monkeypatch.setitem(__import__("sys").modules, "asyncpg", FakeAsyncpg)
+    factory = AsyncpgConnectionFactory("postgresql://db.example/ats", min_size=1, max_size=2)
+
+    first = asyncio.create_task(factory())
+    await create_started.wait()
+    second = asyncio.create_task(factory())
+    await asyncio.sleep(0)
+    release_create.set()
+
+    acquired_first, acquired_second = await asyncio.gather(first, second)
+
+    assert create_calls == 1
+    assert acquired_first is not acquired_second
+    await acquired_first.close()
+    await acquired_second.close()
+    await factory.close()
