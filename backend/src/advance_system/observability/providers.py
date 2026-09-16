@@ -61,6 +61,16 @@ class ValidatedTerminalSnapshotStore:
         return snapshot
 
 
+class StoreBackedTerminalSnapshotProvider:
+    """Expose only fresh, validated observations from a snapshot store."""
+
+    def __init__(self, store: ValidatedTerminalSnapshotStore) -> None:
+        self._store = store
+
+    def snapshot(self, view: ViewName) -> TerminalSnapshot | None:
+        return self._store.snapshot(view)
+
+
 class TerminalDataService:
     """Maps provider snapshots to the stable terminal API without synthesizing values."""
 
