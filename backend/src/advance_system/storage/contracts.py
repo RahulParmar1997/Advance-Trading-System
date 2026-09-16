@@ -68,6 +68,7 @@ class StorageConfig:
         return config
 
 
+@runtime_checkable
 class PostgreSQLStore(Protocol):
     """Operational relational persistence boundary."""
 
@@ -75,6 +76,7 @@ class PostgreSQLStore(Protocol):
         ...
 
 
+@runtime_checkable
 class ClickHouseStore(Protocol):
     """High-volume analytical query boundary."""
 
@@ -82,6 +84,7 @@ class ClickHouseStore(Protocol):
         ...
 
 
+@runtime_checkable
 class RedisStore(Protocol):
     """Hot-state/cache boundary; not the source of truth for orders or positions."""
 
