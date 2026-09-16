@@ -39,6 +39,16 @@ def test_store_rejects_naive_observation_timestamp() -> None:
         )
 
 
+def test_store_rejects_future_observation_timestamp() -> None:
+    store = ValidatedTerminalSnapshotStore(max_age=timedelta(seconds=30))
+
+    with pytest.raises(ValueError, match="cannot be in the future"):
+        store.publish(
+            TerminalSnapshot(view="scanner", data={}),
+            observed_at=datetime.now(timezone.utc) + timedelta(seconds=1),
+        )
+
+
 def test_store_rejects_non_positive_max_age() -> None:
     with pytest.raises(ValueError, match="max_age must be positive"):
         ValidatedTerminalSnapshotStore(max_age=timedelta(0))
