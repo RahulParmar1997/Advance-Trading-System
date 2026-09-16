@@ -32,19 +32,23 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 - Dark-first observational Next.js terminal with Market State, Scanner, Risk and PAPER Portfolio panels.
 - Responsive styling, UI contract tests, ESLint, TypeScript typecheck and production build in CI.
 - Docker standalone image, backend health-gated startup and frontend HTTP healthcheck hardened.
-- GitHub Actions Run 549 (`35076782833`) on `874494a6778e445a5b357bbef7821627e6b8fba7` passed Ruff, unit pytest, Compose validation, frontend checks and full Docker Compose runtime smoke.
 
 ## Typed terminal API contracts
 - `backend/src/advance_system/observability/api.py` defines the stable `TerminalViewResponse` contract and explicit routes for Market State, Scanner, Risk and Portfolio.
 - `backend/src/advance_system/observability/server.py` exposes those routes alongside `/metrics`.
-- The current implementation is deliberately fail-closed: until authoritative providers are connected, each view returns `available=false`, `reason=data_feed_not_connected`, and `data=null`. No market, account, risk or opportunity values are fabricated.
+- The implementation is deliberately fail-closed: until authoritative providers are connected, each view returns `available=false`, `reason=data_feed_not_connected`, and `data=null`. No market, account, risk or opportunity values are fabricated.
 - `backend/src/advance_system/observability/providers.py` provides a provider-owned `TerminalSnapshot` boundary and `TerminalDataService`; provider snapshots are passed through only when the requested view matches exactly.
 - POST/PUT/DELETE remain rejected by the observability server; terminal routes have no broker, OMS or RiskEngine authority.
 - Deterministic tests cover contract versioning, route completeness, JSON shape, mutation rejection, unavailable providers, exact snapshot passthrough and view mismatch fail-closed behavior.
-- GitHub Actions repeatedly identified Ruff I001 import-layout issues in the terminal API. Run 579 established that the previous correction had one extra blank line; the latest correction is committed on `main` as `380fcae9e41f53b52e433e8704296833c929da41`.
+- An explicit `build_observability_handler` composition boundary now accepts a `TerminalSnapshotProvider` dependency. The default server composition supplies no provider, so it remains fail-closed until an authoritative implementation is available.
+- Deterministic composition tests verify injected-provider passthrough and no-provider fail-closed behavior.
+
+## Provider discovery
+- The repository contains a concrete `UpstoxAdapter` market-data adapter plus Upstox market-status/source components, but no existing application-level `TerminalSnapshotProvider` implementation that safely maps authoritative validated observations into all terminal views.
+- The terminal composition layer therefore does not invent or directly couple to partial broker data. A concrete read-only provider remains the next integration task.
 
 ## Pending roadmap
-1. Connect typed terminal endpoints to concrete authoritative market-data/account read-only services at application composition time.
+1. Introduce/identify the concrete authoritative read-only market-data and account/portfolio provider implementation, then inject it through the terminal composition boundary.
 2. Add dedicated market, scanner, risk and portfolio frontend routes while preserving read-only boundaries.
 3. Runtime end-to-end monitoring validation outside CI if a persistent deployment environment is required.
 4. Additional concrete vendor adapter/factory integration coverage when those drivers are introduced.
@@ -58,7 +62,7 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 - Do not claim CI green unless GitHub Actions actually confirms it.
 
 ## Current verification state
-Runs 568 (`35079804364`), 569 (`35080360349`), 570 (`35080510997`), 571 (`35080647090`), 572 (`35080710642`), 574 (`35080835719`), 577 (`35081260014`) and 579 (`35081319193`) failed at Ruff I001 in `backend/src/advance_system/observability/api.py`; pytest and later stages were skipped. The root cause was the exact number of blank lines separating the import block from `ViewName`. The latest implementation correction is `380fcae9e41f53b52e433e8704296833c929da41` on `main`; GitHub Actions verification is pending for the correction and this documentation update. Run 549 remains the latest fully verified successful baseline.
+GitHub Actions Run 582 (`35082009500`) on `d56c3ead4a343aeb11b52f8012a1cede7566fae8` is the latest fully verified green baseline. The later implementation/documentation commits `37a9283b632a9fab127b3bb3482172506e258df0`, `eead42e57b3b45254a11e030efdc03ee3b3e60b4`, and `300f411b1ed8782bb13d5afdab34fd436ffec2b9` still require GitHub Actions verification.
 
 ## Next implementation rule
 When the user says **NEXT**, inspect current `main` and latest GitHub Actions state, implement the highest-priority unfinished task directly on `main`, add deterministic tests, update this file and `PROJECT_WORK_STATUS.md`, verify CI, and report the commit SHA and blockers.
