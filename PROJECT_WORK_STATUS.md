@@ -39,8 +39,9 @@
 - [x] Hardened `MigrationRunner` connection lifecycle so every acquired migration connection is closed/released in a `finally` block, including migration failure paths.
 - [x] Extended migration unit coverage to verify connection cleanup on successful, idempotent, and failed runs.
 - [x] Verified GitHub Actions Run 514 (`35066789576`) on commit `55061e174e39650677488401d402c576c7add60c`: Ruff, unit pytest, Docker Compose configuration validation, and full Docker Compose runtime smoke all passed.
-- [x] Hardened `MigrationRunner` to execute schema changes and `schema_migrations` bookkeeping inside one PostgreSQL transaction.
-- [x] Added deterministic rollback coverage proving a partial migration sequence is rolled back and the connection is still closed.
+- [x] Hardened `MigrationRunner` transaction atomicity so migration SQL and `schema_migrations` bookkeeping run within one PostgreSQL transaction and rollback on failure.
+- [x] Added deterministic migration tests for transaction start/commit, rollback of partial migration application, idempotency, and connection cleanup.
+- [x] Verified GitHub Actions Run 519 (`35067255577`) on commit `4522dc22ad55b1a65fbee262b1332d322ef5b45f`: Ruff, unit pytest, Docker Compose configuration validation, and full Docker Compose runtime smoke all passed.
 
 ## Pending work
 
@@ -64,7 +65,7 @@
 - Research compute must never place orders, mutate positions/balances or bypass RiskEngine → OMS.
 
 ## Current next task
-Continue with the next highest-priority persistence/application integration gap. Preserve PostgreSQL as operational source of truth and keep migration execution transactional and fail-closed.
+Inspect the remaining persistence/application integration boundary and implement the highest-priority concrete adapter/factory coverage gap, with deterministic tests and no broker/execution authority.
 
 ## CI note
-Run 514 (`35066789576`) on `55061e174e39650677488401d402c576c7add60c` verified the migration connection-lifecycle hardening successfully. The later migration transaction/atomicity hardening is committed on `main` and awaits its own Actions verification.
+Run 519 (`35067255577`) on `4522dc22ad55b1a65fbee262b1332d322ef5b45f` is the latest verified successful run: Ruff, unit pytest, Docker Compose configuration validation, and full Docker Compose runtime smoke all passed. Migration connection lifecycle and transaction atomicity hardening are verified on `main`.
