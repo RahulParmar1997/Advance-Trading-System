@@ -3,7 +3,7 @@
 **Repository:** `RahulParmar1997/Advance-Trading-System`
 **Authoritative branch:** `main` only
 **Mode:** PAPER-first; no uncontrolled live execution
-**Updated:** 2026-09-15
+**Updated:** 2026-09-16
 
 ## Purpose
 India-focused Market Intelligence + Quant Research + Automated Trading Platform.
@@ -60,6 +60,10 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 ## Broker reconciliation adapter
 `reconciliation/upstox.py` defines `UpstoxReconciliationAdapter` behind an injected `UpstoxOrderApi`. It translates authoritative broker order details/fills into broker-neutral contracts and rejects identity/timestamp/quantity errors. It has no order-submission capability.
 
+## Persistence / execution hardening
+- PostgreSQL operational adapter has explicit pooled connection lifecycle with acquired connections returned to the pool exactly once.
+- PAPER OMS idempotency now fails closed when a client idempotency key is presented with a different order ID; it never silently replays the original order under a mismatched identity.
+
 ## Pending roadmap
 1. Next.js/React/TypeScript trading terminal and dashboards.
 2. PostgreSQL, ClickHouse, Redis, Parquet/object storage and deployment/observability infrastructure.
@@ -78,4 +82,4 @@ When the user says **NEXT**, inspect the repository and implement the next unche
 - Do not claim CI is green unless the GitHub Actions result has actually been verified.
 
 ## CI note
-The latest GitHub Actions state is not verified green. The repository must repair and verify the Ruff failure before claiming the quality gate is healthy.
+Run 502 (`35064867296`) on `1dbc8ecc2789b4ca6bf6008f0757d63a11f45c25` is the latest verified successful baseline. The newer PAPER OMS idempotency collision fix is committed on `main` and requires fresh GitHub Actions verification.
