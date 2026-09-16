@@ -45,3 +45,21 @@ def test_prometheus_healthcheck_probes_readiness_endpoint() -> None:
     assert "http://127.0.0.1:9090/-/ready" in compose
     assert "  prometheus:" in compose
     assert compose.count("condition: service_healthy") >= 4
+
+
+def test_frontend_runtime_deployment_contract_is_health_gated_and_standalone() -> None:
+    compose = (REPOSITORY_ROOT / "docker-compose.yml").read_text(encoding="utf-8")
+    dockerfile = (REPOSITORY_ROOT / "docker" / "frontend.Dockerfile").read_text(encoding="utf-8")
+    next_config = (REPOSITORY_ROOT / "frontend" / "next.config.ts").read_text(encoding="utf-8")
+
+    assert "  frontend:" in compose
+    assert 'dockerfile: docker/frontend.Dockerfile' in compose
+    assert '"${ATS_FRONTEND_PORT:-3000}:3000"' in compose
+    assert "depends_on:\n      backend:\n        condition: service_healthy" in compose
+    assert "http://127.0.0.1:3000/" in compose
+    assert "healthcheck:" in compose
+    assert "COPY --from=build /app/public ./public" not in dockerfile
+    assert "COPY --from=build /app/.next/standalone ./" in dockerfile
+    assert "COPY --from=build /app/.next/static ./.next/static" in dockerfile
+    assert 'CMD ["node", "server.js"]' in dockerfile
+    assert 'output: "standalone"' in next_config
