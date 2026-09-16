@@ -56,15 +56,17 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 - Deterministic tests cover invalid identity types, blank symbols, and domain validation failures at the source boundary.
 - Upstox market-status observations now expose an explicit `to_domain()` conversion into the broker-neutral `MarketStatus` contract, preserving the authoritative timestamp and invoking domain validation before downstream use.
 - Deterministic tests cover successful domain conversion and rejection of future-dated market-status observations.
+- Corrected the Upstox market-status test import order after GitHub Actions Run 628 reported a Ruff failure.
 
 ## Provider discovery
 - The repository contains a concrete `UpstoxAdapter` market-data adapter plus Upstox market-status/source components, but no existing application-level source that safely supplies all four terminal views from authoritative validated observations.
 - The terminal composition layer therefore does not invent or directly couple to partial broker data. The ingress boundary is ready for concrete upstream validators when those authoritative sources are available.
 
 ## Pending roadmap
-1. Connect concrete authoritative market/account/portfolio validators and lifecycle sources to `TerminalSnapshotIngress`, then inject `StoreBackedTerminalSnapshotProvider` through the terminal composition boundary.
-2. Runtime end-to-end monitoring validation outside CI if a persistent deployment environment is required.
-3. Additional concrete vendor adapter/factory integration coverage when those drivers are introduced.
+1. Verify the Ruff correction with GitHub Actions, then advance to the highest-priority unfinished safety/data-source task.
+2. Connect concrete authoritative market/account/portfolio validators and lifecycle sources to `TerminalSnapshotIngress`, then inject `StoreBackedTerminalSnapshotProvider` through the terminal composition boundary.
+3. Runtime end-to-end monitoring validation outside CI if a persistent deployment environment is required.
+4. Additional concrete vendor adapter/factory integration coverage when those drivers are introduced.
 
 ## Safety / quality rules
 - No fabricated broker fields, market data, probabilities or execution status.
@@ -75,7 +77,7 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 - Do not claim CI green unless GitHub Actions actually confirms it.
 
 ## Current verification state
-Run 619 (`35091319639`) on `961bfaf1f23b40d81792389b010c78c9f65d9d3c` was fully successful. The market-status mapping commits after that run require fresh GitHub Actions verification; no newer green CI run is being claimed until the final HEAD is verified.
+Run 628 (`35092712860`) failed with exactly one Ruff import-order error in `backend/tests/unit/test_upstox_market_status.py`; pytest and later stages were skipped. The corrective test commit is `4f7131d79c1dc3189443a382c448d9a7fd3daa50`. Fresh verification for the final documentation commit is pending.
 
 ## Next implementation rule
 When the user says **NEXT**, inspect current `main` and latest GitHub Actions state, implement the highest-priority unfinished task directly on `main`, add deterministic tests, update this file and `PROJECT_WORK_STATUS.md`, verify CI, and report the commit SHA and blockers.
