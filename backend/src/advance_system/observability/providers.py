@@ -27,8 +27,9 @@ class TerminalSnapshotProvider(Protocol):
 class ValidatedTerminalSnapshotStore:
     """Thread-safe store for snapshots already validated by an authoritative source.
 
-    Publishing requires an aware observation timestamp. The store never creates market
-    or account values; expired observations are withheld so the terminal fails closed.
+    Publishing requires an aware, non-future observation timestamp. The store never
+    creates market or account values; expired observations are withheld so the terminal
+    fails closed.
     """
 
     def __init__(self, *, max_age: timedelta) -> None:
@@ -43,8 +44,11 @@ class ValidatedTerminalSnapshotStore:
             raise ValueError("observed_at must be timezone-aware")
         if not snapshot.view:
             raise ValueError("snapshot view is required")
+        normalized = observed_at.astimezone(timezone.utc)
+        if normalized > datetime.now(timezone.utc):
+            raise ValueError("observed_at cannot be in the future")
         with self._lock:
-            self._snapshots[snapshot.view] = (snapshot, observed_at.astimezone(timezone.utc))
+            self._snapshots[snapshot.view] = (snapshot, normalized)
 
     def snapshot(self, view: ViewName) -> TerminalSnapshot | None:
         with self._lock:
