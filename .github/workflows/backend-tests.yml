@@ -106,6 +106,12 @@ jobs:
             sleep 2
           done
 
+          # Prometheus reports a newly discovered target as "unknown" until its
+          # first scheduled scrape. Give that initial scrape window time to elapse
+          # before asserting target health, then retain bounded polling for startup
+          # and scheduling variance.
+          sleep 20
+
           for attempt in $(seq 1 30); do
             if curl --fail --silent 'http://127.0.0.1:19090/api/v1/targets' > /tmp/prometheus-targets.json; then
               if python - <<'PY'
@@ -123,9 +129,10 @@ jobs:
               None,
           )
           if backend is not None:
-              assert backend['health'] == 'up', backend
-              assert backend['scrapeUrl'].endswith('/metrics'), backend
-              raise SystemExit(0)
+              if backend['health'] == 'up' and not backend['lastScrape'].startswith('0001-01-01T'):
+                  assert backend['scrapeUrl'].endswith('/metrics'), backend
+                  raise SystemExit(0)
+              raise SystemExit(1)
           raise SystemExit(1)
           PY
               then
@@ -133,7 +140,7 @@ jobs:
               fi
             fi
             if [ "$attempt" -eq 30 ]; then
-              echo 'Prometheus backend scrape target did not become healthy.' >&2
+              echo 'Prometheus backend scrape target did not become healthy after the initial scrape window.' >&2
               cat /tmp/prometheus-targets.json >&2 || true
               docker compose logs backend prometheus >&2 || true
               exit 1
