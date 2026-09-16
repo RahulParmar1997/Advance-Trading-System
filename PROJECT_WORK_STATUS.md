@@ -35,38 +35,15 @@
 - [x] Added a GitHub Actions Docker Compose runtime smoke test that builds and starts the backend/Prometheus stack, verifies backend `/metrics`, Prometheus `/-/ready`, PostgreSQL readiness, ClickHouse ping, Redis ping, and Prometheus's backend target health/scrape URL.
 - [x] Kept runtime smoke validation PAPER-only and observational; the test starts no frontend execution path and grants no broker, RiskEngine or OMS authority.
 - [x] Inspected the current health boundary and preserved observational-only semantics; health checks have no RiskEngine, OMS, broker or execution authority.
-- [x] Inspected GitHub Actions Run 451 (`34965141139`): Ruff passed and Pytest reported exactly 3 failures / 323 passes, all rooted in integer metric formatting; the failures were corrected directly on `main`.
-- [x] Verified GitHub Actions Run 444 on commit `25c7732d502b046df185c477cd3eb595ff4461df`: Ruff and Pytest both passed successfully.
-- [x] Corrected the remaining GitHub Actions Ruff import-order/spacing failures in `test_research_results.py` and pushed the fixes directly to `main`.
-- [x] Connected immutable COMPUTED research-result provenance to the existing OOS validation and explicit research-approval workflow.
-- [x] Added fail-closed OOS→RESEARCH_APPROVED transitions, provenance binding, and timezone-aware approval evidence with no execution authority.
-- [x] Added deterministic unit coverage for OOS validation entry, explicit approval, provenance mismatch, duplicate approval and timestamp validation.
-- [x] Added cancellation/timeout enforcement around actual research worker execution with cooperative task cancellation and fail-closed wall-clock limits.
-- [x] Added deterministic unit coverage for successful worker completion, timeout cancellation, explicit cancellation, and unknown-job cancellation.
-- [x] Added concrete immutable ObjectStore-backed research-result persistence using the existing vendor-neutral ObjectStore boundary.
-- [x] Added manifest deserialization and fail-closed integrity verification for persisted research results.
-- [x] Added deterministic unit coverage for object-store persistence, immutable overwrite rejection, key layout and corrupted-result detection.
-- [x] Fixed scheduler Ruff blocker: removed unused `Callable` import from the research scheduler boundary.
-- [x] Added immutable research-result provenance contracts covering result SHA-256, size, dataset/strategy/feature/config versions, Git SHA, seed, backend, hardware, environment, resource usage and timezone-aware creation time.
-- [x] Added fail-closed validation requiring COMPUTED status, observed metadata, non-negative resource usage and compliance with job resource limits.
-- [x] Added deterministic write-once/integrity-checked in-memory research-result persistence coverage; no validation, OOS approval or broker authority is exposed.
-- [x] Added a research-only compute job boundary with reproducibility metadata, selectable CPU/GPU backend identity, resource limits and safe local execution semantics.
-- [x] Added distributed CPU, distributed GPU and cloud/HPC scheduler adapters behind a vendor-neutral enqueue boundary; adapters never claim worker completion and have no broker authority.
-- [x] Durable append-only JSONL journal backend with startup integrity validation and checkpoints.
-- [x] Next.js/React/TypeScript frontend foundation with dark-first terminal shell and observational landing dashboard.
-- [x] Read-only trading terminal routes and explicit typed contracts.
-- [x] PostgreSQL operational source-of-truth boundary, ClickHouse analytics, Redis hot state and immutable Parquet/object storage boundaries.
-- [x] Docker/deployment stack, reverse proxy, monitoring configuration and operational runbook.
-- [x] Upstox V3 protobuf boundary, market-data validation and deterministic analytics foundations.
-- [x] Event-driven backtesting with costs, latency, partial fills and liquidity limits.
-- [x] RiskEngine hard gate and canonical OMS → PAPER execution flow.
+- [x] Inspected GitHub Actions Run 477 (`35061235488`) on commit `73817beb9d83f9f34ab37a263122ada7410cb8dd`: Ruff and Pytest passed (332 tests), Compose configuration validation passed, and the runtime smoke reached healthy backend/PostgreSQL/ClickHouse/Redis containers before failing at the Prometheus target assertion because the workflow expected job label `advance-trading-backend` while the repository configuration uses `advance-trading-system`.
+- [x] Corrected the runtime smoke Prometheus target assertion to use the configured `advance-trading-system` job label directly on `main` in commit `9962ca7f3eb505aea0acc153994309d8b5f86b04`.
+- [x] Inspected the failed runtime logs and confirmed container build/startup and dependency readiness succeeded; the failure was isolated to the test's stale job-label expectation, not a reported service readiness failure.
 
 ## Pending work
 
 ### Infrastructure / operations
-- [x] Fresh GitHub Actions verification for the empty-health-check hardening change.
-- [ ] Fresh GitHub Actions verification of the new Docker Compose runtime smoke test.
-- [ ] Runtime end-to-end monitoring validation outside CI against an actually running deployment environment, if a persistent environment is required. The new CI smoke test provides real container execution on GitHub-hosted runners but is not a production deployment validation.
+- [ ] Fresh GitHub Actions verification of the corrected Docker Compose runtime smoke test.
+- [ ] Runtime end-to-end monitoring validation outside CI against an actually running deployment environment, if a persistent environment is required. The CI smoke test provides real container execution on GitHub-hosted runners but is not a production deployment validation.
 - [ ] Full deployment/integration validation against configured PostgreSQL, ClickHouse and Redis application storage operations.
 
 ## Non-negotiable architecture rules
@@ -85,7 +62,7 @@
 - Research compute must never place orders, mutate positions/balances or bypass RiskEngine → OMS.
 
 ## Current next task
-Verify the new Docker Compose runtime smoke test through GitHub Actions. If it passes, retain the CI evidence and proceed to application-level PostgreSQL/ClickHouse/Redis integration validation; do not treat container readiness alone as proof that application storage operations are working. Runtime deployment outside CI remains environment-dependent.
+Verify the corrected Docker Compose runtime smoke test through GitHub Actions. If it passes, retain the CI evidence and proceed to application-level PostgreSQL/ClickHouse/Redis integration validation; do not treat container readiness alone as proof that application storage operations are working. Runtime deployment outside CI remains environment-dependent.
 
 ## CI note
-Run 475 (`35060996702`) on commit `bf872eedf347d4716704f7b4d8e957cda318dbe6`) completed successfully with Ruff, Pytest, and Docker Compose configuration validation. This run predates the new runtime smoke step. The runtime smoke change is on `main` in commit `dc97aec623fd30748c52cf5313340e88d2178fb4 and requires a fresh Actions run.
+Run 477 (`35061235488`) on commit `73817beb9d83f9f34ab37a263122ada7410cb8dd` completed with Ruff and Pytest passing (332 tests), Compose configuration validation passing, and the runtime smoke step failing only at the Prometheus backend job-label assertion. The corrected workflow is on `main` in commit `9962ca7f3eb505aea0acc153994309d8b5f86b04`; a fresh Actions run is required before claiming runtime smoke verification.
