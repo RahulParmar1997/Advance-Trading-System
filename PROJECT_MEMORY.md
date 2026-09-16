@@ -41,7 +41,7 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 - `backend/src/advance_system/observability/providers.py` provides a provider-owned `TerminalSnapshot` boundary and `TerminalDataService`; provider snapshots are passed through only when the requested view matches exactly.
 - POST/PUT/DELETE remain rejected by the observability server; terminal routes have no broker, OMS or RiskEngine authority.
 - Deterministic tests cover contract versioning, route completeness, JSON shape, mutation rejection, unavailable providers, exact snapshot passthrough and view mismatch fail-closed behavior.
-- GitHub Actions repeatedly identified Ruff I001 import-layout issues in the terminal API. The latest correction restores the required blank line after the import block and is committed on `main` as `122154a080a2e5b6f0bda5f1bd90aed9ab4faf93`; verification is still in progress.
+- GitHub Actions repeatedly identified Ruff I001 import-layout issues in the terminal API. Run 579 established that the previous correction had one extra blank line; the latest correction is committed on `main` as `380fcae9e41f53b52e433e8704296833c929da41`.
 
 ## Pending roadmap
 1. Connect typed terminal endpoints to concrete authoritative market-data/account read-only services at application composition time.
@@ -58,7 +58,7 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 - Do not claim CI green unless GitHub Actions actually confirms it.
 
 ## Current verification state
-GitHub Actions Runs 568 (`35079804364`), 569 (`35080360349`), 570 (`35080510997`), 571 (`35080647090`) and 572 (`35080710642`) failed at Ruff I001 in `backend/src/advance_system/observability/api.py`, and Run 574 (`35080835719`) also failed at the same Ruff check; pytest and later stages were skipped. The latest implementation correction is committed on `main` as `122154a080a2e5b6f0bda5f1bd90aed9ab4faf93`. Run 577 (`35081260014`) is currently in progress for that correction. The documentation follow-up is `f3725efec10df1f5eb7f1cd0a4f84596e33a9245`; because documentation commits trigger CI too, the latest HEAD requires final verification after the documentation update. Run 549 remains the latest fully verified successful baseline.
+Runs 568 (`35079804364`), 569 (`35080360349`), 570 (`35080510997`), 571 (`35080647090`), 572 (`35080710642`), 574 (`35080835719`), 577 (`35081260014`) and 579 (`35081319193`) failed at Ruff I001 in `backend/src/advance_system/observability/api.py`; pytest and later stages were skipped. The root cause was the exact number of blank lines separating the import block from `ViewName`. The latest implementation correction is `380fcae9e41f53b52e433e8704296833c929da41` on `main`; GitHub Actions verification is pending for the correction and this documentation update. Run 549 remains the latest fully verified successful baseline.
 
 ## Next implementation rule
 When the user says **NEXT**, inspect current `main` and latest GitHub Actions state, implement the highest-priority unfinished task directly on `main`, add deterministic tests, update this file and `PROJECT_WORK_STATUS.md`, verify CI, and report the commit SHA and blockers.
