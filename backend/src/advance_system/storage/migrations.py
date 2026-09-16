@@ -7,6 +7,8 @@ from typing import Protocol, Sequence
 class MigrationConnection(Protocol):
     async def execute(self, statement: str, *parameters: object) -> object: ...
 
+    def transaction(self) -> object: ...
+
     async def close(self) -> None: ...
 
 
@@ -30,7 +32,7 @@ class Migration:
 
 
 class MigrationRunner:
-    """Idempotent migration runner using PostgreSQL as migration-state authority."""
+    """Idempotent, atomic migration runner using PostgreSQL as state authority."""
 
     TABLE_SQL = """
     CREATE TABLE IF NOT EXISTS schema_migrations (
@@ -48,20 +50,21 @@ class MigrationRunner:
         self._validate_migrations(ordered)
         connection = await self._connection_factory()
         try:
-            await connection.execute(self.TABLE_SQL)
-            applied = await self._applied_versions(connection)
-            executed: list[int] = []
-            for migration in ordered:
-                if migration.version in applied:
-                    continue
-                await connection.execute(migration.sql)
-                await connection.execute(
-                    "INSERT INTO schema_migrations (version, name) VALUES ($1, $2)",
-                    migration.version,
-                    migration.name,
-                )
-                executed.append(migration.version)
-            return tuple(executed)
+            async with connection.transaction():
+                await connection.execute(self.TABLE_SQL)
+                applied = await self._applied_versions(connection)
+                executed: list[int] = []
+                for migration in ordered:
+                    if migration.version in applied:
+                        continue
+                    await connection.execute(migration.sql)
+                    await connection.execute(
+                        "INSERT INTO schema_migrations (version, name) VALUES ($1, $2)",
+                        migration.version,
+                        migration.name,
+                    )
+                    executed.append(migration.version)
+                return tuple(executed)
         finally:
             await connection.close()
 
