@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime, timedelta, timezone
+from threading import Lock
 from typing import Protocol
 
 from advance_system.observability.api import TerminalViewResponse, ViewName, unavailable_view
@@ -20,6 +22,39 @@ class TerminalSnapshotProvider(Protocol):
     def snapshot(self, view: ViewName) -> TerminalSnapshot | None:
         """Return a validated provider snapshot, or None when the provider has no data."""
         ...
+
+
+class ValidatedTerminalSnapshotStore:
+    """Thread-safe store for snapshots already validated by an authoritative source.
+
+    Publishing requires an aware observation timestamp. The store never creates market
+    or account values; expired observations are withheld so the terminal fails closed.
+    """
+
+    def __init__(self, *, max_age: timedelta) -> None:
+        if max_age <= timedelta(0):
+            raise ValueError("max_age must be positive")
+        self._max_age = max_age
+        self._snapshots: dict[ViewName, tuple[TerminalSnapshot, datetime]] = {}
+        self._lock = Lock()
+
+    def publish(self, snapshot: TerminalSnapshot, *, observed_at: datetime) -> None:
+        if observed_at.tzinfo is None or observed_at.utcoffset() is None:
+            raise ValueError("observed_at must be timezone-aware")
+        if not snapshot.view:
+            raise ValueError("snapshot view is required")
+        with self._lock:
+            self._snapshots[snapshot.view] = (snapshot, observed_at.astimezone(timezone.utc))
+
+    def snapshot(self, view: ViewName) -> TerminalSnapshot | None:
+        with self._lock:
+            entry = self._snapshots.get(view)
+        if entry is None:
+            return None
+        snapshot, observed_at = entry
+        if datetime.now(timezone.utc) - observed_at > self._max_age:
+            return None
+        return snapshot
 
 
 class TerminalDataService:
