@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 
 from advance_system.storage.contracts import StorageConfig
-from advance_system.storage.postgres import PostgresOperationalStore
+from advance_system.storage.postgres import AsyncpgConnectionFactory, PostgresOperationalStore
 
 
 class FakeTransaction:
@@ -136,3 +136,47 @@ async def test_postgres_rejects_empty_statement(config: StorageConfig) -> None:
     store = PostgresOperationalStore(config, factory)
     with pytest.raises(ValueError, match="statement"):
         await store.execute("   ")
+
+
+@pytest.mark.asyncio
+async def test_asyncpg_factory_returns_connection_to_pool(monkeypatch: pytest.MonkeyPatch) -> None:
+    connection = FakeConnection()
+
+    class FakePool:
+        def __init__(self) -> None:
+            self.released: list[object] = []
+            self.closed = False
+
+        async def acquire(self) -> FakeConnection:
+            return connection
+
+        async def release(self, acquired: object) -> None:
+            self.released.append(acquired)
+
+        async def close(self) -> None:
+            self.closed = True
+
+    pool = FakePool()
+
+    class FakeAsyncpg:
+        @staticmethod
+        async def create_pool(*, dsn: str, min_size: int, max_size: int) -> FakePool:
+            assert dsn == "postgresql://db.example/ats"
+            assert min_size == 2
+            assert max_size == 4
+            return pool
+
+    monkeypatch.setitem(__import__("sys").modules, "asyncpg", FakeAsyncpg)
+    factory = AsyncpgConnectionFactory("postgresql://db.example/ats", min_size=2, max_size=4)
+
+    acquired = await factory()
+    await acquired.execute("SELECT 1")
+    await acquired.close()
+    await acquired.close()
+
+    assert connection.calls == [("SELECT 1", ())]
+    assert pool.released == [connection]
+    assert connection.closed is False
+
+    await factory.close()
+    assert pool.closed is True
