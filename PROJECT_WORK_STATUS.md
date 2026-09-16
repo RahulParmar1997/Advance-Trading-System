@@ -31,7 +31,9 @@
 - [x] Verified GitHub Actions Run 472 (`35060805365`) on commit `2176a0e2e8e94f722954eeaf5cdb77d58be4cc48`: Ruff, Pytest, and Docker Compose configuration validation all completed successfully.
 - [x] Hardened `HealthChecker.check()` so an empty check set fails closed instead of being treated as healthy by `all([])`.
 - [x] Added deterministic unit coverage for the empty health-check fail-closed contract.
-- [x] Verified GitHub Actions Run 472 before the health-boundary change; the new health change requires a fresh Actions run for verification.
+- [x] Verified the health-boundary hardening through GitHub Actions Run 475 (`35060996702`) on commit `bf872eedf347d4716704f7b4d8e957cda318dbe6`: Ruff, Pytest, and Docker Compose configuration validation all completed successfully.
+- [x] Added a GitHub Actions Docker Compose runtime smoke test that builds and starts the backend/Prometheus stack, verifies backend `/metrics`, Prometheus `/-/ready`, PostgreSQL readiness, ClickHouse ping, Redis ping, and Prometheus's backend target health/scrape URL.
+- [x] Kept runtime smoke validation PAPER-only and observational; the test starts no frontend execution path and grants no broker, RiskEngine or OMS authority.
 - [x] Inspected the current health boundary and preserved observational-only semantics; health checks have no RiskEngine, OMS, broker or execution authority.
 - [x] Inspected GitHub Actions Run 451 (`34965141139`): Ruff passed and Pytest reported exactly 3 failures / 323 passes, all rooted in integer metric formatting; the failures were corrected directly on `main`.
 - [x] Verified GitHub Actions Run 444 on commit `25c7732d502b046df185c477cd3eb595ff4461df`: Ruff and Pytest both passed successfully.
@@ -62,10 +64,10 @@
 ## Pending work
 
 ### Infrastructure / operations
-- [x] Fresh GitHub Actions verification for the latest Docker Compose CI guard.
-- [ ] Fresh GitHub Actions verification for the empty-health-check hardening change.
-- [ ] Runtime end-to-end monitoring validation against an actually running Prometheus/backend stack. Repository wiring and GitHub Actions tests are verified; runtime deployment has not been executed in this environment.
-- [ ] Full deployment/integration validation against configured PostgreSQL, ClickHouse and Redis services.
+- [x] Fresh GitHub Actions verification for the empty-health-check hardening change.
+- [ ] Fresh GitHub Actions verification of the new Docker Compose runtime smoke test.
+- [ ] Runtime end-to-end monitoring validation outside CI against an actually running deployment environment, if a persistent environment is required. The new CI smoke test provides real container execution on GitHub-hosted runners but is not a production deployment validation.
+- [ ] Full deployment/integration validation against configured PostgreSQL, ClickHouse and Redis application storage operations.
 
 ## Non-negotiable architecture rules
 - AI never bypasses RiskEngine or places uncontrolled orders.
@@ -83,7 +85,7 @@
 - Research compute must never place orders, mutate positions/balances or bypass RiskEngine → OMS.
 
 ## Current next task
-Verify the health-boundary hardening through GitHub Actions, then continue runtime validation in an environment with Docker/network access. Runtime validation must verify backend `/metrics`, Prometheus `/-/ready`, Prometheus scraping `backend:8000/metrics`, and PostgreSQL/ClickHouse/Redis connectivity. Until a real stack run is executed, do not claim runtime monitoring or database integration success.
+Verify the new Docker Compose runtime smoke test through GitHub Actions. If it passes, retain the CI evidence and proceed to application-level PostgreSQL/ClickHouse/Redis integration validation; do not treat container readiness alone as proof that application storage operations are working. Runtime deployment outside CI remains environment-dependent.
 
 ## CI note
-Run 472 (`35060805365`) on commit `2176a0e2e8e94f722954eeaf5cdb77d58be4cc48` completed successfully with Ruff, Pytest, and `docker compose config --quiet` passing. The subsequent health-boundary hardening is on `main` in commit `fe2678e1c55cfbb913ce5b8db563abafe9ebcdff` and requires a fresh GitHub Actions verification. Runtime monitoring and database-service integration remain unverified until the stack can be executed.
+Run 475 (`35060996702`) on commit `bf872eedf347d4716704f7b4d8e957cda318dbe6`) completed successfully with Ruff, Pytest, and Docker Compose configuration validation. This run predates the new runtime smoke step. The runtime smoke change is on `main` in commit `dc97aec623fd30748c52cf5313340e88d2178fb4 and requires a fresh Actions run.
