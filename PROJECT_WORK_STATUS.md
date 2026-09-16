@@ -28,6 +28,11 @@
 - [x] Verified GitHub Actions Run 471 (`35059806411`) on commit `5d467fe8b8eb43678f3929b08ccd374a91285fb4`: Ruff, Pytest, and the Docker Compose configuration validation step all completed successfully.
 - [x] Confirmed the latest CI guard validates Compose configuration only; it does not claim service startup, network connectivity, or runtime monitoring success.
 - [x] Inspected the repository deployment configuration and confirmed Prometheus readiness is health-gated after backend readiness; actual runtime remains unverified.
+- [x] Verified GitHub Actions Run 472 (`35060805365`) on commit `2176a0e2e8e94f722954eeaf5cdb77d58be4cc48`: Ruff, Pytest, and Docker Compose configuration validation all completed successfully.
+- [x] Hardened `HealthChecker.check()` so an empty check set fails closed instead of being treated as healthy by `all([])`.
+- [x] Added deterministic unit coverage for the empty health-check fail-closed contract.
+- [x] Verified GitHub Actions Run 472 before the health-boundary change; the new health change requires a fresh Actions run for verification.
+- [x] Inspected the current health boundary and preserved observational-only semantics; health checks have no RiskEngine, OMS, broker or execution authority.
 - [x] Inspected GitHub Actions Run 451 (`34965141139`): Ruff passed and Pytest reported exactly 3 failures / 323 passes, all rooted in integer metric formatting; the failures were corrected directly on `main`.
 - [x] Verified GitHub Actions Run 444 on commit `25c7732d502b046df185c477cd3eb595ff4461df`: Ruff and Pytest both passed successfully.
 - [x] Corrected the remaining GitHub Actions Ruff import-order/spacing failures in `test_research_results.py` and pushed the fixes directly to `main`.
@@ -58,6 +63,7 @@
 
 ### Infrastructure / operations
 - [x] Fresh GitHub Actions verification for the latest Docker Compose CI guard.
+- [ ] Fresh GitHub Actions verification for the empty-health-check hardening change.
 - [ ] Runtime end-to-end monitoring validation against an actually running Prometheus/backend stack. Repository wiring and GitHub Actions tests are verified; runtime deployment has not been executed in this environment.
 - [ ] Full deployment/integration validation against configured PostgreSQL, ClickHouse and Redis services.
 
@@ -77,7 +83,7 @@
 - Research compute must never place orders, mutate positions/balances or bypass RiskEngine → OMS.
 
 ## Current next task
-Runtime validation is the next infrastructure blocker: execute the Docker Compose stack in an environment with Docker/network access, verify backend `/metrics` and Prometheus `/-/ready`, confirm Prometheus can scrape `backend:8000/metrics`, then validate PostgreSQL/ClickHouse/Redis connectivity. Until a real stack run is executed, do not claim runtime monitoring or database integration success.
+Verify the health-boundary hardening through GitHub Actions, then continue runtime validation in an environment with Docker/network access. Runtime validation must verify backend `/metrics`, Prometheus `/-/ready`, Prometheus scraping `backend:8000/metrics`, and PostgreSQL/ClickHouse/Redis connectivity. Until a real stack run is executed, do not claim runtime monitoring or database integration success.
 
 ## CI note
-Run 471 (`35059806411`) on commit `5d467fe8b8eb43678f3929b08ccd374a91285fb4` completed successfully. Its `quality` job passed Ruff, Pytest, and `docker compose config --quiet`. The Compose guard therefore has fresh GitHub Actions verification. Runtime monitoring and database-service integration remain unverified until the stack can be executed.
+Run 472 (`35060805365`) on commit `2176a0e2e8e94f722954eeaf5cdb77d58be4cc48` completed successfully with Ruff, Pytest, and `docker compose config --quiet` passing. The subsequent health-boundary hardening is on `main` in commit `fe2678e1c55cfbb913ce5b8db563abafe9ebcdff` and requires a fresh GitHub Actions verification. Runtime monitoring and database-service integration remain unverified until the stack can be executed.
