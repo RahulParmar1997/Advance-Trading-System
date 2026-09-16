@@ -6,7 +6,7 @@ from threading import Thread
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
-from advance_system.observability.api import VIEW_PATHS, TerminalViewResponse, unavailable_view
+from advance_system.observability.api import VIEW_PATHS, TerminalViewResponse, ViewName, unavailable_view
 from advance_system.observability.metrics import MetricSample, MetricsRegistry
 from advance_system.observability.server import TerminalObservabilityHandler
 
@@ -21,6 +21,11 @@ def test_terminal_view_contract_is_versioned_and_does_not_fabricate_data() -> No
     assert response.available is False
     assert response.reason == "data_feed_not_connected"
     assert response.data is None
+
+
+def test_terminal_view_name_remains_a_runtime_string_contract() -> None:
+    assert ViewName is str
+    assert isinstance("portfolio", ViewName)
 
 
 def test_all_terminal_views_have_explicit_read_only_routes() -> None:
