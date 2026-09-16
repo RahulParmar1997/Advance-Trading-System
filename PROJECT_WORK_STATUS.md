@@ -24,12 +24,13 @@
 - [x] Verified GitHub Actions Run 487 (`35062475086`) on commit `adfaba2be8ea07b4c35831910f5f47d6e7bb2958`: Ruff passed, Pytest passed (332 tests), Compose configuration validation passed, and the full Docker Compose runtime smoke test passed.
 - [x] Added `backend/tests/integration/test_storage_services.py` covering real PostgreSQL temporary-table write/read, ClickHouse query execution, and Redis set/get/delete operations against the Compose services.
 - [x] Isolated Docker-dependent integration tests from the normal unit pytest invocation with an explicit `integration` marker and CI `-m "not integration"` unit-suite selection.
-- [x] Committed the integration-test isolation fix directly to `main` as `fb9a2e697cab7f32cf3020fd4fed9f6e03259c44`.
+- [x] Diagnosed Run 495 (`35063440412`) failure: unit validation passed (332 tests), but the runtime smoke invoked the integration test from repository root, so pytest could not resolve `tests/integration/test_storage_services.py`.
+- [x] Corrected the runtime smoke to execute the storage integration test from `backend` while retaining Docker Compose execution from repository root.
 
 ## Pending work
 
 ### Infrastructure / operations
-- [ ] Fresh GitHub Actions verification of the integration-test isolation fix and full Docker Compose runtime smoke, including the explicit storage application integration test.
+- [ ] Fresh GitHub Actions verification of the corrected integration-test working-directory fix and full Docker Compose runtime smoke, including the explicit storage integration test.
 - [ ] Runtime end-to-end monitoring validation outside CI against an actually running deployment environment, if a persistent environment is required. The CI smoke test provides real container execution on GitHub-hosted runners but is not a production deployment validation.
 - [ ] Extend application-level integration coverage to the concrete adapter/factory implementations where vendor drivers are introduced; current service integration verifies the deployed database/cache operations themselves.
 
@@ -49,7 +50,7 @@
 - Research compute must never place orders, mutate positions/balances or bypass RiskEngine → OMS.
 
 ## Current next task
-Freshly verify the corrected CI test isolation and Docker Compose storage integration path. Run 492 (`35062956646`) on commit `bfd7fe0a6dcb347f5ae9cf8eb5f20b87f03bf7ef` exposed a test-contract defect: the Docker-dependent integration test was collected by the normal unit pytest step before Compose services and `POSTGRES_PASSWORD` were provisioned. The fix marks that test as `integration` and excludes integration tests from the unit suite; the runtime smoke explicitly runs the integration test after starting and validating PostgreSQL, ClickHouse and Redis. A fresh Actions run is required before claiming the new storage integration path is verified. If it passes, proceed to the next persistence/application integration gap. Runtime deployment outside CI remains environment-dependent.
+Verify the working-directory correction for the Docker-dependent storage integration test. Run 495 (`35063440412`) on `e55fe46a7bf398edf4dd6df8f4ebc45ceced4637` failed with exactly one runtime-smoke error because the test path was evaluated from repository root. The corrected workflow runs `(cd backend && python -m pytest tests/integration/test_storage_services.py -m integration -q)` after PostgreSQL, ClickHouse and Redis readiness. Do not claim CI green until the fresh Actions run completes successfully. If it passes, proceed to the next persistence/application integration gap. Runtime deployment outside CI remains environment-dependent.
 
 ## CI note
-Run 487 (`35062475086`) on `adfaba2be8ea07b4c35831910f5f47d6e7bb2958` is verified successful for Ruff, 332 unit tests, Compose configuration validation and Docker Compose runtime smoke. Run 492 (`35062956646`) on `bfd7fe0a6dcb347f5ae9cf8eb5f20b87f03bf7ef` failed at the normal pytest step with exactly 1 integration-test failure and 332 passing tests; the failure was caused by `docker compose exec` running before Compose services/environment were provisioned. This has been corrected by separating integration-test selection from the unit suite. The corrected files are committed on `main`; fresh Actions verification is still required.
+Run 487 (`35062475086`) on `adfaba2be8ea07b4c35831910f5f47d6e7bb2958` is verified successful for Ruff, 332 unit tests, Compose configuration validation and Docker Compose runtime smoke. Run 492 (`35062956646`) on `bfd7fe0a6dcb347f5ae9cf8eb5f20b87f03bf7ef` failed at normal pytest with exactly 1 integration-test failure and 332 passing tests because the Docker-dependent test ran before Compose services/environment were provisioned. Run 495 (`35063440412`) on `e55fe46a7bf398edf4dd6df8f4ebc45ceced4637` then verified the isolation itself: Ruff passed, 332 unit tests passed, and Compose configuration passed, but runtime smoke failed because the integration test path was resolved from repository root. The working-directory correction is now committed on `main` as `432dace611bbbc746468dcb107ee7460cd4a2939`; fresh Actions verification is required.
