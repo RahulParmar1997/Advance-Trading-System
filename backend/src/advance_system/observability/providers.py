@@ -29,7 +29,8 @@ class ValidatedTerminalSnapshotStore:
 
     Publishing requires an aware, non-future observation timestamp. The store never
     creates market or account values; expired observations are withheld so the terminal
-    fails closed.
+    fails closed. Observations must also arrive monotonically per view so stale upstream
+    events cannot roll back a newer terminal state.
     """
 
     def __init__(self, *, max_age: timedelta) -> None:
@@ -48,6 +49,15 @@ class ValidatedTerminalSnapshotStore:
         if normalized > datetime.now(timezone.utc):
             raise ValueError("observed_at cannot be in the future")
         with self._lock:
+            existing = self._snapshots.get(snapshot.view)
+            if existing is not None:
+                _, existing_observed_at = existing
+                if normalized < existing_observed_at:
+                    raise ValueError("observed_at cannot be older than stored snapshot")
+                if normalized == existing_observed_at and snapshot != existing[0]:
+                    raise ValueError("conflicting snapshot at stored observation timestamp")
+                if normalized == existing_observed_at:
+                    return
             self._snapshots[snapshot.view] = (snapshot, normalized)
 
     def snapshot(self, view: ViewName) -> TerminalSnapshot | None:
