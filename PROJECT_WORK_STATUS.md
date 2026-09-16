@@ -28,13 +28,15 @@
 - [x] Corrected the runtime smoke to execute the storage integration test from `backend` while retaining Docker Compose execution from repository root.
 - [x] Diagnosed Run 497 (`35063728912`) storage integration assertion failure: PostgreSQL `psql -tAc` emitted command-status lines (`CREATE TABLE`, `INSERT 0 1`) in addition to the selected value.
 - [x] Hardened the PostgreSQL integration assertion to use quiet, tuples-only, unaligned output (`-qAt`) so the test validates the returned value deterministically.
+- [x] Fixed the concrete `AsyncpgConnectionFactory` lifecycle so acquired pooled connections are returned with `pool.release()` when the store closes them, rather than calling the raw asyncpg connection's `close()`.
+- [x] Added unit coverage proving pooled connections delegate operations, return exactly once to the pool, and remain open at the driver-connection level until pool shutdown.
 
 ## Pending work
 
 ### Infrastructure / operations
-- [ ] Fresh GitHub Actions verification of the PostgreSQL integration assertion fix and full Docker Compose runtime smoke, including the explicit storage integration test.
+- [ ] Fresh GitHub Actions verification of the pooled PostgreSQL connection lifecycle fix and full Docker Compose runtime smoke, including the explicit storage integration test.
 - [ ] Runtime end-to-end monitoring validation outside CI against an actually running deployment environment, if a persistent environment is required. The CI smoke test provides real container execution on GitHub-hosted runners but is not a production deployment validation.
-- [ ] Extend application-level integration coverage to the concrete adapter/factory implementations where vendor drivers are introduced; current service integration verifies the deployed database/cache operations themselves.
+- [ ] Extend application-level integration coverage to the concrete adapter/factory implementations where additional vendor drivers are introduced.
 
 ## Non-negotiable architecture rules
 - AI never bypasses RiskEngine or places uncontrolled orders.
@@ -52,7 +54,7 @@
 - Research compute must never place orders, mutate positions/balances or bypass RiskEngine → OMS.
 
 ## Current next task
-Verify the PostgreSQL integration assertion fix in GitHub Actions. Run 497 (`35063728912`) on `e63a612153f76b998b59fd386cbeab6f929a6abd` reached the storage integration test successfully but failed exactly one assertion because `psql -tAc` returned command-status lines along with `42`. The test now uses `-qAt`; do not claim CI green until the fresh Actions run completes successfully. If it passes, proceed to the next persistence/application integration gap. Runtime deployment outside CI remains environment-dependent.
+Verify the fresh GitHub Actions run for the pooled PostgreSQL connection lifecycle fix. Do not claim CI green until that run completes successfully. If it passes, continue with the next highest-priority persistence/application integration gap.
 
 ## CI note
-Run 487 (`35062475086`) on `adfaba2be8ea07b4c35831910f5f47d6e7bb2958` is verified successful for Ruff, 332 unit tests, Compose configuration validation and Docker Compose runtime smoke. Run 492 (`35062956646`) on `bfd7fe0a6dcb347f5ae9cf8eb5f20b87f03bf7ef` failed at normal pytest with exactly 1 integration-test failure and 332 passing tests because the Docker-dependent test ran before Compose services/environment were provisioned. Run 495 (`35063440412`) on `e55fe46a7bf398edf4dd6df8f4ebc45ceced4637` then verified the isolation itself: Ruff passed, 332 unit tests passed, and Compose configuration passed, but runtime smoke failed because the integration test path was resolved from repository root. The working-directory correction was committed on `main` as `432dace611bbbc746468dcb107ee7460cd4a2939`. Run 497 (`35063728912`) on `e63a612153f76b998b59fd386cbeab6f929a6abd` confirmed the path correction reached the test but exposed a PostgreSQL output-format assertion defect; Ruff, 332 unit tests and Compose configuration passed before the single integration assertion failure. The `-qAt` fix is now committed on `main` as `001d8112192334ae16136e1753287ed0b5cc5b33`; fresh Actions verification is required.
+Run 499 (`35064305638`) on `436cc93772538b86138fe7c2b372438472e7b416` is the latest verified successful baseline: Ruff passed, 332 unit tests passed, Compose configuration validation passed, and the full Docker Compose runtime smoke/storage integration passed. Earlier Run 497 (`35063728912`) exposed the PostgreSQL integration output-format defect; the `-qAt` correction was committed before Run 499. The pooled PostgreSQL lifecycle fix is now committed on `main`; fresh Actions verification is required.
