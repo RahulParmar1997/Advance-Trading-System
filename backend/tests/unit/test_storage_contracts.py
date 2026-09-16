@@ -5,7 +5,14 @@ from datetime import datetime, timezone
 import pytest
 
 from advance_system.storage.clickhouse import ClickHouseAnalyticsStore
-from advance_system.storage.contracts import ParquetStore, StorageConfig, StorageMode
+from advance_system.storage.contracts import (
+    ClickHouseStore,
+    ParquetStore,
+    PostgreSQLStore,
+    RedisStore,
+    StorageConfig,
+    StorageMode,
+)
 from advance_system.storage.parquet import ImmutableParquetStore, ResearchDatasetRef
 from advance_system.storage.postgres import PostgresOperationalStore
 from advance_system.storage.redis import RedisHotStateStore
@@ -89,20 +96,26 @@ def test_storage_config_does_not_use_http_for_parquet_root() -> None:
 
 
 @pytest.mark.asyncio
-async def test_concrete_parquet_adapter_conforms_to_storage_contract() -> None:
-    adapter = ImmutableParquetStore(valid_config(), FakeObjectStore())
-    assert isinstance(adapter, ParquetStore)
+async def test_concrete_storage_adapters_conform_to_runtime_contracts() -> None:
+    parquet = ImmutableParquetStore(valid_config(), FakeObjectStore())
 
-    manifest = await adapter.write_dataset(
+    assert isinstance(PostgresOperationalStore, type)
+    assert isinstance(ClickHouseAnalyticsStore, type)
+    assert isinstance(RedisHotStateStore, type)
+    assert isinstance(ImmutableParquetStore, type)
+
+    postgres = PostgresOperationalStore(valid_config(), lambda: None)  # type: ignore[arg-type]
+    clickhouse = ClickHouseAnalyticsStore(valid_config(), lambda: None)  # type: ignore[arg-type]
+    redis = RedisHotStateStore(valid_config(), lambda: None)  # type: ignore[arg-type]
+
+    assert isinstance(postgres, PostgreSQLStore)
+    assert isinstance(clickhouse, ClickHouseStore)
+    assert isinstance(redis, RedisStore)
+    assert isinstance(parquet, ParquetStore)
+
+    manifest = await parquet.write_dataset(
         ResearchDatasetRef("features", "v1"),
         b"PAR1contract",
         created_at=datetime(2026, 9, 16, tzinfo=timezone.utc),
     )
     assert manifest.dataset == "features"
-
-
-def test_storage_adapters_are_concrete_classes() -> None:
-    assert isinstance(PostgresOperationalStore, type)
-    assert isinstance(ClickHouseAnalyticsStore, type)
-    assert isinstance(RedisHotStateStore, type)
-    assert isinstance(ImmutableParquetStore, type)
