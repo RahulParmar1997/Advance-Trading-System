@@ -1,8 +1,14 @@
 from __future__ import annotations
 
+from datetime import datetime, timezone
+
 import pytest
 
-from advance_system.storage.contracts import StorageConfig, StorageMode
+from advance_system.storage.clickhouse import ClickHouseAnalyticsStore
+from advance_system.storage.contracts import ParquetStore, StorageConfig, StorageMode
+from advance_system.storage.parquet import ImmutableParquetStore, ResearchDatasetRef
+from advance_system.storage.postgres import PostgresOperationalStore
+from advance_system.storage.redis import RedisHotStateStore
 
 
 def valid_config() -> StorageConfig:
@@ -12,6 +18,20 @@ def valid_config() -> StorageConfig:
         redis_url="rediss://cache.example:6379/0",
         parquet_root="s3://ats-research",
     )
+
+
+class FakeObjectStore:
+    async def exists(self, key: str) -> bool:
+        return False
+
+    async def read(self, key: str) -> bytes:
+        raise KeyError(key)
+
+    async def write_if_absent(self, key: str, payload: bytes) -> bool:
+        return True
+
+    async def healthcheck(self) -> bool:
+        return True
 
 
 def test_storage_config_validates_all_backend_endpoints() -> None:
@@ -66,3 +86,23 @@ def test_storage_config_does_not_use_http_for_parquet_root() -> None:
 
     with pytest.raises(ValueError, match="parquet_root"):
         config.validate()
+
+
+@pytest.mark.asyncio
+async def test_concrete_parquet_adapter_conforms_to_storage_contract() -> None:
+    adapter = ImmutableParquetStore(valid_config(), FakeObjectStore())
+    assert isinstance(adapter, ParquetStore)
+
+    manifest = await adapter.write_dataset(
+        ResearchDatasetRef("features", "v1"),
+        b"PAR1contract",
+        created_at=datetime(2026, 9, 16, tzinfo=timezone.utc),
+    )
+    assert manifest.dataset == "features"
+
+
+def test_storage_adapters_are_concrete_classes() -> None:
+    assert isinstance(PostgresOperationalStore, type)
+    assert isinstance(ClickHouseAnalyticsStore, type)
+    assert isinstance(RedisHotStateStore, type)
+    assert isinstance(ImmutableParquetStore, type)
