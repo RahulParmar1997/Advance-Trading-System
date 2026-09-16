@@ -29,3 +29,51 @@ jobs:
         env:
           POSTGRES_PASSWORD: ci-validation-password
         run: docker compose config --quiet
+      - name: Run Docker Compose runtime smoke test
+        env:
+          POSTGRES_PASSWORD: ci-runtime-password
+          ATS_METRICS_PORT: 18000
+          ATS_PROMETHEUS_PORT: 19090
+          ATS_FRONTEND_PORT: 13000
+        run: |
+          set -euo pipefail
+          cleanup() {
+            docker compose down --volumes --remove-orphans
+          }
+          trap cleanup EXIT
+
+          docker compose up -d --build backend prometheus
+          docker compose ps
+
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:18000/metrics | grep -q '^ats_process_up 1'; then
+              break
+            fi
+            if [ "$attempt" -eq 30 ]; then
+              echo 'Backend /metrics did not become ready.' >&2
+              docker compose logs backend prometheus >&2 || true
+              exit 1
+            fi
+            sleep 2
+          done
+
+          curl --fail --silent http://127.0.0.1:19090/-/ready >/dev/null
+
+          docker compose exec -T postgres pg_isready -U advance_trading -d advance_trading
+          docker compose exec -T clickhouse wget -qO- http://127.0.0.1:8123/ping | grep -q '^Ok\.?$'
+          docker compose exec -T redis redis-cli ping | grep -q '^PONG$'
+
+          curl --fail --silent 'http://127.0.0.1:19090/api/v1/targets' > /tmp/prometheus-targets.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          payload = json.loads(Path('/tmp/prometheus-targets.json').read_text())
+          targets = payload['data']['activeTargets']
+          backend = next(
+              target for target in targets
+              if target.get('labels', {}).get('job') == 'advance-trading-backend'
+          )
+          assert backend['health'] == 'up', backend
+          assert backend['scrapeUrl'].endswith('/metrics'), backend
+          PY
