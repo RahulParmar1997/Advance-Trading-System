@@ -18,7 +18,7 @@
 - [x] Added deterministic HTTP contract tests for versioning, all routes, JSON response shape and rejection of POST.
 - [x] Added a provider-owned `TerminalSnapshot` boundary and `TerminalDataService`; terminal HTTP routes now consume that service rather than constructing view payloads themselves.
 - [x] Added deterministic provider-service tests covering unavailable state, exact snapshot passthrough, view mismatch fail-closed behavior and all four terminal views.
-- [x] Diagnosed the persistent Ruff I001 issue in `observability/api.py` using GitHub Actions feedback and iteratively corrected the import grouping on `main`.
+- [x] Corrected the persistent Ruff I001 import-layout issue in `observability/api.py` by restoring the required blank line after the standard-library import block and committed the fix directly on `main` as `122154a080a2e5b6f0bda5f1bd90aed9ab4faf93`.
 
 ## Pending work
 ### Frontend / terminal
@@ -30,10 +30,10 @@
 - [ ] Extend application-level integration coverage to additional concrete vendor adapter/factory implementations when those drivers are introduced.
 
 ## Current task
-Complete GitHub verification of the terminal API import-layout correction, then continue connecting concrete authoritative market-data and account/read-only providers at application composition time without fabricating data or creating execution authority.
+Verify the `122154a080a2e5b6f0bda5f1bd90aed9ab4faf93` terminal API import-layout correction through GitHub Actions. Only after CI is verified should the next task begin: connecting concrete authoritative market-data and account/read-only providers at application composition time without fabricating data or creating execution authority.
 
 ## Latest verified CI state
-Runs 568 (`35079804364`), 569 (`35080360349`), 570 (`35080510997`), 571 (`35080647090`) and 572 (`35080710642`) all failed at Ruff I001 in `backend/src/advance_system/observability/api.py`; pytest and later stages were skipped. Their logs were used to apply the successive import-layout corrections. The current `main` HEAD is `44b9ab7c5c8429073b32dd51f1b74051de1d76dd`, with GitHub Actions Run 574 (`35080835719`) queued/pending verification. Run 549 (`35076782833`) remains the latest fully verified successful baseline.
+Runs 568 (`35079804364`), 569 (`35080360349`), 570 (`35080510997`), 571 (`35080647090`), 572 (`35080710642`) and 574 (`35080835719`) failed at Ruff I001 in `backend/src/advance_system/observability/api.py`; pytest and later stages were skipped. The latest implementation correction is `122154a080a2e5b6f0bda5f1bd90aed9ab4faf93` on `main`. GitHub Actions Run 577 (`35081260014`) for that correction is currently in progress; Ruff has not yet completed, so the latest HEAD is not yet verified green. Run 549 (`35076782833`) remains the latest fully verified successful baseline.
 
 ## Architectural decisions
 - Mandatory execution path remains `Market Data → Validation → Market Intelligence → Scanner → Trade Type → Strategy → Probability/EV → RiskEngine → OMS → Execution`.
