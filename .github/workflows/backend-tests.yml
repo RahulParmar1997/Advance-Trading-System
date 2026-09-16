@@ -57,7 +57,17 @@ jobs:
             sleep 2
           done
 
-          curl --fail --silent http://127.0.0.1:19090/-/ready >/dev/null
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:19090/-/ready >/dev/null; then
+              break
+            fi
+            if [ "$attempt" -eq 30 ]; then
+              echo 'Prometheus did not become ready.' >&2
+              docker compose logs backend prometheus >&2 || true
+              exit 1
+            fi
+            sleep 2
+          done
 
           docker compose exec -T postgres pg_isready -U advance_trading -d advance_trading
           docker compose exec -T clickhouse wget -qO- http://127.0.0.1:8123/ping | grep -q '^Ok\.?$'
