@@ -37,3 +37,11 @@ def test_backend_healthcheck_probes_metrics_endpoint_before_prometheus_starts() 
     assert "healthcheck:" in compose
     assert "http://127.0.0.1:8000/metrics" in compose
     assert "condition: service_healthy" in compose
+
+
+def test_prometheus_healthcheck_probes_readiness_endpoint() -> None:
+    compose = (REPOSITORY_ROOT / "docker-compose.yml").read_text(encoding="utf-8")
+
+    assert "http://127.0.0.1:9090/-/ready" in compose
+    assert "  prometheus:" in compose
+    assert compose.count("condition: service_healthy") >= 4
