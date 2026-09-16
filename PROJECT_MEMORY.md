@@ -10,96 +10,53 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 
 ## Architecture invariants
 - Market Event → Normalization → Validation → Candle → Features → Market State → Strategy → Opportunity → Probability/EV → RiskEngine → OMS → Paper Fill → Position → P&L → Journal.
-- AI must never bypass RiskEngine or place uncontrolled orders.
-- Strategy logic must be deterministic, testable, network-independent and database-independent.
+- AI/HPC never bypasses RiskEngine or places uncontrolled orders.
+- Strategy logic is deterministic, testable, network-independent and database-independent.
 - Broker-specific code stays behind adapter boundaries.
-- Observed market data must remain distinguishable from model-derived estimates.
-- Backtests must be chronology-safe and free of look-ahead bias.
+- Observed market data and model-derived estimates remain distinguishable.
+- Backtests are chronology-safe and free of look-ahead bias.
 - PAPER remains the default.
-- Work directly on `main`; do not create feature branches unless explicitly requested.
+- Work directly on `main`.
 
 ## Completed foundation
-- Python backend package with pytest/Ruff and GitHub Actions quality workflow.
-- Versioned domain contracts and compatibility validation.
-- Structured JSON logging with recursive secret redaction.
-- Deterministic health/readiness checks.
-- Canonical broker-neutral QuoteEvent and market-data normalization.
-- Multi-timeframe, session-aware candle engine with volume delta.
-- Deterministic data-quality service.
-- Versioned/content-addressed instrument-master snapshots and monotonic publication.
-- Upstox BOD JSON instrument-master parser/source boundary.
-- Upstox V3 protobuf decoder boundary and vendored/pinned schema boundary.
-- Real `websockets` transport with injectable connector/decoder.
-- India market-session calendar and authoritative market-status contract/source.
-- RiskEngine freshness/fail-closed market-status gate.
-- Market structure, liquidity, FVG, order-block and regime primitives.
-- Unified MarketState foundation.
-- Displacement feature engine using only prior completed candles.
-- Volume-profile and order-flow analytics with explicit feed-capability boundaries.
-- Futures/options contract metadata and option-chain validation.
-- Deterministic Black-Scholes option Greeks and implied-volatility solver.
-- Deterministic futures basis analytics.
-- Deterministic breadth and sector analytics from explicit constituent observations.
-- Deterministic sector rotation ranking from constituent returns and optional explicit benchmark return.
-- Explicit FII/DII institutional-flow aggregation from observed flow records; no inference from price/volume.
-- Explicit MarketContextEngine joining completed-candle regime classification with market-session metadata and rejecting chronology/session/instrument inconsistencies.
-- Deterministic Wyckoff-style event features from completed candles and explicit candle volume.
-- Rich scanner result contract with explicit evidence and deterministic explanations.
-- Multi-symbol / multi-timeframe scanner orchestration with explicit scope identity and deterministic ordering.
-- Deterministic evidence-based scanner scoring.
-- Historical probability calibration and leakage-safe OOS validation.
-- Immutable append-only audit evidence persistence for scanner, scoring, probability and risk decisions.
-- Upstox broker reconciliation adapter translating authoritative order/fill responses into broker-neutral snapshots and fills with identity and timestamp validation.
-
-## Durable journal backend
-`journal/durable.py` provides `JsonlAuditJournal` and `JournalCheckpoint`. The journal is append-only and persists one validated `AuditEvent` per JSONL record. Startup reload validates every record and rejects malformed or duplicate entries fail-closed. Appends flush the record before updating in-memory indexes. Checkpoints expose event count and last event id without adding execution capability. This backend is intended for PAPER/local durability and remains separate from broker execution authority; a database-backed production journal can replace it behind the same conceptual boundary.
-
-## Audit evidence persistence
-`audit/evidence.py` defines immutable, content-addressed audit records for scanner, score, probability and risk decisions. Audit evidence is observational provenance only and cannot authorize or submit orders.
-
-## Broker reconciliation adapter
-`reconciliation/upstox.py` defines `UpstoxReconciliationAdapter` behind an injected `UpstoxOrderApi`. It translates authoritative broker order details/fills into broker-neutral contracts and rejects identity/timestamp/quantity errors. It has no order-submission capability.
-
-## Persistence / execution hardening
-- PostgreSQL operational adapter has explicit pooled connection lifecycle with acquired connections returned to the pool exactly once.
-- `AsyncpgConnectionFactory` serializes lazy pool creation so concurrent first callers share one pool instead of racing to create multiple PostgreSQL pools.
-- PAPER OMS idempotency fails closed when a client idempotency key is presented with a different order ID; it never silently replays the original order under a mismatched identity.
-- `MigrationRunner` always closes/releases its acquired PostgreSQL migration connection, including migration failure paths.
-- `MigrationRunner` executes migration SQL and `schema_migrations` bookkeeping in one transaction so partial migration application rolls back atomically.
-- Migration tests cover commit, rollback, idempotency and connection cleanup.
-- The `ParquetStore` application protocol matches the concrete immutable adapter's versioned dataset reference, manifest and dataset read/write API, with deterministic runtime conformance coverage.
-- PostgreSQL, ClickHouse, Redis and Parquet storage protocols are runtime-checkable, with deterministic tests asserting that all concrete application adapters satisfy their corresponding boundaries.
+- Versioned domain contracts; market-data normalization; session-aware candles; data-quality validation; instrument-master versioning.
+- Upstox V3 protobuf/transport/source boundaries and authoritative market-status integration.
+- Market structure, liquidity, FVG, order-block, regime, breadth, sector, derivatives, option Greeks, futures basis, institutional-flow, Wyckoff and MarketContext primitives.
+- Deterministic scanner orchestration/scoring, probability calibration and leakage-safe OOS validation.
+- Immutable audit evidence, durable journal and broker reconciliation adapter.
+- PostgreSQL/ClickHouse/Redis/Parquet storage boundaries with runtime conformance tests.
+- Asyncpg pool lifecycle/concurrency hardening, atomic migration handling and PAPER OMS idempotency collision protection.
+- Observational Prometheus metrics, health/readiness checks and Docker Compose runtime smoke validation.
 
 ## Frontend terminal
-- The Next.js frontend provides a dark-first observational overview with Market State, Scanner, Risk and PAPER Portfolio panels, navigation, feed-state messaging and explicit RiskEngine → OMS execution-boundary messaging.
-- Responsive terminal styling covers desktop, tablet and mobile widths without adding execution controls.
-- A deterministic Node UI-contract test verifies required panels, PAPER mode, disconnected-feed state and safety-boundary messaging.
-- Frontend CI installs dependencies and runs UI contract tests, ESLint, TypeScript typecheck and a production build.
-- No live market values are fabricated; the terminal explicitly reports an unconnected feed until typed backend read-only endpoints exist.
-- Docker Compose runtime smoke builds/starts the frontend service and verifies the served HTML contains the observational terminal title, PAPER mode indicator and RiskEngine → OMS boundary.
-- The frontend standalone Docker image no longer copies a nonexistent `public` directory, eliminating the known image-build failure.
-- Frontend Compose startup is health-gated on the backend and includes a Node-based HTTP healthcheck.
-- Deterministic deployment tests cover the frontend image, standalone output, port mapping, backend health gate and frontend healthcheck.
+- Dark-first observational Next.js terminal with Market State, Scanner, Risk and PAPER Portfolio panels.
+- Responsive styling, UI contract tests, ESLint, TypeScript typecheck and production build in CI.
+- Docker standalone image, backend health-gated startup and frontend HTTP healthcheck hardened.
+- GitHub Actions Run 549 (`35076782833`) on `874494a6778e445a5b357bbef7821627e6b8fba7` passed Ruff, unit pytest, Compose validation, frontend checks and full Docker Compose runtime smoke.
+
+## Typed terminal API contracts
+- `backend/src/advance_system/observability/api.py` defines a versioned `TerminalViewResponse` contract and explicit routes for Market State, Scanner, Risk and Portfolio.
+- `backend/src/advance_system/observability/server.py` exposes those routes alongside `/metrics`.
+- The current implementation is deliberately fail-closed: until authoritative providers are connected, each view returns `available=false`, `reason=data_feed_not_connected`, and `data=null`. No market, account, risk or opportunity values are fabricated.
+- POST/PUT/DELETE remain rejected by the observability server; terminal routes have no broker, OMS or RiskEngine authority.
+- Deterministic tests cover contract versioning, route completeness, JSON shape and mutation rejection.
 
 ## Pending roadmap
-1. Verify the frontend runtime smoke fix through GitHub Actions.
-2. Typed read-only backend endpoints for the terminal's Market State, Scanner, Risk and Portfolio views.
-3. Dedicated frontend routes for market, scanner, risk and portfolio views.
-4. Runtime end-to-end monitoring validation outside CI against an actually running deployment environment, if a persistent environment is required.
-5. Additional concrete vendor adapter/factory integration coverage when those drivers are introduced.
-
-## Next implementation rule
-When the user says **NEXT**, inspect the repository and implement the next unchecked roadmap item directly on `main`. Add deterministic tests, update `PROJECT_WORK_STATUS.md`, and update this memory file so the next session can resume without reconstructing project state.
+1. Connect typed terminal endpoints to authoritative provider-backed read-only services.
+2. Add dedicated market, scanner, risk and portfolio frontend routes while preserving read-only boundaries.
+3. Runtime end-to-end monitoring validation outside CI if a persistent deployment environment is required.
+4. Additional concrete vendor adapter/factory integration coverage when those drivers are introduced.
 
 ## Safety / quality rules
 - No fabricated broker fields, market data, probabilities or execution status.
-- Prefer explicit capability/availability contracts over unsupported inference.
 - Validate timestamps, instruments, quantities and session metadata.
-- Reject malformed or stale data fail-closed where safety is involved.
-- Keep broker SDK/protobuf details out of domain logic.
-- Add unit tests for happy path, invalid input, chronology/look-ahead and boundary cases.
-- Do not mark a task complete until implementation and tests exist in the repository.
-- Do not claim CI is green unless the GitHub Actions result has actually been verified.
+- Reject malformed/stale data fail-closed where safety is involved.
+- PostgreSQL remains operational source of truth; Redis/ClickHouse/Parquet never become execution authority.
+- Research compute is isolated from execution and cannot approve its own trades.
+- Do not claim CI green unless GitHub Actions actually confirms it.
 
-## CI note
-GitHub Actions Run 547 (`35076685947`) is in progress for commit `f7dd1a9958283ae914aefcb352c120810f15a1a3`. Ruff has passed and unit pytest is running; frontend runtime smoke remains unverified until the run completes.
+## Current verification state
+The latest completed pre-change verification is Run 549 (`35076782833`), fully successful. Commits for the typed terminal API contracts and tests now sit on `main` and have triggered a new GitHub Actions run; that new run is the required verification for the current HEAD.
+
+## Next implementation rule
+When the user says **NEXT**, inspect current `main` and latest GitHub Actions state, implement the highest-priority unfinished task directly on `main`, add deterministic tests, update this file and `PROJECT_WORK_STATUS.md`, verify CI, and report the commit SHA and blockers.
