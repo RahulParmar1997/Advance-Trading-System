@@ -49,13 +49,14 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 - `ValidatedTerminalSnapshotStore` requires timezone-aware, non-future observation timestamps and withholds observations beyond its configured freshness age.
 - Deterministic tests cover fresh, expired, naive, future-dated, and invalid-freshness cases.
 - `StoreBackedTerminalSnapshotProvider` exposes only fresh observations already accepted by the validated snapshot store; it performs no synthesis or transformation.
+- `TerminalSnapshotIngress` now provides an explicit validation-before-publication lifecycle boundary. It requires an upstream validator to accept an observation before it reaches the snapshot store.
 
 ## Provider discovery
 - The repository contains a concrete `UpstoxAdapter` market-data adapter plus Upstox market-status/source components, but no existing application-level source that safely supplies all four terminal views from authoritative validated observations.
-- The terminal composition layer therefore does not invent or directly couple to partial broker data. The remaining integration task is upstream lifecycle wiring into the validated store.
+- The terminal composition layer therefore does not invent or directly couple to partial broker data. The ingress boundary is ready for concrete upstream validators when those authoritative sources are available.
 
 ## Pending roadmap
-1. Connect authoritative market/account/portfolio ingestion lifecycle to `ValidatedTerminalSnapshotStore` and inject `StoreBackedTerminalSnapshotProvider` through the terminal composition boundary.
+1. Connect concrete authoritative market/account/portfolio validators and lifecycle sources to `TerminalSnapshotIngress`, then inject `StoreBackedTerminalSnapshotProvider` through the terminal composition boundary.
 2. Runtime end-to-end monitoring validation outside CI if a persistent deployment environment is required.
 3. Additional concrete vendor adapter/factory integration coverage when those drivers are introduced.
 
@@ -68,7 +69,7 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 - Do not claim CI green unless GitHub Actions actually confirms it.
 
 ## Current verification state
-Run 603 (`35086961799`) on `b81c72631620f1f161f92c1080b6782089f065c7` was fully successful, including Ruff, unit pytest, Compose validation, frontend checks and Docker Compose runtime smoke. The current provider commits require fresh GitHub Actions verification; no newer green CI run is being claimed until the final HEAD is verified.
+Run 611 (`35089747079`) on `509af0706459faac7611ba8de0e315a9c599a29b` was fully successful, including Ruff, unit pytest, Compose validation, frontend checks and Docker Compose runtime smoke. The validated-ingress commits after Run 611 require fresh GitHub Actions verification; no newer green CI run is being claimed until the final HEAD is verified.
 
 ## Next implementation rule
 When the user says **NEXT**, inspect current `main` and latest GitHub Actions state, implement the highest-priority unfinished task directly on `main`, add deterministic tests, update this file and `PROJECT_WORK_STATUS.md`, verify CI, and report the commit SHA and blockers.
