@@ -19,3 +19,13 @@ def test_prometheus_scrapes_backend_metrics_endpoint() -> None:
 
     assert "metrics_path: /metrics" in config
     assert 'targets: ["backend:8000"]' in config
+
+
+def test_backend_container_starts_metrics_server_with_expected_runtime_contract() -> None:
+    dockerfile = (REPOSITORY_ROOT / "docker" / "backend.Dockerfile").read_text(encoding="utf-8")
+    compose = (REPOSITORY_ROOT / "docker-compose.yml").read_text(encoding="utf-8")
+
+    assert 'CMD ["python", "-m", "advance_system.observability.server"]' in dockerfile
+    assert "ATS_METRICS_HOST: 0.0.0.0" in compose
+    assert "ATS_METRICS_PORT: 8000" in compose
+    assert '"${ATS_METRICS_PORT:-8000}:8000"' in compose
