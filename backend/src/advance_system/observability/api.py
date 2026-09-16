@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 import json
-import typing
 from dataclasses import asdict, dataclass
 
 
-ViewName = typing.Literal["market-state", "scanner", "risk", "portfolio"]
+ViewName = str
 
 
 @dataclass(frozen=True, slots=True)
