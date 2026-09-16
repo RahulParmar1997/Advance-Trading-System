@@ -1,30 +1,98 @@
 const panels = [
-  ["Market State", "Session, regime and data freshness"],
-  ["Scanner", "Evidence-backed candidate opportunities"],
-  ["Risk", "Pre-trade controls and current guardrails"],
-  ["Portfolio", "PAPER positions, exposure and P&L"],
+  {
+    title: "Market State",
+    eyebrow: "01",
+    description: "Session, regime and data freshness",
+    status: "Awaiting feed",
+    detail: "No live market observation is connected to this view.",
+  },
+  {
+    title: "Scanner",
+    eyebrow: "02",
+    description: "Evidence-backed candidate opportunities",
+    status: "Read only",
+    detail: "Candidates appear only when supplied by the backend scanner.",
+  },
+  {
+    title: "Risk",
+    eyebrow: "03",
+    description: "Pre-trade controls and current guardrails",
+    status: "Backend gated",
+    detail: "The UI cannot approve, submit, or mutate an order.",
+  },
+  {
+    title: "Portfolio",
+    eyebrow: "04",
+    description: "PAPER positions, exposure and P&L",
+    status: "PAPER",
+    detail: "Operational state remains authoritative in the backend.",
+  },
 ] as const;
+
+const navigation = ["Overview", "Market", "Scanner", "Risk", "Portfolio", "Research"];
 
 export default function HomePage() {
   return (
-    <main style={{ margin: "0 auto", maxWidth: 1200, padding: 32 }}>
-      <header style={{ borderBottom: "1px solid #242a31", paddingBottom: 24 }}>
-        <p style={{ margin: 0, fontSize: 13, letterSpacing: 1.5, textTransform: "uppercase" }}>Advance Trading System</p>
-        <h1 style={{ margin: "10px 0 8px", fontSize: 36 }}>Market intelligence terminal</h1>
-        <p style={{ color: "#9ba6b2", margin: 0 }}>India-focused analytics with PAPER-first execution safety.</p>
+    <main className="terminal-shell">
+      <header className="topbar">
+        <div>
+          <p className="brand">Advance Trading System</p>
+          <p className="product-line">Market intelligence terminal</p>
+        </div>
+        <div className="environment" aria-label="Execution environment">
+          <span className="status-dot" aria-hidden="true" />
+          PAPER MODE
+        </div>
       </header>
 
-      <section aria-label="System panels" style={{ display: "grid", gap: 16, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", marginTop: 28 }}>
-        {panels.map(([title, description]) => (
-          <article key={title} style={{ border: "1px solid #242a31", borderRadius: 10, padding: 20, background: "#11151a" }}>
-            <h2 style={{ fontSize: 18, margin: "0 0 8px" }}>{title}</h2>
-            <p style={{ color: "#9ba6b2", lineHeight: 1.5, margin: 0 }}>{description}</p>
+      <nav className="nav-strip" aria-label="Primary navigation">
+        {navigation.map((item, index) => (
+          <span className={index === 0 ? "nav-item active" : "nav-item"} key={item}>
+            {item}
+          </span>
+        ))}
+      </nav>
+
+      <section className="hero" aria-labelledby="dashboard-title">
+        <div>
+          <p className="section-kicker">CONTROL ROOM / OBSERVATIONAL</p>
+          <h1 id="dashboard-title">Trading system overview</h1>
+          <p className="hero-copy">
+            A read-only terminal for market context, scanner evidence, risk state and PAPER portfolio data.
+          </p>
+        </div>
+        <div className="feed-state">
+          <span>DATA FEED</span>
+          <strong>NOT CONNECTED</strong>
+          <small>Live observations will be rendered from backend contracts.</small>
+        </div>
+      </section>
+
+      <section className="panel-grid" aria-label="Trading system panels">
+        {panels.map((panel) => (
+          <article className="panel" key={panel.title}>
+            <div className="panel-heading">
+              <span className="panel-index">{panel.eyebrow}</span>
+              <span className="panel-status">{panel.status}</span>
+            </div>
+            <h2>{panel.title}</h2>
+            <p className="panel-description">{panel.description}</p>
+            <div className="panel-detail">{panel.detail}</div>
           </article>
         ))}
       </section>
 
-      <footer style={{ color: "#697582", fontSize: 13, marginTop: 32 }}>
-        UI is observational. Order execution remains behind the backend RiskEngine → OMS boundary.
+      <section className="safety-banner" aria-label="Execution boundary">
+        <div>
+          <p className="section-kicker">EXECUTION BOUNDARY</p>
+          <strong>RiskEngine → OMS</strong>
+        </div>
+        <p>Frontend actions remain observational. No screen action directly invokes broker execution.</p>
+      </section>
+
+      <footer className="footer">
+        <span>Advance Trading System</span>
+        <span>Backend is the source of operational truth.</span>
       </footer>
     </main>
   );
