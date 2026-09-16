@@ -32,11 +32,14 @@
 - [x] Added unit coverage proving pooled connections delegate operations, return exactly once to the pool, and remain open at the driver-connection level until pool shutdown.
 - [x] Fixed PAPER OMS idempotency so reusing an existing client key with a different order ID fails closed instead of silently replaying the original order.
 - [x] Added unit coverage for the client-key/different-order collision case.
+- [x] Verified GitHub Actions Run 506 (`35065625581`) on commit `c6cd5df92e5b3afd89d5837956634aeb9c2a9e86`: Ruff passed, 334 unit tests passed with 1 integration test deselected, Compose configuration validation passed, the real PostgreSQL/ClickHouse/Redis storage integration test passed, and the full Docker Compose runtime smoke test passed.
+- [x] Serialized `AsyncpgConnectionFactory` lazy pool initialization with an async lock so concurrent first callers cannot create multiple PostgreSQL pools.
+- [x] Added a deterministic concurrency test proving two simultaneous first calls share one initialized pool.
 
 ## Pending work
 
 ### Infrastructure / operations
-- [ ] GitHub Actions verification of the PAPER OMS idempotency collision fix and full Docker Compose runtime smoke.
+- [ ] GitHub Actions verification of the concurrent PostgreSQL pool-initialization hardening and full Docker Compose runtime smoke.
 - [ ] Runtime end-to-end monitoring validation outside CI against an actually running deployment environment, if a persistent environment is required. The CI smoke test provides real container execution on GitHub-hosted runners but is not a production deployment validation.
 - [ ] Extend application-level integration coverage to the concrete adapter/factory implementations where additional vendor drivers are introduced.
 
@@ -56,7 +59,7 @@
 - Research compute must never place orders, mutate positions/balances or bypass RiskEngine → OMS.
 
 ## Current next task
-Verify GitHub Actions for the PAPER OMS idempotency collision fix. Do not claim CI green until the new run completes successfully. If it passes, continue with the next highest-priority persistence/application integration gap.
+Verify GitHub Actions for the concurrent PostgreSQL pool-initialization hardening. Do not claim CI green until the new run completes successfully. If it passes, continue with the next highest-priority persistence/application integration gap.
 
 ## CI note
-Run 502 (`35064867296`) on `1dbc8ecc2789b4ca6bf6008f0757d63a11f45c25` was the latest verified successful baseline: Ruff passed, unit tests passed, Compose configuration validation passed, and the full Docker Compose runtime/storage integration smoke passed. The current OMS fix is committed on `main` and requires fresh Actions verification.
+Run 506 (`35065625581`) on `c6cd5df92e5b3afd89d5837956634aeb9c2a9e86` is the latest verified successful run: Ruff passed, 334 unit tests passed, Compose configuration validation passed, storage integration passed, and the full Docker Compose runtime smoke passed. The newer PostgreSQL pool-concurrency hardening is committed on `main` and requires fresh Actions verification.
