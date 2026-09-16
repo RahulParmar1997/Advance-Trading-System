@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+from advance_system.observability.metrics import MetricsRegistry
 from advance_system.observability.providers import TerminalSnapshot
 from advance_system.observability.server import build_observability_handler
-from advance_system.observability.metrics import MetricsRegistry
 
 
 class StaticTerminalProvider:
