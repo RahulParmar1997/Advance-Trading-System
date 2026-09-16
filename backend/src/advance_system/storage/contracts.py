@@ -2,8 +2,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Protocol
+from typing import Protocol, TYPE_CHECKING, runtime_checkable
 from urllib.parse import urlparse
+
+if TYPE_CHECKING:
+    from advance_system.storage.parquet import ResearchDatasetRef
 
 
 class StorageMode(StrEnum):
@@ -88,11 +91,21 @@ class RedisStore(Protocol):
         ...
 
 
+@runtime_checkable
 class ParquetStore(Protocol):
     """Immutable/research dataset boundary for parquet/object storage."""
 
-    async def write(self, dataset: str, payload: bytes) -> None:
+    async def write_dataset(
+        self,
+        ref: ResearchDatasetRef,
+        payload: bytes,
+        *,
+        created_at: object | None = None,
+    ) -> object:
         ...
 
-    async def read(self, dataset: str) -> bytes:
+    async def read_dataset(self, ref: ResearchDatasetRef) -> bytes:
+        ...
+
+    async def read_manifest(self, ref: ResearchDatasetRef) -> object:
         ...
