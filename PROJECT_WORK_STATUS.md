@@ -41,6 +41,7 @@
 - [x] Added deterministic tests for invalid field types, blank symbols and domain validation failures at the Upstox source boundary.
 - [x] Added a broker-to-domain `UpstoxMarketStatus.to_domain()` conversion that creates a timezone-aware `MarketStatus` from the authoritative millisecond timestamp and invokes domain validation, including rejection of future observations.
 - [x] Added deterministic tests covering domain conversion and future timestamp rejection.
+- [x] Corrected the Ruff import ordering in the Upstox market-status tests identified by GitHub Actions Run 628.
 
 ## Pending work
 ### Frontend / terminal
@@ -51,10 +52,10 @@
 - [ ] Extend application-level integration coverage to additional concrete vendor adapter/factory implementations when those drivers are introduced.
 
 ## Current task
-Upstox market-status data now has an explicit validated domain conversion. Concrete terminal lifecycle wiring remains blocked until authoritative market/account/portfolio sources are available.
+Restore CI quality-gate correctness after Run 628's Ruff import-order failure, then verify the resulting main commit with GitHub Actions before advancing to the next safety-critical unfinished task.
 
 ## Latest verified CI state
-Fresh verification is pending for the final documentation commit below. The latest fully verified pre-change run was Run 619 (`35091319639`).
+Run 628 (`35092712860`) failed at Ruff with exactly 1 import-order error in `backend/tests/unit/test_upstox_market_status.py`; pytest and later workflow stages were skipped. The corrective commit is `4f7131d79c1dc3189443a382c448d9a7fd3daa50`. Fresh verification for that commit is pending.
 
 ## Architectural decisions
 - Mandatory execution path remains `Market Data → Validation → Market Intelligence → Scanner → Trade Type → Strategy → Probability/EV → RiskEngine → OMS → Execution`.
