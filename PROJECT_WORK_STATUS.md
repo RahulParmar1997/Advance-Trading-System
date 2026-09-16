@@ -50,6 +50,7 @@
 - [x] Added responsive terminal styling for desktop, tablet and mobile layouts without introducing broker/execution controls.
 - [x] Added deterministic Node-based frontend UI contract tests covering required panels, PAPER mode, disconnected-feed state and execution-boundary messaging.
 - [x] Added frontend ESLint configuration, lint/typecheck/test scripts, and GitHub Actions verification for frontend install, contract tests, lint, typecheck and production build.
+- [x] Extended the Docker Compose runtime smoke test to build/start the frontend container and verify its served HTML contains the observational terminal title, PAPER mode indicator and RiskEngine → OMS safety boundary.
 
 ## Pending work
 
@@ -80,4 +81,4 @@
 Connect the observational terminal to typed, read-only backend endpoints/contracts when those endpoints are introduced; otherwise continue with the next concrete frontend route or backend contract gap without adding execution authority to the UI.
 
 ## CI note
-Run 527 (`35068304434`) on `b77b3f11f2e3b3ff78156ec165dcf152ebdecd30` was the last verified completed run before the current frontend changes. A new GitHub Actions run is required to verify the current frontend changes; do not treat Run 527 as validation of the new commits.
+The frontend runtime smoke enhancement is committed on `main` as `5c0835d2aaf8cc0ecc92b4f8952863ff8cb6b8f8` and requires its new GitHub Actions run to complete successfully before this change is considered verified.
