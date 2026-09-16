@@ -27,6 +27,9 @@
 - [x] Verified GitHub Actions Run 600 (`35086084256`) fully successful, including Ruff, pytest, frontend checks and Docker Compose runtime smoke.
 - [x] Added a thread-safe `ValidatedTerminalSnapshotStore` with mandatory timezone-aware observation timestamps and configurable freshness expiry; expired observations fail closed instead of being served as current.
 - [x] Added deterministic unit coverage for fresh snapshots, expiry, timezone validation and invalid freshness configuration.
+- [x] Verified GitHub Actions Run 603 (`35086961799`) fully successful, including Ruff, pytest, frontend checks and Docker Compose runtime smoke.
+- [x] Hardened `ValidatedTerminalSnapshotStore` to reject future-dated observations rather than allowing them to appear indefinitely fresh.
+- [x] Added deterministic unit coverage for future observation timestamp rejection.
 
 ## Pending work
 ### Frontend / terminal
@@ -37,16 +40,16 @@
 - [ ] Extend application-level integration coverage to additional concrete vendor adapter/factory implementations when those drivers are introduced.
 
 ## Current task
-The terminal now has a freshness-enforcing provider store, but it is intentionally not populated implicitly. The next integration task is to connect validated upstream market/account/portfolio observations to this store through an explicit lifecycle/composition boundary without synthesizing values.
+The terminal provider boundary now rejects naive, future-dated, expired, and invalid-freshness observations. The next integration task is to connect validated upstream market/account/portfolio observations to this store through an explicit lifecycle/composition boundary without synthesizing values.
 
 ## Latest verified CI state
-Run 600 (`35086084256`) on `cf212cf9f966642cf70508c25000034ef14e8421` was fully successful, including Ruff, unit pytest, Compose validation, frontend checks and Docker Compose runtime smoke. The snapshot-store commits after Run 600 require fresh GitHub Actions verification; no newer green CI run is being claimed until the final HEAD is verified.
+Run 603 (`35086961799`) on `b81c72631620f1f161f92c1080b6782089f065c7` was fully successful, including Ruff, unit pytest, Compose validation, frontend checks and Docker Compose runtime smoke. The future-timestamp hardening commits after Run 603 require fresh GitHub Actions verification; no newer green CI run is being claimed until the final HEAD is verified.
 
 ## Architectural decisions
 - Mandatory execution path remains `Market Data → Validation → Market Intelligence → Scanner → Trade Type → Strategy → Probability/EV → RiskEngine → OMS → Execution`.
 - PostgreSQL is operational source of truth; ClickHouse analytics; Redis ephemeral/hot state; Parquet/object storage immutable research data.
 - Frontend and terminal APIs are observational/read-only and cannot invoke broker execution.
-- Terminal provider services may expose only authoritative, validated observations; unavailable, mismatched, or expired provider data fails closed and is never guessed.
+- Terminal provider services may expose only authoritative, validated observations; unavailable, mismatched, expired, or future-dated provider data fails closed and is never guessed.
 - `ValidatedTerminalSnapshotStore` is a transport/lifecycle boundary, not a source of truth: only an upstream component that has already validated an observation may publish it.
 - Application composition accepts an explicit `TerminalSnapshotProvider`; no provider is created implicitly, preserving fail-closed behavior until authoritative wiring exists.
 - Frontend server routes may consume backend terminal contracts, but they must preserve `available`, `reason`, and `data=null` semantics on unavailable/error responses.
