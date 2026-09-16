@@ -32,6 +32,9 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 - Dark-first observational Next.js terminal with Market State, Scanner, Risk and PAPER Portfolio panels.
 - Responsive styling, UI contract tests, ESLint, TypeScript typecheck and production build in CI.
 - Docker standalone image, backend health-gated startup and frontend HTTP healthcheck hardened.
+- Dedicated `/risk` route now consumes the backend `/api/v1/risk` contract server-side with `cache: "no-store"`; backend errors and unavailable data remain explicit and `data` is never synthesized.
+- Terminal navigation exposes the dedicated Risk route.
+- Frontend contract tests cover the Risk route, backend endpoint, no-store fetch semantics, unavailable handling and execution boundary.
 
 ## Typed terminal API contracts
 - `backend/src/advance_system/observability/api.py` defines the stable `TerminalViewResponse` contract and explicit routes for Market State, Scanner, Risk and Portfolio.
@@ -48,9 +51,9 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 - The terminal composition layer therefore does not invent or directly couple to partial broker data. A concrete read-only provider remains the next integration task.
 
 ## Pending roadmap
-1. Verify the terminal composition change and corrected composition-test imports through GitHub Actions.
+1. Verify the composition correction and current frontend route changes through GitHub Actions; the available run lookup has not exposed a newer completed run yet.
 2. Introduce/identify the concrete authoritative read-only market-data and account/portfolio provider implementation, then inject it through the terminal composition boundary.
-3. Add dedicated market, scanner, risk and portfolio frontend routes while preserving read-only boundaries.
+3. Replace remaining static terminal placeholders on Market State, Scanner and Portfolio routes with backend-contract consumption while preserving fail-closed behavior.
 4. Runtime end-to-end monitoring validation outside CI if a persistent deployment environment is required.
 5. Additional concrete vendor adapter/factory integration coverage when those drivers are introduced.
 
@@ -63,7 +66,7 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 - Do not claim CI green unless GitHub Actions actually confirms it.
 
 ## Current verification state
-Run 582 (`35082009500`) on `d56c3ead4a343aeb11b52f8012a1cede7566fae8` was fully successful, including Ruff, unit pytest, Compose validation, frontend checks and Docker Compose runtime smoke. Run 586 (`35083495456`) on `2ad580a59862abed7d150685b6c59c02a4e2ff33` failed at Ruff with exactly one I001 import-order error in `test_terminal_composition.py`; pytest and later stages were skipped. Commit `81d741835a7f0acff7e1572e21aab16b63e61b42` corrects that import order, and the subsequent documentation commit `d80c8f1defa916b30aba238fab495cb2cedb14cf` records the state. Verification of the corrected HEAD is pending.
+Run 582 (`35082009500`) on `d56c3ead4a343aeb11b52f8012a1cede7566fae8` was fully successful, including Ruff, unit pytest, Compose validation, frontend checks and Docker Compose runtime smoke. Run 586 (`35083495456`) on `2ad580a59862abed7d150685b6c59c02a4e2ff33` failed at Ruff with exactly one I001 import-order error in `test_terminal_composition.py`. Commit `81d741835a7f0acff7e1572e21aab16b63e61b42` corrected that import order. Current main is now `d1bd1fa3baca6db25296799e5bb16b7953a2f2c8`; the available workflow lookup has not exposed a completed run for the later corrections, so CI is not being claimed green for the current HEAD.
 
 ## Next implementation rule
 When the user says **NEXT**, inspect current `main` and latest GitHub Actions state, implement the highest-priority unfinished task directly on `main`, add deterministic tests, update this file and `PROJECT_WORK_STATUS.md`, verify CI, and report the commit SHA and blockers.
