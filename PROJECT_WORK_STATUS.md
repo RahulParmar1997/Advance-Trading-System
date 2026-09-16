@@ -33,7 +33,7 @@
 - [x] Fixed PAPER OMS idempotency so reusing an existing client key with a different order ID fails closed instead of silently replaying the original order.
 - [x] Added unit coverage for the client-key/different-order collision case.
 - [x] Verified GitHub Actions Run 506 (`35065625581`) on commit `c6cd5df92e5b3afd89d5837956634aeb9c2a9e86`: Ruff passed, 334 unit tests passed with 1 integration test deselected, Compose configuration validation passed, the real PostgreSQL/ClickHouse/Redis storage integration test passed, and the full Docker Compose runtime smoke test passed.
-- [x] Serialized `AsyncpgConnectionFactory` lazy pool initialization with an async lock so concurrent first callers cannot create multiple PostgreSQL pools.
+- [x] Serialized `AsyncpgConnectionFactory` lazy pool initialization with an async lock so concurrent first callers share one initialized pool instead of racing to create multiple PostgreSQL pools.
 - [x] Added a deterministic concurrency test proving two simultaneous first calls share one initialized pool.
 - [x] Verified GitHub Actions Run 510 (`35066042755`) on commit `ff2995aca8121e301e3732a8de2fa6736aa27735`: Ruff, unit pytest, Docker Compose configuration validation, and full Docker Compose runtime smoke all passed.
 - [x] Hardened `MigrationRunner` connection lifecycle so every acquired migration connection is closed/released in a `finally` block, including migration failure paths.
@@ -42,12 +42,14 @@
 - [x] Hardened `MigrationRunner` transaction atomicity so migration SQL and `schema_migrations` bookkeeping run within one PostgreSQL transaction and rollback on failure.
 - [x] Added deterministic migration tests for transaction start/commit, rollback of partial migration application, idempotency, and connection cleanup.
 - [x] Verified GitHub Actions Run 519 (`35067255577`) on commit `4522dc22ad55b1a65fbee262b1332d322ef5b45f`: Ruff, unit pytest, Docker Compose configuration validation, and full Docker Compose runtime smoke all passed.
+- [x] Aligned the `ParquetStore` application contract with the concrete immutable adapter's versioned `ResearchDatasetRef` API, manifest return type, and dataset read/write methods.
+- [x] Added deterministic unit coverage proving the concrete Parquet adapter conforms to the application storage protocol alongside the existing concrete PostgreSQL, ClickHouse and Redis adapter coverage.
 
 ## Pending work
 
 ### Infrastructure / operations
 - [ ] Runtime end-to-end monitoring validation outside CI against an actually running deployment environment, if a persistent environment is required. The CI smoke test provides real container execution on GitHub-hosted runners but is not a production deployment validation.
-- [ ] Extend application-level integration coverage to the concrete adapter/factory implementations where additional vendor drivers are introduced.
+- [ ] Extend application-level integration coverage to additional concrete vendor adapter/factory implementations when those drivers are introduced.
 
 ## Non-negotiable architecture rules
 - AI never bypasses RiskEngine or places uncontrolled orders.
@@ -65,7 +67,7 @@
 - Research compute must never place orders, mutate positions/balances or bypass RiskEngine → OMS.
 
 ## Current next task
-Inspect the remaining persistence/application integration boundary and implement the highest-priority concrete adapter/factory coverage gap, with deterministic tests and no broker/execution authority.
+Validate the remaining infrastructure boundary against an actually running deployment if such an environment is available; otherwise continue with the next concrete persistence/vendor-driver coverage gap when a new implementation is introduced.
 
 ## CI note
-Run 519 (`35067255577`) on `4522dc22ad55b1a65fbee262b1332d322ef5b45f` is the latest verified successful run: Ruff, unit pytest, Docker Compose configuration validation, and full Docker Compose runtime smoke all passed. Migration connection lifecycle and transaction atomicity hardening are verified on `main`.
+The Parquet contract/test changes are committed on `main` and require fresh GitHub Actions verification. The prior latest verified successful run is Run 519 (`35067255577`) on `4522dc22ad55b1a65fbee262b1332d322ef5b45f`, with Ruff, unit pytest, Docker Compose configuration validation, and full Docker Compose runtime smoke all passing.
