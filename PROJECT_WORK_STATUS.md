@@ -32,20 +32,23 @@
 - [x] Added deterministic unit coverage for future observation timestamp rejection.
 - [x] Added `StoreBackedTerminalSnapshotProvider`, a read-only provider implementation over the validated snapshot store; it exposes only fresh observations already published by an upstream validator and cannot synthesize terminal values.
 - [x] Added deterministic provider tests covering exact store passthrough, unknown views and expiry.
+- [x] Added `TerminalSnapshotIngress`, an explicit validated-ingress lifecycle boundary. It requires an upstream validator to accept an observation before publication to the snapshot store, preventing unvalidated data from becoming terminal state.
+- [x] Added deterministic ingress tests proving accepted observations publish and rejected observations never reach the store.
+- [x] Verified GitHub Actions Run 611 (`35089747079`) fully successful, including Ruff, pytest, Compose validation, frontend checks and Docker Compose runtime smoke.
 
 ## Pending work
 ### Frontend / terminal
-- [ ] Connect an authoritative market/account/portfolio ingestion lifecycle to `ValidatedTerminalSnapshotStore` and inject `StoreBackedTerminalSnapshotProvider` through the application composition boundary. The repository currently has no safe concrete all-view upstream source, so no broker/account values are fabricated.
+- [ ] Connect concrete authoritative market/account/portfolio ingestion validators to `TerminalSnapshotIngress` and inject `StoreBackedTerminalSnapshotProvider` through the application composition boundary. No broker/account values are fabricated.
 
 ### Infrastructure / operations
 - [ ] Runtime end-to-end monitoring validation outside CI against an actually running deployment environment, if a persistent environment is required.
 - [ ] Extend application-level integration coverage to additional concrete vendor adapter/factory implementations when those drivers are introduced.
 
 ## Current task
-The validated snapshot store now has a read-only provider implementation. The next integration task is to connect concrete authoritative market/account/portfolio ingestion to the store through an explicit lifecycle boundary without synthesizing values.
+The terminal now has an explicit validated-ingress boundary. The next integration task is to implement concrete authoritative source validators and lifecycle wiring from existing validated ingestion/domain sources into the ingress, without synthesizing terminal values or granting execution authority.
 
 ## Latest verified CI state
-Run 603 (`35086961799`) on `b81c72631620f1f161f92c1080b6782089f065c7` was fully successful, including Ruff, unit pytest, Compose validation, frontend checks and Docker Compose runtime smoke. The current provider commits require fresh GitHub Actions verification; no newer green CI run is being claimed until the final HEAD is verified.
+Run 611 (`35089747079`) on `509af0706459faac7611ba8de0e315a9c599a29b` was fully successful, including Ruff, unit pytest, Compose validation, frontend checks and Docker Compose runtime smoke. The new ingress commits after Run 611 require fresh GitHub Actions verification; no newer green CI run is being claimed until the final HEAD is verified.
 
 ## Architectural decisions
 - Mandatory execution path remains `Market Data → Validation → Market Intelligence → Scanner → Trade Type → Strategy → Probability/EV → RiskEngine → OMS → Execution`.
@@ -54,6 +57,7 @@ Run 603 (`35086961799`) on `b81c72631620f1f161f92c1080b6782089f065c7` was fully 
 - Terminal provider services may expose only authoritative, validated observations; unavailable, mismatched, expired, or future-dated provider data fails closed and is never guessed.
 - `ValidatedTerminalSnapshotStore` is a transport/lifecycle boundary, not a source of truth: only an upstream component that has already validated an observation may publish it.
 - `StoreBackedTerminalSnapshotProvider` only delegates reads to that store; it does not create, transform, or approve data.
+- `TerminalSnapshotIngress` requires an explicit upstream validation dependency before store publication; it does not itself infer authority from payload shape.
 - Application composition accepts an explicit `TerminalSnapshotProvider`; no provider is created implicitly, preserving fail-closed behavior until authoritative wiring exists.
 - Frontend server routes may consume backend terminal contracts, but they must preserve `available`, `reason`, and `data=null` semantics on unavailable/error responses.
 - AI/HPC cannot bypass `RiskEngine → OMS`.
