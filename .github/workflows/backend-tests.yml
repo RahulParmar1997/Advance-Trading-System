@@ -73,17 +73,37 @@ jobs:
           docker compose exec -T clickhouse wget -qO- http://127.0.0.1:8123/ping | grep -q '^Ok\.?$'
           docker compose exec -T redis redis-cli ping | grep -q '^PONG$'
 
-          curl --fail --silent 'http://127.0.0.1:19090/api/v1/targets' > /tmp/prometheus-targets.json
-          python - <<'PY'
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent 'http://127.0.0.1:19090/api/v1/targets' > /tmp/prometheus-targets.json; then
+              if python - <<'PY'
           import json
           from pathlib import Path
 
           payload = json.loads(Path('/tmp/prometheus-targets.json').read_text())
           targets = payload['data']['activeTargets']
           backend = next(
-              target for target in targets
-              if target.get('labels', {}).get('job') == 'advance-trading-system'
+              (
+                  target
+                  for target in targets
+                  if target.get('labels', {}).get('job') == 'advance-trading-system'
+              ),
+              None,
           )
-          assert backend['health'] == 'up', backend
-          assert backend['scrapeUrl'].endswith('/metrics'), backend
+          if backend is not None:
+              assert backend['health'] == 'up', backend
+              assert backend['scrapeUrl'].endswith('/metrics'), backend
+              raise SystemExit(0)
+          raise SystemExit(1)
           PY
+              then
+                break
+              fi
+            fi
+            if [ "$attempt" -eq 30 ]; then
+              echo 'Prometheus backend scrape target did not become healthy.' >&2
+              cat /tmp/prometheus-targets.json >&2 || true
+              docker compose logs backend prometheus >&2 || true
+              exit 1
+            fi
+            sleep 2
+          done
