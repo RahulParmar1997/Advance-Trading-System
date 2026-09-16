@@ -62,7 +62,7 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 
 ## Persistence / execution hardening
 - PostgreSQL operational adapter has explicit pooled connection lifecycle with acquired connections returned to the pool exactly once.
-- `AsyncpgConnectionFactory` serializes lazy pool creation so concurrent first callers share one pool instead of racing to create multiple pools.
+- `AsyncpgConnectionFactory` serializes lazy pool creation so concurrent first callers share one pool instead of racing to create multiple PostgreSQL pools.
 - PAPER OMS idempotency fails closed when a client idempotency key is presented with a different order ID; it never silently replays the original order under a mismatched identity.
 - `MigrationRunner` always closes/releases its acquired PostgreSQL migration connection, including migration failure paths.
 - `MigrationRunner` executes migration SQL and `schema_migrations` bookkeeping in one transaction so partial migration application rolls back atomically.
@@ -71,18 +71,22 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 - PostgreSQL, ClickHouse, Redis and Parquet storage protocols are runtime-checkable, with deterministic tests asserting that all concrete application adapters satisfy their corresponding boundaries.
 
 ## Frontend terminal
-- The Next.js frontend now provides a dark-first observational overview with Market State, Scanner, Risk and PAPER Portfolio panels, navigation, feed-state messaging and explicit RiskEngine → OMS execution-boundary messaging.
+- The Next.js frontend provides a dark-first observational overview with Market State, Scanner, Risk and PAPER Portfolio panels, navigation, feed-state messaging and explicit RiskEngine → OMS execution-boundary messaging.
 - Responsive terminal styling covers desktop, tablet and mobile widths without adding execution controls.
 - A deterministic Node UI-contract test verifies required panels, PAPER mode, disconnected-feed state and safety-boundary messaging.
-- Frontend CI now installs dependencies and runs UI contract tests, ESLint, TypeScript typecheck and a production build.
+- Frontend CI installs dependencies and runs UI contract tests, ESLint, TypeScript typecheck and a production build.
 - No live market values are fabricated; the terminal explicitly reports an unconnected feed until typed backend read-only endpoints exist.
-- Docker Compose runtime smoke now builds/starts the frontend service and verifies the served HTML contains the observational terminal title, PAPER mode indicator and RiskEngine → OMS boundary.
+- Docker Compose runtime smoke builds/starts the frontend service and verifies the served HTML contains the observational terminal title, PAPER mode indicator and RiskEngine → OMS boundary.
+- The frontend standalone Docker image no longer copies a nonexistent `public` directory, eliminating the known image-build failure.
+- Frontend Compose startup is health-gated on the backend and includes a Node-based HTTP healthcheck.
+- Deterministic deployment tests cover the frontend image, standalone output, port mapping, backend health gate and frontend healthcheck.
 
 ## Pending roadmap
-1. Typed read-only backend endpoints for the terminal's Market State, Scanner, Risk and Portfolio views.
-2. Dedicated frontend routes for market, scanner, risk and portfolio views.
-3. Runtime end-to-end monitoring validation outside CI against an actually running deployment environment, if a persistent environment is required.
-4. Additional concrete vendor adapter/factory integration coverage when those drivers are introduced.
+1. Verify the frontend runtime smoke fix through GitHub Actions.
+2. Typed read-only backend endpoints for the terminal's Market State, Scanner, Risk and Portfolio views.
+3. Dedicated frontend routes for market, scanner, risk and portfolio views.
+4. Runtime end-to-end monitoring validation outside CI against an actually running deployment environment, if a persistent environment is required.
+5. Additional concrete vendor adapter/factory integration coverage when those drivers are introduced.
 
 ## Next implementation rule
 When the user says **NEXT**, inspect the repository and implement the next unchecked roadmap item directly on `main`. Add deterministic tests, update `PROJECT_WORK_STATUS.md`, and update this memory file so the next session can resume without reconstructing project state.
@@ -98,4 +102,4 @@ When the user says **NEXT**, inspect the repository and implement the next unche
 - Do not claim CI is green unless the GitHub Actions result has actually been verified.
 
 ## CI note
-The frontend runtime smoke enhancement is committed on `main` as `5c0835d2aaf8cc0ecc92b4f8952863ff8cb6b8f8` and requires its new GitHub Actions run to complete successfully before this change is considered verified.
+GitHub Actions Run 547 (`35076685947`) is in progress for commit `f7dd1a9958283ae914aefcb352c120810f15a1a3`. Ruff has passed and unit pytest is running; frontend runtime smoke remains unverified until the run completes.
