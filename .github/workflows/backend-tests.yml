@@ -57,7 +57,7 @@ jobs:
           }
           trap cleanup EXIT
 
-          docker compose up -d --build backend prometheus
+          docker compose up -d --build backend prometheus frontend
           docker compose ps
 
           for attempt in $(seq 1 30); do
@@ -66,7 +66,7 @@ jobs:
             fi
             if [ "$attempt" -eq 30 ]; then
               echo 'Backend /metrics did not become ready.' >&2
-              docker compose logs backend prometheus >&2 || true
+              docker compose logs backend prometheus frontend >&2 || true
               exit 1
             fi
             sleep 2
@@ -78,7 +78,24 @@ jobs:
             fi
             if [ "$attempt" -eq 30 ]; then
               echo 'Prometheus did not become ready.' >&2
-              docker compose logs backend prometheus >&2 || true
+              docker compose logs backend prometheus frontend >&2 || true
+              exit 1
+            fi
+            sleep 2
+          done
+
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:13000/ > /tmp/frontend.html; then
+              if grep -q 'Trading system overview' /tmp/frontend.html \
+                && grep -q 'PAPER MODE' /tmp/frontend.html \
+                && grep -q 'RiskEngine → OMS' /tmp/frontend.html; then
+                break
+              fi
+            fi
+            if [ "$attempt" -eq 30 ]; then
+              echo 'Frontend container did not serve the expected observational terminal.' >&2
+              cat /tmp/frontend.html >&2 || true
+              docker compose logs frontend >&2 || true
               exit 1
             fi
             sleep 2
