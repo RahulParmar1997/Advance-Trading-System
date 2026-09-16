@@ -106,7 +106,7 @@ jobs:
             sleep 2
           done
 
-          python -m pytest tests/integration/test_storage_services.py -q
+          python -m pytest tests/integration/test_storage_services.py -m integration -q
 
           # Prometheus reports a newly discovered target as "unknown" until its
           # first scheduled scrape. Give that initial scrape window time to elapse
