@@ -35,14 +35,16 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 - GitHub Actions Run 549 (`35076782833`) on `874494a6778e445a5b357bbef7821627e6b8fba7` passed Ruff, unit pytest, Compose validation, frontend checks and full Docker Compose runtime smoke.
 
 ## Typed terminal API contracts
-- `backend/src/advance_system/observability/api.py` defines a versioned `TerminalViewResponse` contract and explicit routes for Market State, Scanner, Risk and Portfolio.
+- `backend/src/advance_system/observability/api.py` defines the stable `TerminalViewResponse` contract and explicit routes for Market State, Scanner, Risk and Portfolio.
 - `backend/src/advance_system/observability/server.py` exposes those routes alongside `/metrics`.
 - The current implementation is deliberately fail-closed: until authoritative providers are connected, each view returns `available=false`, `reason=data_feed_not_connected`, and `data=null`. No market, account, risk or opportunity values are fabricated.
+- `backend/src/advance_system/observability/providers.py` provides a provider-owned `TerminalSnapshot` boundary and `TerminalDataService`; provider snapshots are passed through only when the requested view matches exactly.
 - POST/PUT/DELETE remain rejected by the observability server; terminal routes have no broker, OMS or RiskEngine authority.
-- Deterministic tests cover contract versioning, route completeness, JSON shape and mutation rejection.
+- Deterministic tests cover contract versioning, route completeness, JSON shape, mutation rejection, unavailable providers, exact snapshot passthrough and view mismatch fail-closed behavior.
+- GitHub Actions Runs 557 and 560 identified Ruff import-order defects in the new terminal API/test code; those defects were corrected on `main`.
 
 ## Pending roadmap
-1. Connect typed terminal endpoints to authoritative provider-backed read-only services.
+1. Connect typed terminal endpoints to concrete authoritative market-data/account read-only services at application composition time.
 2. Add dedicated market, scanner, risk and portfolio frontend routes while preserving read-only boundaries.
 3. Runtime end-to-end monitoring validation outside CI if a persistent deployment environment is required.
 4. Additional concrete vendor adapter/factory integration coverage when those drivers are introduced.
@@ -56,7 +58,7 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 - Do not claim CI green unless GitHub Actions actually confirms it.
 
 ## Current verification state
-The latest completed pre-change verification is Run 549 (`35076782833`), fully successful. Commits for the typed terminal API contracts and tests now sit on `main` and have triggered a new GitHub Actions run; that new run is the required verification for the current HEAD.
+Run 549 (`35076782833`) is the latest fully verified successful baseline. Run 562 (`35078584881`) started against `668c4ea9b38a0ad7913e6ae3ee370f65f155b49d` and was still in progress when this state was recorded; therefore the current HEAD is not yet CI-verified.
 
 ## Next implementation rule
 When the user says **NEXT**, inspect current `main` and latest GitHub Actions state, implement the highest-priority unfinished task directly on `main`, add deterministic tests, update this file and `PROJECT_WORK_STATUS.md`, verify CI, and report the commit SHA and blockers.
