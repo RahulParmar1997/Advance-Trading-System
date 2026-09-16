@@ -12,18 +12,18 @@
 - [x] PostgreSQL pooled-connection lifecycle, lazy-pool concurrency, migration cleanup/atomicity, and PAPER OMS idempotency hardened.
 - [x] Dark-first observational Next.js terminal with Market State, Scanner, Risk and PAPER Portfolio panels; no broker/execution controls.
 - [x] Frontend CI contract tests, lint, typecheck, production build, Docker runtime smoke, standalone-image fix, backend health gate and HTTP healthcheck.
-- [x] Verified GitHub Actions Run 549 (`35076782833`) on commit `874494a6778e445a5b357bbef7821627e6b8fba7`: Ruff, unit pytest, Compose validation, frontend install/contract/lint/typecheck/build, and Docker Compose runtime smoke all passed.
 - [x] Added versioned read-only terminal API contracts for Market State, Scanner, Risk and Portfolio views. Until authoritative feed-backed providers exist, responses explicitly report `available=false` and `data=null` rather than synthesizing market/account values.
 - [x] Exposed the four terminal API routes from the existing backend observability server without adding broker or execution authority.
 - [x] Added deterministic HTTP contract tests for versioning, all routes, JSON response shape and rejection of POST.
 - [x] Added a provider-owned `TerminalSnapshot` boundary and `TerminalDataService`; terminal HTTP routes now consume that service rather than constructing view payloads themselves.
 - [x] Added deterministic provider-service tests covering unavailable state, exact snapshot passthrough, view mismatch fail-closed behavior and all four terminal views.
-- [x] Diagnosed the exact persistent Ruff I001 requirement: the import block must be followed by exactly one blank line before `ViewName`.
-- [x] Applied the corrected terminal API spacing directly on `main` as `380fcae9e41f53b52e433e8704296833c929da41`.
+- [x] Corrected the persistent Ruff import-layout issue in the terminal API and verified it with GitHub Actions Run 582 (`35082009500`).
+- [x] Added an explicit application composition boundary for injecting a `TerminalSnapshotProvider` into the observability handler; the default application composition remains provider-free and therefore fail-closed.
+- [x] Added deterministic composition tests proving an injected provider is used and no-provider composition remains unavailable.
 
 ## Pending work
 ### Frontend / terminal
-- [ ] Connect a concrete authoritative market-data/portfolio provider into the terminal service at application composition time.
+- [ ] Introduce/identify the concrete authoritative read-only market-data and account/portfolio provider implementation, then inject it through the composition boundary.
 - [ ] Add dedicated market, scanner, risk and portfolio frontend routes while preserving read-only frontend boundaries.
 
 ### Infrastructure / operations
@@ -31,16 +31,17 @@
 - [ ] Extend application-level integration coverage to additional concrete vendor adapter/factory implementations when those drivers are introduced.
 
 ## Current task
-Verify the `380fcae9e41f53b52e433e8704296833c929da41` terminal API import-layout correction through GitHub Actions. Only after CI is verified should the next task begin: connecting concrete authoritative market-data and account/read-only providers at application composition time without fabricating data or creating execution authority.
+The terminal composition boundary is now implemented and tested, but no concrete authoritative provider has been safely wired. The next task is to build or identify the concrete read-only provider that can consume validated authoritative observations (without synthetic values or execution authority), then compose it into the application.
 
 ## Latest verified CI state
-Runs 568 (`35079804364`), 569 (`35080360349`), 570 (`35080510997`), 571 (`35080647090`), 572 (`35080710642`), 574 (`35080835719`), 577 (`35081260014`) and 579 (`35081319193`) failed at Ruff I001 in `backend/src/advance_system/observability/api.py`; pytest and later stages were skipped. Run 579 confirmed that the prior correction still had one extra blank line. The current implementation correction is `380fcae9e41f53b52e433e8704296833c929da41` on `main`. GitHub Actions verification for this new correction and the following status update is pending. Run 549 (`35076782833`) remains the latest fully verified successful baseline.
+Run 582 (`35082009500`) on commit `d56c3ead4a343aeb11b52f8012a1cede7566fae8` completed successfully with Ruff, unit pytest, Compose validation, frontend install/contract/lint/typecheck/build, Docker Compose runtime smoke and cleanup. The two subsequent implementation commits (`37a9283b632a9fab127b3bb3482172506e258df0` and `eead42e57b3b45254a11e030efdc03ee3b3e60b4`) have not yet completed GitHub Actions verification.
 
 ## Architectural decisions
 - Mandatory execution path remains `Market Data → Validation → Market Intelligence → Scanner → Trade Type → Strategy → Probability/EV → RiskEngine → OMS → Execution`.
 - PostgreSQL is operational source of truth; ClickHouse analytics; Redis ephemeral/hot state; Parquet/object storage immutable research data.
 - Frontend and terminal APIs are observational/read-only and cannot invoke broker execution.
 - Terminal provider services may expose only authoritative, validated observations; unavailable or mismatched provider data fails closed and is never guessed.
+- Application composition accepts an explicit `TerminalSnapshotProvider`; no provider is created implicitly, preserving fail-closed behavior until an authoritative implementation exists.
 - AI/HPC cannot bypass `RiskEngine → OMS`.
 
 ## Main-only requirement
