@@ -8,6 +8,13 @@ def test_health_is_healthy_when_all_checks_pass() -> None:
     assert [item.name for item in report.checks] == ["broker", "market_data"]
 
 
+def test_empty_health_checks_fail_closed() -> None:
+    report = HealthChecker().check()
+    assert report.status is HealthStatus.UNHEALTHY
+    assert not report.ready
+    assert report.checks == ()
+
+
 def test_readiness_fails_closed_without_checks() -> None:
     report = HealthChecker().readiness()
     assert report.status is HealthStatus.UNHEALTHY
