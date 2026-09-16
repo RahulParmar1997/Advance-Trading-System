@@ -46,12 +46,20 @@
 - [x] Added deterministic unit coverage proving the concrete Parquet adapter conforms to the application storage protocol alongside the existing concrete PostgreSQL, ClickHouse and Redis adapter coverage.
 - [x] Extended PostgreSQL, ClickHouse and Redis storage protocols with runtime-checkable contracts and added deterministic conformance assertions for all four concrete storage adapters.
 - [x] Verified GitHub Actions Run 527 (`35068304434`) on commit `b77b3f11f2e3b3ff78156ec165dcf152ebdecd30`: Ruff, unit pytest, Docker Compose configuration validation, and full Docker Compose runtime smoke all passed.
+- [x] Reworked the Next.js frontend into a dark-first observational trading-terminal overview with explicit Market State, Scanner, Risk and PAPER Portfolio panels, navigation, feed-state messaging and an explicit RiskEngine → OMS execution boundary.
+- [x] Added responsive terminal styling for desktop, tablet and mobile layouts without introducing broker/execution controls.
+- [x] Added deterministic Node-based frontend UI contract tests covering required panels, PAPER mode, disconnected-feed state and execution-boundary messaging.
+- [x] Added frontend ESLint configuration, lint/typecheck/test scripts, and GitHub Actions verification for frontend install, contract tests, lint, typecheck and production build.
 
 ## Pending work
 
 ### Infrastructure / operations
 - [ ] Runtime end-to-end monitoring validation outside CI against an actually running deployment environment, if a persistent environment is required. The CI smoke test provides real container execution on GitHub-hosted runners but is not a production deployment validation.
 - [ ] Extend application-level integration coverage to additional concrete vendor adapter/factory implementations when those drivers are introduced.
+
+### Frontend / terminal
+- [ ] Connect terminal panels to typed backend read-only endpoints once those endpoints/contracts are introduced.
+- [ ] Add dedicated market, scanner, risk and portfolio routes while preserving read-only frontend boundaries.
 
 ## Non-negotiable architecture rules
 - AI never bypasses RiskEngine or places uncontrolled orders.
@@ -69,7 +77,7 @@
 - Research compute must never place orders, mutate positions/balances or bypass RiskEngine → OMS.
 
 ## Current next task
-Validate the remaining infrastructure boundary against an actually running deployment if such an environment is available; otherwise continue with the next concrete persistence/vendor-driver coverage gap when a new implementation is introduced.
+Connect the observational terminal to typed, read-only backend endpoints/contracts when those endpoints are introduced; otherwise continue with the next concrete frontend route or backend contract gap without adding execution authority to the UI.
 
 ## CI note
-Run 527 (`35068304434`) on `b77b3f11f2e3b3ff78156ec165dcf152ebdecd30` completed successfully: Ruff, unit pytest, Docker Compose configuration validation, and full Docker Compose runtime smoke all passed. The storage runtime-contract hardening is verified on `main`.
+Run 527 (`35068304434`) on `b77b3f11f2e3b3ff78156ec165dcf152ebdecd30` was the last verified completed run before the current frontend changes. A new GitHub Actions run is required to verify the current frontend changes; do not treat Run 527 as validation of the new commits.
