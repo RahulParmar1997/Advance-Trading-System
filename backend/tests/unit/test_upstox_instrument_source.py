@@ -46,7 +46,7 @@ def test_missing_required_upstox_field_fails_closed():
         UpstoxInstrumentMasterConfig("https://example.test/bod.json"),
         lambda _: b'[{"exchange":"NSE"}]',
     )
-    with pytest.raises(ValueError, match="missing Upstox instrument field"):
+    with pytest.raises(ValueError, match="missing or invalid Upstox instrument field"):
         source.fetch()
 
 
