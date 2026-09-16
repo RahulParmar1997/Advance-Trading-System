@@ -1,8 +1,24 @@
 from __future__ import annotations
 
+from contextlib import asynccontextmanager
+
 import pytest
 
 from advance_system.storage.migrations import Migration, MigrationRunner
+
+
+class FakeTransaction:
+    def __init__(self, connection: "FakeConnection") -> None:
+        self.connection = connection
+
+    async def __aenter__(self) -> "FakeTransaction":
+        self.connection.transaction_started = True
+        return self
+
+    async def __aexit__(self, exc_type: object, exc: object, tb: object) -> bool:
+        self.connection.transaction_committed = exc_type is None
+        self.connection.transaction_rolled_back = exc_type is not None
+        return False
 
 
 class FakeConnection:
@@ -10,7 +26,13 @@ class FakeConnection:
         self.applied = applied
         self.fail_on = fail_on
         self.closed = False
+        self.transaction_started = False
+        self.transaction_committed = False
+        self.transaction_rolled_back = False
         self.calls: list[tuple[str, tuple[object, ...]]] = []
+
+    def transaction(self) -> FakeTransaction:
+        return FakeTransaction(self)
 
     async def execute(self, statement: str, *parameters: object) -> object:
         self.calls.append((statement, parameters))
@@ -27,7 +49,7 @@ class FakeConnection:
 
 
 @pytest.mark.asyncio
-async def test_runner_applies_only_pending_migrations() -> None:
+async def test_runner_applies_only_pending_migrations_atomically() -> None:
     connection = FakeConnection([1])
 
     async def factory() -> FakeConnection:
@@ -38,6 +60,9 @@ async def test_runner_applies_only_pending_migrations() -> None:
 
     assert await runner.run(migrations) == (2,)
     assert connection.applied == [1, 2]
+    assert connection.transaction_started is True
+    assert connection.transaction_committed is True
+    assert connection.transaction_rolled_back is False
     assert connection.closed is True
 
 
@@ -53,11 +78,12 @@ async def test_runner_is_idempotent() -> None:
 
     assert await runner.run(migrations) == ()
     assert not any("INSERT INTO schema_migrations" in call[0] for call in connection.calls)
+    assert connection.transaction_committed is True
     assert connection.closed is True
 
 
 @pytest.mark.asyncio
-async def test_runner_closes_connection_when_migration_fails() -> None:
+async def test_runner_rolls_back_and_closes_connection_when_migration_fails() -> None:
     connection = FakeConnection([], fail_on="CREATE TABLE broken_table (id INTEGER)")
 
     async def factory() -> FakeConnection:
@@ -68,6 +94,9 @@ async def test_runner_closes_connection_when_migration_fails() -> None:
     with pytest.raises(RuntimeError, match="migration failed"):
         await runner.run((Migration(1, "broken", "CREATE TABLE broken_table (id INTEGER)"),))
 
+    assert connection.transaction_started is True
+    assert connection.transaction_committed is False
+    assert connection.transaction_rolled_back is True
     assert connection.closed is True
 
 
