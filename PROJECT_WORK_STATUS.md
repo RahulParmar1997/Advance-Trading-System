@@ -18,6 +18,7 @@
 - [x] Added deterministic HTTP contract tests for versioning, all routes, JSON response shape and rejection of POST.
 - [x] Added a provider-owned `TerminalSnapshot` boundary and `TerminalDataService`; terminal HTTP routes now consume that service rather than constructing view payloads themselves.
 - [x] Added deterministic provider-service tests covering unavailable state, exact snapshot passthrough, view mismatch fail-closed behavior and all four terminal views.
+- [x] Corrected Ruff import-order failures discovered by GitHub Actions Runs 557 and 560; current terminal API typing is intentionally simple and lint-safe.
 
 ## Pending work
 ### Frontend / terminal
@@ -32,7 +33,7 @@
 Connect concrete authoritative market-data and account/read-only providers into the terminal service at application composition time without fabricating data or creating execution authority.
 
 ## Latest verified CI state
-Run 549 (`35076782833`) on `874494a6778e445a5b357bbef7821627e6b8fba7` is the latest verified completed run. The provider-service implementation commits on `main` require a new GitHub Actions run to complete before they are considered CI-verified.
+Run 549 (`35076782833`) on `874494a6778e445a5b357bbef7821627e6b8fba7` is the latest fully verified successful run. Run 557 and Run 560 exposed Ruff import-order issues; those issues were corrected. Run 562 (`35078584881`) is now executing against current `main` commit `668c4ea9b38a0ad7913e6ae3ee370f65f155b49d` and has not completed yet, so the current HEAD is not yet CI-verified.
 
 ## Architectural decisions
 - Mandatory execution path remains `Market Data → Validation → Market Intelligence → Scanner → Trade Type → Strategy → Probability/EV → RiskEngine → OMS → Execution`.
