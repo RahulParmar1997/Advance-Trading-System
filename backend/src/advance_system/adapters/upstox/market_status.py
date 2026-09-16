@@ -2,8 +2,11 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from typing import Any, Protocol
 from urllib.request import Request, urlopen
+
+from advance_system.domain.market_status import MarketStatus
 
 
 @dataclass(frozen=True, slots=True)
@@ -13,9 +16,23 @@ class UpstoxMarketStatus:
     last_updated_ms: int
     cas_status: str | None = None
 
+    def to_domain(self) -> MarketStatus:
+        """Convert the broker response to the validated domain status contract."""
+        observed_at = datetime.fromtimestamp(self.last_updated_ms / 1000, tz=timezone.utc)
+        result = MarketStatus(
+            exchange=self.exchange,
+            status=self.status,
+            observed_at=observed_at,
+            cas_status=self.cas_status,
+        )
+        result.validate()
+        return result
+
 
 @dataclass(frozen=True, slots=True)
 class UpstoxMarketStatusConfig:
+    """Configuration for the official Upstox market-status source."""
+
     base_url: str = "https://api.upstox.com/v2"
     timeout_seconds: float = 10.0
 
