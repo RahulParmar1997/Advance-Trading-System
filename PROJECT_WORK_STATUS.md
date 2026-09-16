@@ -44,6 +44,8 @@
 - [x] Verified GitHub Actions Run 519 (`35067255577`) on commit `4522dc22ad55b1a65fbee262b1332d322ef5b45f`: Ruff, unit pytest, Docker Compose configuration validation, and full Docker Compose runtime smoke all passed.
 - [x] Aligned the `ParquetStore` application contract with the concrete immutable adapter's versioned `ResearchDatasetRef` API, manifest return type, and dataset read/write methods.
 - [x] Added deterministic unit coverage proving the concrete Parquet adapter conforms to the application storage protocol alongside the existing concrete PostgreSQL, ClickHouse and Redis adapter coverage.
+- [x] Extended PostgreSQL, ClickHouse and Redis storage protocols with runtime-checkable contracts and added deterministic conformance assertions for all four concrete storage adapters.
+- [x] Verified GitHub Actions Run 527 (`35068304434`) on commit `b77b3f11f2e3b3ff78156ec165dcf152ebdecd30`: Ruff, unit pytest, Docker Compose configuration validation, and full Docker Compose runtime smoke all passed.
 
 ## Pending work
 
@@ -70,4 +72,4 @@
 Validate the remaining infrastructure boundary against an actually running deployment if such an environment is available; otherwise continue with the next concrete persistence/vendor-driver coverage gap when a new implementation is introduced.
 
 ## CI note
-The Parquet contract/test changes are committed on `main` and require fresh GitHub Actions verification. The prior latest verified successful run is Run 519 (`35067255577`) on `4522dc22ad55b1a65fbee262b1332d322ef5b45f`, with Ruff, unit pytest, Docker Compose configuration validation, and full Docker Compose runtime smoke all passing.
+Run 527 (`35068304434`) on `b77b3f11f2e3b3ff78156ec165dcf152ebdecd30` completed successfully: Ruff, unit pytest, Docker Compose configuration validation, and full Docker Compose runtime smoke all passed. The storage runtime-contract hardening is verified on `main`.
