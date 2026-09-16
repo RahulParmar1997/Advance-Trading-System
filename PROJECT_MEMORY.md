@@ -40,7 +40,7 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 - `backend/src/advance_system/observability/providers.py` provides a provider-owned `TerminalSnapshot` boundary and `TerminalDataService`; provider snapshots are passed through only when the requested view matches exactly.
 - POST/PUT/DELETE remain rejected by the observability server; terminal routes have no broker, OMS or RiskEngine authority.
 - Deterministic tests cover contract versioning, route completeness, JSON shape, mutation rejection, unavailable providers, exact snapshot passthrough and view mismatch fail-closed behavior.
-- An explicit `build_observability_handler` composition boundary now accepts a `TerminalSnapshotProvider` dependency. The default server composition supplies no provider, so it remains fail-closed until an authoritative implementation is available.
+- An explicit `build_observability_handler` composition boundary accepts a `TerminalSnapshotProvider` dependency. The default server composition supplies no provider, so it remains fail-closed until an authoritative implementation is available.
 - Deterministic composition tests verify injected-provider passthrough and no-provider fail-closed behavior.
 
 ## Provider discovery
@@ -48,10 +48,11 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 - The terminal composition layer therefore does not invent or directly couple to partial broker data. A concrete read-only provider remains the next integration task.
 
 ## Pending roadmap
-1. Introduce/identify the concrete authoritative read-only market-data and account/portfolio provider implementation, then inject it through the terminal composition boundary.
-2. Add dedicated market, scanner, risk and portfolio frontend routes while preserving read-only boundaries.
-3. Runtime end-to-end monitoring validation outside CI if a persistent deployment environment is required.
-4. Additional concrete vendor adapter/factory integration coverage when those drivers are introduced.
+1. Verify the terminal composition change and corrected composition-test imports through GitHub Actions.
+2. Introduce/identify the concrete authoritative read-only market-data and account/portfolio provider implementation, then inject it through the terminal composition boundary.
+3. Add dedicated market, scanner, risk and portfolio frontend routes while preserving read-only boundaries.
+4. Runtime end-to-end monitoring validation outside CI if a persistent deployment environment is required.
+5. Additional concrete vendor adapter/factory integration coverage when those drivers are introduced.
 
 ## Safety / quality rules
 - No fabricated broker fields, market data, probabilities or execution status.
@@ -62,7 +63,7 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 - Do not claim CI green unless GitHub Actions actually confirms it.
 
 ## Current verification state
-GitHub Actions Run 582 (`35082009500`) on `d56c3ead4a343aeb11b52f8012a1cede7566fae8` is the latest fully verified green baseline. The later implementation/documentation commits `37a9283b632a9fab127b3bb3482172506e258df0`, `eead42e57b3b45254a11e030efdc03ee3b3e60b4`, and `300f411b1ed8782bb13d5afdab34fd436ffec2b9` still require GitHub Actions verification.
+Run 582 (`35082009500`) on `d56c3ead4a343aeb11b52f8012a1cede7566fae8` was fully successful, including Ruff, unit pytest, Compose validation, frontend checks and Docker Compose runtime smoke. Run 586 (`35083495456`) on `2ad580a59862abed7d150685b6c59c02a4e2ff33` failed at Ruff with exactly one I001 import-order error in `test_terminal_composition.py`; pytest and later stages were skipped. Commit `81d741835a7f0acff7e1572e21aab16b63e61b42` corrects that import order, and the subsequent documentation commit `d80c8f1defa916b30aba238fab495cb2cedb14cf` records the state. Verification of the corrected HEAD is pending.
 
 ## Next implementation rule
 When the user says **NEXT**, inspect current `main` and latest GitHub Actions state, implement the highest-priority unfinished task directly on `main`, add deterministic tests, update this file and `PROJECT_WORK_STATUS.md`, verify CI, and report the commit SHA and blockers.
