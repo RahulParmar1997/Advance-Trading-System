@@ -16,27 +16,29 @@
 - [x] Added versioned read-only terminal API contracts for Market State, Scanner, Risk and Portfolio views. Until authoritative feed-backed providers exist, responses explicitly report `available=false` and `data=null` rather than synthesizing market/account values.
 - [x] Exposed the four terminal API routes from the existing backend observability server without adding broker or execution authority.
 - [x] Added deterministic HTTP contract tests for versioning, all routes, JSON response shape and rejection of POST.
+- [x] Added a provider-owned `TerminalSnapshot` boundary and `TerminalDataService`; terminal HTTP routes now consume that service rather than constructing view payloads themselves.
+- [x] Added deterministic provider-service tests covering unavailable state, exact snapshot passthrough, view mismatch fail-closed behavior and all four terminal views.
 
 ## Pending work
 ### Frontend / terminal
-- [ ] Connect terminal panels to authoritative provider-backed implementations of the typed read-only API contracts.
-- [ ] Add dedicated market, scanner, risk and portfolio routes while preserving read-only frontend boundaries.
+- [ ] Connect a concrete authoritative market-data/portfolio provider into the terminal service at application composition time.
+- [ ] Add dedicated market, scanner, risk and portfolio frontend routes while preserving read-only frontend boundaries.
 
 ### Infrastructure / operations
 - [ ] Runtime end-to-end monitoring validation outside CI against an actually running deployment environment, if a persistent environment is required.
 - [ ] Extend application-level integration coverage to additional concrete vendor adapter/factory implementations when those drivers are introduced.
 
 ## Current task
-Implement authoritative provider-backed read-only data services behind the typed terminal API contracts without fabricating data or creating execution authority.
+Connect concrete authoritative market-data and account/read-only providers into the terminal service at application composition time without fabricating data or creating execution authority.
 
 ## Latest verified CI state
-Run 549 (`35076782833`) on `874494a6778e445a5b357bbef7821627e6b8fba7` passed all workflow steps, including the Docker Compose runtime smoke test. The current API-contract commits have triggered a new GitHub Actions verification run; that run must complete before this latest change is considered CI-verified.
+Run 549 (`35076782833`) on `874494a6778e445a5b357bbef7821627e6b8fba7` is the latest verified completed run. The provider-service implementation commits on `main` require a new GitHub Actions run to complete before they are considered CI-verified.
 
 ## Architectural decisions
 - Mandatory execution path remains `Market Data → Validation → Market Intelligence → Scanner → Trade Type → Strategy → Probability/EV → RiskEngine → OMS → Execution`.
 - PostgreSQL is operational source of truth; ClickHouse analytics; Redis ephemeral/hot state; Parquet/object storage immutable research data.
 - Frontend and terminal APIs are observational/read-only and cannot invoke broker execution.
-- Observed market/account data must be sourced from authoritative providers; unavailable data is represented explicitly, never guessed.
+- Terminal provider services may expose only authoritative, validated observations; unavailable or mismatched provider data fails closed and is never guessed.
 - AI/HPC cannot bypass `RiskEngine → OMS`.
 
 ## Main-only requirement
