@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from contextlib import asynccontextmanager
-
 import pytest
 
 from advance_system.storage.migrations import Migration, MigrationRunner
@@ -10,14 +8,18 @@ from advance_system.storage.migrations import Migration, MigrationRunner
 class FakeTransaction:
     def __init__(self, connection: "FakeConnection") -> None:
         self.connection = connection
+        self._applied_snapshot: list[int] = []
 
     async def __aenter__(self) -> "FakeTransaction":
         self.connection.transaction_started = True
+        self._applied_snapshot = list(self.connection.applied)
         return self
 
     async def __aexit__(self, exc_type: object, exc: object, tb: object) -> bool:
         self.connection.transaction_committed = exc_type is None
         self.connection.transaction_rolled_back = exc_type is not None
+        if exc_type is not None:
+            self.connection.applied[:] = self._applied_snapshot
         return False
 
 
@@ -83,17 +85,22 @@ async def test_runner_is_idempotent() -> None:
 
 
 @pytest.mark.asyncio
-async def test_runner_rolls_back_and_closes_connection_when_migration_fails() -> None:
+async def test_runner_rolls_back_partial_migrations_and_closes_connection() -> None:
     connection = FakeConnection([], fail_on="CREATE TABLE broken_table (id INTEGER)")
 
     async def factory() -> FakeConnection:
         return connection
 
     runner = MigrationRunner(factory)
+    migrations = (
+        Migration(1, "first", "CREATE TABLE first_table (id INTEGER)"),
+        Migration(2, "broken", "CREATE TABLE broken_table (id INTEGER)"),
+    )
 
     with pytest.raises(RuntimeError, match="migration failed"):
-        await runner.run((Migration(1, "broken", "CREATE TABLE broken_table (id INTEGER)"),))
+        await runner.run(migrations)
 
+    assert connection.applied == []
     assert connection.transaction_started is True
     assert connection.transaction_committed is False
     assert connection.transaction_rolled_back is True
