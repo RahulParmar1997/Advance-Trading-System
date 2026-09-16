@@ -39,6 +39,8 @@
 - [x] Verified GitHub Actions Run 619 (`35091319639`) fully successful, including Ruff, pytest, Compose validation, frontend checks and Docker Compose runtime smoke.
 - [x] Hardened the Upstox instrument-master source to validate strict string identity fields and apply `InstrumentMasterRecord.validate()` before records leave the adapter boundary.
 - [x] Added deterministic tests for invalid field types, blank symbols and domain validation failures at the Upstox source boundary.
+- [x] Added a broker-to-domain `UpstoxMarketStatus.to_domain()` conversion that creates a timezone-aware `MarketStatus` from the authoritative millisecond timestamp and invokes domain validation, including rejection of future observations.
+- [x] Added deterministic tests covering domain conversion and future timestamp rejection.
 
 ## Pending work
 ### Frontend / terminal
@@ -49,10 +51,10 @@
 - [ ] Extend application-level integration coverage to additional concrete vendor adapter/factory implementations when those drivers are introduced.
 
 ## Current task
-The next safe market-data correctness step is complete: the Upstox instrument source now rejects malformed identity fields and validates each broker-neutral record before returning it. Concrete terminal lifecycle wiring remains blocked until authoritative market/account/portfolio sources are available.
+Upstox market-status data now has an explicit validated domain conversion. Concrete terminal lifecycle wiring remains blocked until authoritative market/account/portfolio sources are available.
 
 ## Latest verified CI state
-Run 619 (`35091319639`) on `961bfaf1f23b40d81792389b010c78c9f65d9d3c` was fully successful, including Ruff, unit pytest, Compose validation, frontend checks and Docker Compose runtime smoke. The Upstox instrument-source hardening commits after Run 619 require fresh GitHub Actions verification; no newer green run is being claimed until the final HEAD is verified.
+Fresh verification is pending for the final documentation commit below. The latest fully verified pre-change run was Run 619 (`35091319639`).
 
 ## Architectural decisions
 - Mandatory execution path remains `Market Data → Validation → Market Intelligence → Scanner → Trade Type → Strategy → Probability/EV → RiskEngine → OMS → Execution`.
@@ -64,6 +66,7 @@ Run 619 (`35091319639`) on `961bfaf1f23b40d81792389b010c78c9f65d9d3c` was fully 
 - `StoreBackedTerminalSnapshotProvider` only delegates reads to that store; it does not create, transform, or approve data.
 - `TerminalSnapshotIngress` requires an explicit upstream validation dependency before store publication; it does not itself infer authority from payload shape.
 - Upstox instrument parsing performs strict field-shape and domain validation before exposing records to downstream ingestion.
+- Upstox market-status conversion preserves the authoritative observation timestamp and delegates safety validation to the broker-neutral `MarketStatus` domain contract.
 - Application composition accepts an explicit `TerminalSnapshotProvider`; no provider is created implicitly, preserving fail-closed behavior until authoritative wiring exists.
 - Frontend server routes may consume backend terminal contracts, but they must preserve `available`, `reason`, and `data=null` semantics on unavailable/error responses.
 - AI/HPC cannot bypass `RiskEngine → OMS`.
