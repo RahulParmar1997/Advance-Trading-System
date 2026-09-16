@@ -51,6 +51,9 @@
 - [x] Added deterministic Node-based frontend UI contract tests covering required panels, PAPER mode, disconnected-feed state and execution-boundary messaging.
 - [x] Added frontend ESLint configuration, lint/typecheck/test scripts, and GitHub Actions verification for frontend install, contract tests, lint, typecheck and production build.
 - [x] Extended the Docker Compose runtime smoke test to build/start the frontend container and verify its served HTML contains the observational terminal title, PAPER mode indicator and RiskEngine → OMS safety boundary.
+- [x] Fixed the frontend standalone Docker image build by removing the invalid copy of a nonexistent `frontend/public` directory.
+- [x] Hardened frontend Compose startup with a backend health-gated dependency and a Node-based HTTP healthcheck.
+- [x] Added deterministic deployment tests covering the frontend Dockerfile standalone contract, port mapping, backend health gate, healthcheck and removal of the nonexistent public-assets copy.
 
 ## Pending work
 
@@ -78,7 +81,7 @@
 - Research compute must never place orders, mutate positions/balances or bypass RiskEngine → OMS.
 
 ## Current next task
-Connect the observational terminal to typed, read-only backend endpoints/contracts when those endpoints are introduced; otherwise continue with the next concrete frontend route or backend contract gap without adding execution authority to the UI.
+Verify the frontend runtime smoke fix through GitHub Actions. If verified, proceed to the next concrete frontend/backend contract gap without adding execution authority to the UI.
 
 ## CI note
-The frontend runtime smoke enhancement is committed on `main` as `5c0835d2aaf8cc0ecc92b4f8952863ff8cb6b8f8` and requires its new GitHub Actions run to complete successfully before this change is considered verified.
+GitHub Actions Run 547 (`35076685947`) is currently in progress for commit `f7dd1a9958283ae914aefcb352c120810f15a1a3`. Ruff has passed; unit pytest is still running. The frontend runtime smoke fix is not yet considered CI-verified.
