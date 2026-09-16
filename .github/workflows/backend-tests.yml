@@ -25,3 +25,7 @@ jobs:
       - name: Pytest
         working-directory: backend
         run: python -m pytest
+      - name: Validate Docker Compose configuration
+        env:
+          POSTGRES_PASSWORD: ci-validation-password
+        run: docker compose config --quiet
