@@ -40,12 +40,14 @@
 - [x] Inspected GitHub Actions Run 479 (`35061410821`) and found the corrected target assertion was not reached: Prometheus was still `health: starting` when the workflow immediately called `/-/ready`, causing the runtime smoke to exit with code 1 after all container health checks had otherwise become healthy.
 - [x] Hardened the runtime smoke by polling Prometheus `/-/ready` with the same bounded 30-attempt/2-second fail-closed pattern used for backend readiness, including diagnostic service logs on timeout. Committed directly to `main` in `538bf2b979a9a3f0143fb9b908da1e3ce78de0b9`.
 - [x] Inspected GitHub Actions Run 481 (`35061603284`): Ruff passed, Pytest passed (332 tests), Compose configuration validation passed, and runtime startup reached healthy backend/PostgreSQL/ClickHouse/Redis services and Prometheus successfully; the remaining failure occurred after PostgreSQL readiness, before the ClickHouse/Redis and Prometheus target assertions completed.
-- [x] Hardened PostgreSQL, ClickHouse and Redis runtime smoke probes with bounded 30-attempt/2-second polling and fail-closed service diagnostics, so transient service convergence is distinguished from a genuine readiness failure. Committed directly to `main` in `ecf232d89469279ba779713222083ab8c36460c2`.
+- [x] Hardened PostgreSQL, ClickHouse and Redis runtime smoke probes with bounded 30-attempt/2-second polling and fail-closed service diagnostics, so transient service convergence is distinguished from a genuine readiness failure. Committed directly to `main` in commit `ecf232d89469279ba779713222083ab8c36460c2`.
+- [x] Inspected GitHub Actions Run 485 (`35062076082`) on commit `1dc1c833f7ab48363dbc5bc11fc1dd56b4b73c4a`: Ruff passed, Pytest passed (332 tests), Compose configuration validation passed, and runtime services became healthy; the runtime smoke then failed after PostgreSQL readiness because the ClickHouse probe piped `wget` into `grep -q` under `set -o pipefail`, allowing `grep` to exit early and causing `wget` to receive SIGPIPE. This was a CI probe defect, not evidence that ClickHouse was unhealthy.
+- [x] Fixed the ClickHouse smoke probe to capture the HTTP response first and compare it without a `grep -q` pipeline, preserving bounded retries and fail-closed diagnostics. Committed directly to `main` in commit `822f5464d883d152355250caac1fb338c86d7359`.
 
 ## Pending work
 
 ### Infrastructure / operations
-- [ ] Fresh GitHub Actions verification of the hardened Docker Compose runtime smoke test, including storage readiness and backend Prometheus scrape-target convergence.
+- [ ] Fresh GitHub Actions verification of the ClickHouse smoke-probe fix and full Docker Compose runtime smoke, including storage readiness and backend Prometheus scrape-target convergence.
 - [ ] Runtime end-to-end monitoring validation outside CI against an actually running deployment environment, if a persistent environment is required. The CI smoke test provides real container execution on GitHub-hosted runners but is not a production deployment validation.
 - [ ] Full deployment/integration validation against configured PostgreSQL, ClickHouse and Redis application storage operations.
 
@@ -65,7 +67,7 @@
 - Research compute must never place orders, mutate positions/balances or bypass RiskEngine → OMS.
 
 ## Current next task
-Verify the hardened Docker Compose runtime smoke test through GitHub Actions. If it passes, retain the CI evidence and proceed to application-level PostgreSQL/ClickHouse/Redis integration validation; do not treat container readiness alone as proof that application storage operations are working. Runtime deployment outside CI remains environment-dependent.
+Verify the ClickHouse smoke-probe fix through GitHub Actions. If it passes, retain the CI evidence and proceed to application-level PostgreSQL/ClickHouse/Redis integration validation; do not treat container readiness alone as proof that application storage operations are working. Runtime deployment outside CI remains environment-dependent.
 
 ## CI note
-Run 483 (`35061922864`) on commit `6604a11cbae93635ad3ec581576442401bebfeba` completed Ruff, Pytest (332 passed), and Compose configuration validation successfully, but the runtime smoke failed immediately after PostgreSQL readiness while executing the ClickHouse/Redis readiness sequence. The hardened storage probes are now on `main` in commit `ecf232d89469279ba779713222083ab8c36460c2`; a fresh Actions run is required before claiming runtime smoke verification.
+Run 485 (`35062076082`) on commit `1dc1c833f7ab48363dbc5bc11fc1dd56b4b73c4a` completed Ruff, Pytest (332 passed), and Compose configuration validation successfully. Runtime services became healthy, but the ClickHouse smoke probe failed because `wget | grep -q` was used under `set -o pipefail`; the early `grep` exit can propagate SIGPIPE to `wget` and fail the pipeline. Commit `822f5464d883d152355250caac1fb338c86d7359` replaces that pipeline with response capture and exact response validation. A fresh Actions run is required before claiming runtime smoke verification.
