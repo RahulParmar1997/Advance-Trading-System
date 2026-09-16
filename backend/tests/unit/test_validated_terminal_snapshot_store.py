@@ -3,6 +3,7 @@ from datetime import datetime, timedelta, timezone
 import pytest
 
 from advance_system.observability.providers import (
+    StoreBackedTerminalSnapshotProvider,
     TerminalSnapshot,
     ValidatedTerminalSnapshotStore,
 )
@@ -52,3 +53,24 @@ def test_store_rejects_future_observation_timestamp() -> None:
 def test_store_rejects_non_positive_max_age() -> None:
     with pytest.raises(ValueError, match="max_age must be positive"):
         ValidatedTerminalSnapshotStore(max_age=timedelta(0))
+
+
+def test_store_backed_provider_returns_only_store_observation() -> None:
+    store = ValidatedTerminalSnapshotStore(max_age=timedelta(seconds=30))
+    provider = StoreBackedTerminalSnapshotProvider(store)
+    snapshot = TerminalSnapshot(view="portfolio", data={"source": "validated-upstream"})
+    store.publish(snapshot, observed_at=datetime.now(timezone.utc))
+
+    assert provider.snapshot("portfolio") == snapshot
+    assert provider.snapshot("risk") is None
+
+
+def test_store_backed_provider_withholds_expired_observation() -> None:
+    store = ValidatedTerminalSnapshotStore(max_age=timedelta(seconds=30))
+    provider = StoreBackedTerminalSnapshotProvider(store)
+    store.publish(
+        TerminalSnapshot(view="scanner", data={"source": "validated-upstream"}),
+        observed_at=datetime.now(timezone.utc) - timedelta(seconds=31),
+    )
+
+    assert provider.snapshot("scanner") is None
