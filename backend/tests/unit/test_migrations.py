@@ -6,17 +6,24 @@ from advance_system.storage.migrations import Migration, MigrationRunner
 
 
 class FakeConnection:
-    def __init__(self, applied: list[int]) -> None:
+    def __init__(self, applied: list[int], fail_on: str | None = None) -> None:
         self.applied = applied
+        self.fail_on = fail_on
+        self.closed = False
         self.calls: list[tuple[str, tuple[object, ...]]] = []
 
     async def execute(self, statement: str, *parameters: object) -> object:
         self.calls.append((statement, parameters))
+        if statement == self.fail_on:
+            raise RuntimeError("migration failed")
         if statement.startswith("SELECT version"):
             return [(version,) for version in self.applied]
         if statement.startswith("INSERT INTO schema_migrations"):
             self.applied.append(int(parameters[0]))
         return None
+
+    async def close(self) -> None:
+        self.closed = True
 
 
 @pytest.mark.asyncio
@@ -31,6 +38,7 @@ async def test_runner_applies_only_pending_migrations() -> None:
 
     assert await runner.run(migrations) == (2,)
     assert connection.applied == [1, 2]
+    assert connection.closed is True
 
 
 @pytest.mark.asyncio
@@ -45,6 +53,22 @@ async def test_runner_is_idempotent() -> None:
 
     assert await runner.run(migrations) == ()
     assert not any("INSERT INTO schema_migrations" in call[0] for call in connection.calls)
+    assert connection.closed is True
+
+
+@pytest.mark.asyncio
+async def test_runner_closes_connection_when_migration_fails() -> None:
+    connection = FakeConnection([], fail_on="CREATE TABLE broken_table (id INTEGER)")
+
+    async def factory() -> FakeConnection:
+        return connection
+
+    runner = MigrationRunner(factory)
+
+    with pytest.raises(RuntimeError, match="migration failed"):
+        await runner.run((Migration(1, "broken", "CREATE TABLE broken_table (id INTEGER)"),))
+
+    assert connection.closed is True
 
 
 def test_runner_rejects_duplicate_versions() -> None:
