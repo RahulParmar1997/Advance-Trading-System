@@ -41,7 +41,7 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 - `backend/src/advance_system/observability/providers.py` provides a provider-owned `TerminalSnapshot` boundary and `TerminalDataService`; provider snapshots are passed through only when the requested view matches exactly.
 - POST/PUT/DELETE remain rejected by the observability server; terminal routes have no broker, OMS or RiskEngine authority.
 - Deterministic tests cover contract versioning, route completeness, JSON shape, mutation rejection, unavailable providers, exact snapshot passthrough and view mismatch fail-closed behavior.
-- GitHub Actions Runs 557 and 560 identified Ruff import-order defects in the new terminal API/test code; those defects were corrected on `main`.
+- GitHub Actions Runs 557, 560 and 564 identified Ruff import-order defects in the new terminal API code; the unnecessary future import was removed and a regression test now locks the runtime `ViewName` string contract.
 
 ## Pending roadmap
 1. Connect typed terminal endpoints to concrete authoritative market-data/account read-only services at application composition time.
@@ -58,7 +58,7 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 - Do not claim CI green unless GitHub Actions actually confirms it.
 
 ## Current verification state
-Run 549 (`35076782833`) is the latest fully verified successful baseline. Run 562 (`35078584881`) started against `668c4ea9b38a0ad7913e6ae3ee370f65f155b49d` and was still in progress when this state was recorded; therefore the current HEAD is not yet CI-verified.
+Run 564 (`35078654413`) on `952d6becf4204f5ddfb647d97e6d0a21cd620f89` failed at Ruff I001 in `backend/src/advance_system/observability/api.py`; pytest and later stages were skipped. The correction and regression test are now committed on `main` as `135046507f996f433f4f0b702a5cb30dbc805f46` and `8c2b5e6a5e73803cc4098751d3ac7f8c38e4da47`. The documentation update is `12ed2517e1199eec71dda61afe7553b8be715136`; GitHub Actions verification for the current HEAD is pending. Run 549 remains the latest fully verified successful baseline.
 
 ## Next implementation rule
 When the user says **NEXT**, inspect current `main` and latest GitHub Actions state, implement the highest-priority unfinished task directly on `main`, add deterministic tests, update this file and `PROJECT_WORK_STATUS.md`, verify CI, and report the commit SHA and blockers.
