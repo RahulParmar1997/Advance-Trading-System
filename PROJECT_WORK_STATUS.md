@@ -30,11 +30,13 @@
 - [x] Hardened the PostgreSQL integration assertion to use quiet, tuples-only, unaligned output (`-qAt`) so the test validates the returned value deterministically.
 - [x] Fixed the concrete `AsyncpgConnectionFactory` lifecycle so acquired pooled connections are returned with `pool.release()` when the store closes them, rather than calling the raw asyncpg connection's `close()`.
 - [x] Added unit coverage proving pooled connections delegate operations, return exactly once to the pool, and remain open at the driver-connection level until pool shutdown.
+- [x] Fixed PAPER OMS idempotency so reusing an existing client key with a different order ID fails closed instead of silently replaying the original order.
+- [x] Added unit coverage for the client-key/different-order collision case.
 
 ## Pending work
 
 ### Infrastructure / operations
-- [ ] Fresh GitHub Actions verification of the pooled PostgreSQL connection lifecycle fix and full Docker Compose runtime smoke, including the explicit storage integration test.
+- [ ] GitHub Actions verification of the PAPER OMS idempotency collision fix and full Docker Compose runtime smoke.
 - [ ] Runtime end-to-end monitoring validation outside CI against an actually running deployment environment, if a persistent environment is required. The CI smoke test provides real container execution on GitHub-hosted runners but is not a production deployment validation.
 - [ ] Extend application-level integration coverage to the concrete adapter/factory implementations where additional vendor drivers are introduced.
 
@@ -54,7 +56,7 @@
 - Research compute must never place orders, mutate positions/balances or bypass RiskEngine → OMS.
 
 ## Current next task
-Verify the fresh GitHub Actions run for the pooled PostgreSQL connection lifecycle fix. Do not claim CI green until that run completes successfully. If it passes, continue with the next highest-priority persistence/application integration gap.
+Verify GitHub Actions for the PAPER OMS idempotency collision fix. Do not claim CI green until the new run completes successfully. If it passes, continue with the next highest-priority persistence/application integration gap.
 
 ## CI note
-Run 499 (`35064305638`) on `436cc93772538b86138fe7c2b372438472e7b416` is the latest verified successful baseline: Ruff passed, 332 unit tests passed, Compose configuration validation passed, and the full Docker Compose runtime smoke/storage integration passed. Earlier Run 497 (`35063728912`) exposed the PostgreSQL integration output-format defect; the `-qAt` correction was committed before Run 499. The pooled PostgreSQL lifecycle fix is now committed on `main`; fresh Actions verification is required.
+Run 502 (`35064867296`) on `1dbc8ecc2789b4ca6bf6008f0757d63a11f45c25` was the latest verified successful baseline: Ruff passed, unit tests passed, Compose configuration validation passed, and the full Docker Compose runtime/storage integration smoke passed. The current OMS fix is committed on `main` and requires fresh Actions verification.
