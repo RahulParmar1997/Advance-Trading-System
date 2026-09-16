@@ -44,13 +44,36 @@ class UpstoxInstrumentMasterSource:
     def _parse_record(item: Any) -> InstrumentMasterRecord:
         if not isinstance(item, dict):
             raise ValueError("Upstox instrument record must be an object")
-        try:
-            return InstrumentMasterRecord(
-                instrument=str(item["instrument_key"]),
-                exchange=str(item["exchange"]),
-                symbol=str(item.get("trading_symbol") or item["symbol"]),
-                asset_type=str(item.get("instrument_type") or item["segment"]),
-                tradable=True,
-            )
-        except KeyError as exc:
-            raise ValueError(f"missing Upstox instrument field: {exc.args[0]}") from exc
+        instrument = UpstoxInstrumentMasterSource._required_string(item, "instrument_key")
+        exchange = UpstoxInstrumentMasterSource._required_string(item, "exchange")
+        symbol = UpstoxInstrumentMasterSource._optional_string(item, "trading_symbol")
+        if symbol is None:
+            symbol = UpstoxInstrumentMasterSource._required_string(item, "symbol")
+        asset_type = UpstoxInstrumentMasterSource._optional_string(item, "instrument_type")
+        if asset_type is None:
+            asset_type = UpstoxInstrumentMasterSource._required_string(item, "segment")
+        record = InstrumentMasterRecord(
+            instrument=instrument,
+            exchange=exchange,
+            symbol=symbol,
+            asset_type=asset_type,
+            tradable=True,
+        )
+        record.validate()
+        return record
+
+    @staticmethod
+    def _required_string(item: dict[str, Any], field_name: str) -> str:
+        value = item.get(field_name)
+        if not isinstance(value, str) or not value.strip():
+            raise ValueError(f"missing or invalid Upstox instrument field: {field_name}")
+        return value
+
+    @staticmethod
+    def _optional_string(item: dict[str, Any], field_name: str) -> str | None:
+        value = item.get(field_name)
+        if value is None:
+            return None
+        if not isinstance(value, str) or not value.strip():
+            raise ValueError(f"invalid Upstox instrument field: {field_name}")
+        return value
