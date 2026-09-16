@@ -43,11 +43,13 @@
 - [x] Hardened PostgreSQL, ClickHouse and Redis runtime smoke probes with bounded 30-attempt/2-second polling and fail-closed service diagnostics, so transient service convergence is distinguished from a genuine readiness failure. Committed directly to `main` in commit `ecf232d89469279ba779713222083ab8c36460c2`.
 - [x] Inspected GitHub Actions Run 485 (`35062076082`) on commit `1dc1c833f7ab48363dbc5bc11fc1dd56b4b73c4a`: Ruff passed, Pytest passed (332 tests), Compose configuration validation passed, and runtime services became healthy; the runtime smoke then failed after PostgreSQL readiness because the ClickHouse probe piped `wget` into `grep -q` under `set -o pipefail`, allowing `grep` to exit early and causing `wget` to receive SIGPIPE. This was a CI probe defect, not evidence that ClickHouse was unhealthy.
 - [x] Fixed the ClickHouse smoke probe to capture the HTTP response first and compare it without a `grep -q` pipeline, preserving bounded retries and fail-closed diagnostics. Committed directly to `main` in commit `822f5464d883d152355250caac1fb338c86d7359`.
+- [x] Inspected GitHub Actions Run 487 (`35062475086`) on commit `adfaba2be8ea07b4c35831910f5f47d6e7bb2958`: Ruff passed, Pytest passed (332 tests), Compose configuration validation passed, and backend/PostgreSQL/ClickHouse/Redis plus Prometheus became ready. The runtime smoke then failed because the Prometheus backend target was still `health: unknown` with `lastScrape` unset during the bounded target polling window; this is a monitoring convergence timing defect in the smoke assertion, not evidence that the backend metrics endpoint was unhealthy.
+- [x] Hardened Prometheus target verification to allow the configured initial scrape interval to elapse before asserting target health, while retaining bounded polling and fail-closed diagnostics. The assertion now also requires a non-zero `lastScrape` before accepting the target as healthy. Committed directly to `main` in commit `b249c129ca0151a5c180cf86d9a00792d5cebb6b`.
 
 ## Pending work
 
 ### Infrastructure / operations
-- [ ] Fresh GitHub Actions verification of the ClickHouse smoke-probe fix and full Docker Compose runtime smoke, including storage readiness and backend Prometheus scrape-target convergence.
+- [ ] Fresh GitHub Actions verification of the Prometheus initial-scrape hardening and full Docker Compose runtime smoke, including storage readiness and backend Prometheus scrape-target convergence.
 - [ ] Runtime end-to-end monitoring validation outside CI against an actually running deployment environment, if a persistent environment is required. The CI smoke test provides real container execution on GitHub-hosted runners but is not a production deployment validation.
 - [ ] Full deployment/integration validation against configured PostgreSQL, ClickHouse and Redis application storage operations.
 
@@ -67,7 +69,7 @@
 - Research compute must never place orders, mutate positions/balances or bypass RiskEngine → OMS.
 
 ## Current next task
-Verify the ClickHouse smoke-probe fix through GitHub Actions. If it passes, retain the CI evidence and proceed to application-level PostgreSQL/ClickHouse/Redis integration validation; do not treat container readiness alone as proof that application storage operations are working. Runtime deployment outside CI remains environment-dependent.
+Verify the Prometheus initial-scrape hardening through GitHub Actions. If it passes, retain the CI evidence and proceed to application-level PostgreSQL/ClickHouse/Redis integration validation; do not treat container readiness alone as proof that application storage operations are working. Runtime deployment outside CI remains environment-dependent.
 
 ## CI note
-Run 485 (`35062076082`) on commit `1dc1c833f7ab48363dbc5bc11fc1dd56b4b73c4a` completed Ruff, Pytest (332 passed), and Compose configuration validation successfully. Runtime services became healthy, but the ClickHouse smoke probe failed because `wget | grep -q` was used under `set -o pipefail`; the early `grep` exit can propagate SIGPIPE to `wget` and fail the pipeline. Commit `822f5464d883d152355250caac1fb338c86d7359` replaces that pipeline with response capture and exact response validation. A fresh Actions run is required before claiming runtime smoke verification.
+Run 487 (`35062475086`) on commit `adfaba2be8ea07b4c35831910f5f47d6e7bb2958` completed Ruff, Pytest (332 passed), and Compose configuration validation successfully. Runtime services became healthy, but the Prometheus target assertion observed the configured backend target as `health: unknown` with `lastScrape` at the zero timestamp during the polling window. Commit `b249c129ca0151a5c180cf86d9a00792d5cebb6b` adds an explicit initial-scrape wait and requires a non-zero `lastScrape` together with `health: up`. A fresh Actions run is required before claiming runtime smoke verification.
