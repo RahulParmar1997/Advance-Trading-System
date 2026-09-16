@@ -46,27 +46,28 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 - Deterministic tests cover contract versioning, route completeness, JSON shape, mutation rejection, unavailable providers, exact snapshot passthrough and view mismatch fail-closed behavior.
 - An explicit `build_observability_handler` composition boundary accepts a `TerminalSnapshotProvider` dependency. The default server composition supplies no provider, so it remains fail-closed until an authoritative implementation is available.
 - Deterministic composition tests verify injected-provider passthrough and no-provider fail-closed behavior.
+- `ValidatedTerminalSnapshotStore` now requires timezone-aware, non-future observation timestamps and withholds observations beyond its configured freshness age.
+- Deterministic tests cover fresh, expired, naive, future-dated, and invalid-freshness cases.
 
 ## Provider discovery
 - The repository contains a concrete `UpstoxAdapter` market-data adapter plus Upstox market-status/source components, but no existing application-level `TerminalSnapshotProvider` implementation that safely maps authoritative validated observations into all terminal views.
 - The terminal composition layer therefore does not invent or directly couple to partial broker data. A concrete read-only provider remains the next integration task.
 
 ## Pending roadmap
-1. Verify the current terminal route-consumption commits through GitHub Actions.
-2. Introduce/identify the concrete authoritative read-only market-data and account/portfolio provider implementation, then inject it through the terminal composition boundary.
-3. Runtime end-to-end monitoring validation outside CI if a persistent deployment environment is required.
-4. Additional concrete vendor adapter/factory integration coverage when those drivers are introduced.
+1. Connect the snapshot store to concrete authoritative market/account/portfolio ingestion and inject the resulting provider through the terminal composition boundary.
+2. Runtime end-to-end monitoring validation outside CI if a persistent deployment environment is required.
+3. Additional concrete vendor adapter/factory integration coverage when those drivers are introduced.
 
 ## Safety / quality rules
 - No fabricated broker fields, market data, probabilities or execution status.
 - Validate timestamps, instruments, quantities and session metadata.
-- Reject malformed/stale data fail-closed where safety is involved.
+- Reject malformed, stale, or future-dated data fail-closed where safety is involved.
 - PostgreSQL remains operational source of truth; Redis/ClickHouse/Parquet never become execution authority.
 - Research compute is isolated from execution and cannot approve its own trades.
 - Do not claim CI green unless GitHub Actions actually confirms it.
 
 ## Current verification state
-Run 594 (`35085263149`) on `cb7a241fce78a2a4e181f97fac5e1ec4b9f61469` was fully successful, including Ruff, unit pytest, Compose validation, frontend checks and Docker Compose runtime smoke. The subsequent terminal route-consumption commits require fresh GitHub Actions verification; no newer green run is being claimed until the final HEAD is verified.
+Run 603 (`35086961799`) on `b81c72631620f1f161f92c1080b6782089f065c7` was fully successful, including Ruff, unit pytest, Compose validation, frontend checks and Docker Compose runtime smoke. Future-timestamp hardening commits after Run 603 require fresh GitHub Actions verification; no newer green run is being claimed until the final HEAD is verified.
 
 ## Next implementation rule
 When the user says **NEXT**, inspect current `main` and latest GitHub Actions state, implement the highest-priority unfinished task directly on `main`, add deterministic tests, update this file and `PROJECT_WORK_STATUS.md`, verify CI, and report the commit SHA and blockers.
