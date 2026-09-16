@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 from contextlib import asynccontextmanager
 from typing import Any, AsyncIterator, Protocol
 
@@ -96,6 +97,7 @@ class AsyncpgConnectionFactory:
         self._min_size = min_size
         self._max_size = max_size
         self._pool: Any | None = None
+        self._pool_lock = asyncio.Lock()
 
     async def __call__(self) -> AsyncConnection:
         if self._pool is None:
@@ -103,18 +105,22 @@ class AsyncpgConnectionFactory:
                 import asyncpg
             except ImportError as exc:
                 raise RuntimeError("asyncpg is required for concrete PostgreSQL integration") from exc
-            self._pool = await asyncpg.create_pool(
-                dsn=self._dsn,
-                min_size=self._min_size,
-                max_size=self._max_size,
-            )
+            async with self._pool_lock:
+                if self._pool is None:
+                    self._pool = await asyncpg.create_pool(
+                        dsn=self._dsn,
+                        min_size=self._min_size,
+                        max_size=self._max_size,
+                    )
         connection = await self._pool.acquire()
         return _PooledAsyncConnection(self._pool, connection)
 
     async def close(self) -> None:
-        if self._pool is not None:
-            await self._pool.close()
-            self._pool = None
+        async with self._pool_lock:
+            if self._pool is not None:
+                pool = self._pool
+                self._pool = None
+                await pool.close()
 
 
 # Explicit alias documents compatibility with the vendor-neutral boundary.
