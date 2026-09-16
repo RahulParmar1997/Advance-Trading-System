@@ -5,7 +5,7 @@ from http.server import ThreadingHTTPServer
 
 from advance_system.observability.api import VIEW_PATHS
 from advance_system.observability.metrics import MetricSample, MetricsHandler, MetricsRegistry
-from advance_system.observability.providers import TerminalDataService
+from advance_system.observability.providers import TerminalDataService, TerminalSnapshotProvider
 
 
 class TerminalObservabilityHandler(MetricsHandler):
@@ -27,6 +27,18 @@ class TerminalObservabilityHandler(MetricsHandler):
         self.wfile.write(payload)
 
 
+def build_observability_handler(
+    registry: MetricsRegistry,
+    provider: TerminalSnapshotProvider | None = None,
+) -> type[TerminalObservabilityHandler]:
+    """Compose the HTTP handler with an explicitly injected observational provider."""
+    return type(
+        "BoundTerminalObservabilityHandler",
+        (TerminalObservabilityHandler,),
+        {"registry": registry, "terminal_service": TerminalDataService(provider)},
+    )
+
+
 def main() -> None:
     registry = MetricsRegistry()
     registry.set(
@@ -38,7 +50,7 @@ def main() -> None:
     )
     host = os.getenv("ATS_METRICS_HOST", "0.0.0.0")
     port = int(os.getenv("ATS_METRICS_PORT", "8000"))
-    handler = type("BoundTerminalObservabilityHandler", (TerminalObservabilityHandler,), {"registry": registry})
+    handler = build_observability_handler(registry)
     server = ThreadingHTTPServer((host, port), handler)
     try:
         server.serve_forever()
