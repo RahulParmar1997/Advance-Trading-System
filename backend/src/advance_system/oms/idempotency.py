@@ -24,6 +24,8 @@ class PaperOrderGateway:
             raise ValueError("client_key is required")
         existing_id = self._client_keys.get(client_key)
         if existing_id is not None:
+            if existing_id != order.order_id:
+                raise ValueError("client_key already bound to a different order_id")
             return SubmissionResult(self._orders[existing_id], True)
         if order.order_id in self._orders:
             raise ValueError("duplicate order_id")
