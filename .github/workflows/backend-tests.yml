@@ -82,7 +82,8 @@ jobs:
           done
 
           for attempt in $(seq 1 30); do
-            if docker compose exec -T clickhouse wget -qO- http://127.0.0.1:8123/ping | grep -q '^Ok\.?$'; then
+            clickhouse_ping="$(docker compose exec -T clickhouse wget -qO- http://127.0.0.1:8123/ping)"
+            if [ "$clickhouse_ping" = 'Ok.' ] || [ "$clickhouse_ping" = 'Ok' ]; then
               break
             fi
             if [ "$attempt" -eq 30 ]; then
