@@ -1,7 +1,5 @@
 import json
 from dataclasses import asdict, dataclass
-
-
 ViewName = str
 
 
