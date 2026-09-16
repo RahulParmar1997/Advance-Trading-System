@@ -70,9 +70,18 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 - The `ParquetStore` application protocol matches the concrete immutable adapter's versioned dataset reference, manifest and dataset read/write API, with deterministic runtime conformance coverage.
 - PostgreSQL, ClickHouse, Redis and Parquet storage protocols are runtime-checkable, with deterministic tests asserting that all concrete application adapters satisfy their corresponding boundaries.
 
+## Frontend terminal
+- The Next.js frontend now provides a dark-first observational overview with Market State, Scanner, Risk and PAPER Portfolio panels, navigation, feed-state messaging and explicit RiskEngine → OMS execution-boundary messaging.
+- Responsive terminal styling covers desktop, tablet and mobile widths without adding execution controls.
+- A deterministic Node UI-contract test verifies required panels, PAPER mode, disconnected-feed state and safety-boundary messaging.
+- Frontend CI now installs dependencies and runs UI contract tests, ESLint, TypeScript typecheck and a production build.
+- No live market values are fabricated; the terminal explicitly reports an unconnected feed until typed backend read-only endpoints exist.
+
 ## Pending roadmap
-1. Next.js/React/TypeScript trading terminal and dashboards.
-2. PostgreSQL, ClickHouse, Redis, Parquet/object storage and deployment/observability infrastructure.
+1. Typed read-only backend endpoints for the terminal's Market State, Scanner, Risk and Portfolio views.
+2. Dedicated frontend routes for market, scanner, risk and portfolio views.
+3. Runtime end-to-end monitoring validation outside CI against an actually running deployment environment, if a persistent environment is required.
+4. Additional concrete vendor adapter/factory integration coverage when those drivers are introduced.
 
 ## Next implementation rule
 When the user says **NEXT**, inspect the repository and implement the next unchecked roadmap item directly on `main`. Add deterministic tests, update `PROJECT_WORK_STATUS.md`, and update this memory file so the next session can resume without reconstructing project state.
@@ -88,4 +97,4 @@ When the user says **NEXT**, inspect the repository and implement the next unche
 - Do not claim CI is green unless the GitHub Actions result has actually been verified.
 
 ## CI note
-Run 527 (`35068304434`) on `b77b3f11f2e3b3ff78156ec165dcf152ebdecd30` verified the Parquet/runtime-contract changes with Ruff, unit pytest, Docker Compose configuration validation and full Docker Compose runtime smoke all passing. The subsequent runtime-contract hardening is committed on `main` and requires fresh GitHub Actions verification.
+Run 527 (`35068304434`) on `b77b3f11f2e3b3ff78156ec165dcf152ebdecd30` was the last verified successful run before the frontend changes. The current frontend commits require a new GitHub Actions run before their tests/build can be considered verified.
