@@ -3,19 +3,22 @@ from __future__ import annotations
 import os
 from http.server import ThreadingHTTPServer
 
-from advance_system.observability.api import VIEW_PATHS, unavailable_view
+from advance_system.observability.api import VIEW_PATHS
 from advance_system.observability.metrics import MetricSample, MetricsHandler, MetricsRegistry
+from advance_system.observability.providers import TerminalDataService
 
 
 class TerminalObservabilityHandler(MetricsHandler):
     """Metrics plus read-only terminal API; no broker or execution authority."""
+
+    terminal_service = TerminalDataService()
 
     def do_GET(self) -> None:  # noqa: N802 - BaseHTTPRequestHandler API
         view = VIEW_PATHS.get(self.path)
         if view is None:
             super().do_GET()
             return
-        payload = unavailable_view(view).to_json()
+        payload = self.terminal_service.get(view).to_json()
         self.send_response(200)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Cache-Control", "no-store")
