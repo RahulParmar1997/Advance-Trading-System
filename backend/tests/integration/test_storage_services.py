@@ -27,7 +27,8 @@ def test_postgres_clickhouse_and_redis_application_operations() -> None:
         "advance_trading",
         "-d",
         "advance_trading",
-        "-tAc",
+        "-qAt",
+        "-c",
         f"CREATE TEMP TABLE {marker}(value integer); INSERT INTO {marker} VALUES (42); SELECT value FROM {marker};",
     )
     assert postgres == "42"
