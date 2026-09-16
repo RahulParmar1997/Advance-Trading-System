@@ -29,6 +29,21 @@ jobs:
         env:
           POSTGRES_PASSWORD: ci-validation-password
         run: docker compose config --quiet
+      - name: Frontend install
+        working-directory: frontend
+        run: npm install --no-audit --no-fund
+      - name: Frontend contract tests
+        working-directory: frontend
+        run: npm test
+      - name: Frontend lint
+        working-directory: frontend
+        run: npm run lint
+      - name: Frontend typecheck
+        working-directory: frontend
+        run: npm run typecheck
+      - name: Frontend production build
+        working-directory: frontend
+        run: npm run build
       - name: Run Docker Compose runtime smoke test
         env:
           POSTGRES_PASSWORD: ci-runtime-password
@@ -108,10 +123,6 @@ jobs:
 
           (cd backend && python -m pytest tests/integration/test_storage_services.py -m integration -q)
 
-          # Prometheus reports a newly discovered target as "unknown" until its
-          # first scheduled scrape. Give that initial scrape window time to elapse
-          # before asserting target health, then retain bounded polling for startup
-          # and scheduling variance.
           sleep 20
 
           for attempt in $(seq 1 30); do
