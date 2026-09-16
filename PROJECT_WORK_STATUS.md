@@ -24,27 +24,31 @@
 - [x] Added the dedicated `/risk` frontend route, wired it to `/api/v1/risk`, added navigation and deterministic frontend contract coverage.
 - [x] Replaced static Market State, Scanner and Portfolio frontend placeholders with server-side consumption of `/api/v1/market-state`, `/api/v1/scanner` and `/api/v1/portfolio`, respectively, using `cache: "no-store"` and explicit fail-closed unavailable/error handling.
 - [x] Extended frontend contract tests to require backend endpoint consumption and unavailable semantics for all four dedicated terminal routes.
+- [x] Verified GitHub Actions Run 600 (`35086084256`) fully successful, including Ruff, pytest, frontend checks and Docker Compose runtime smoke.
+- [x] Added a thread-safe `ValidatedTerminalSnapshotStore` with mandatory timezone-aware observation timestamps and configurable freshness expiry; expired observations fail closed instead of being served as current.
+- [x] Added deterministic unit coverage for fresh snapshots, expiry, timezone validation and invalid freshness configuration.
 
 ## Pending work
 ### Frontend / terminal
-- [ ] Introduce/identify the concrete authoritative read-only market-data and account/portfolio provider implementation, then inject it through the composition boundary.
+- [ ] Connect the snapshot store to concrete authoritative market/account/portfolio ingestion and inject the resulting provider through the application composition boundary.
 
 ### Infrastructure / operations
 - [ ] Runtime end-to-end monitoring validation outside CI against an actually running deployment environment, if a persistent environment is required.
 - [ ] Extend application-level integration coverage to additional concrete vendor adapter/factory implementations when those drivers are introduced.
 
 ## Current task
-The dedicated terminal routes now consume their backend contracts. The next integration task is to identify an authoritative read-only market-data and account/portfolio provider and inject it through the existing composition boundary without synthesizing observations.
+The terminal now has a freshness-enforcing provider store, but it is intentionally not populated implicitly. The next integration task is to connect validated upstream market/account/portfolio observations to this store through an explicit lifecycle/composition boundary without synthesizing values.
 
 ## Latest verified CI state
-Run 594 (`35085263149`) on `cb7a241fce78a2a4e181f97fac5e1ec4b9f61469` was fully successful, including Ruff, unit pytest, Compose validation, frontend checks and Docker Compose runtime smoke. The current route-consumption commits after that run require fresh GitHub Actions verification; no newer green CI run is being claimed until the final HEAD is verified.
+Run 600 (`35086084256`) on `cf212cf9f966642cf70508c25000034ef14e8421` was fully successful, including Ruff, unit pytest, Compose validation, frontend checks and Docker Compose runtime smoke. The snapshot-store commits after Run 600 require fresh GitHub Actions verification; no newer green CI run is being claimed until the final HEAD is verified.
 
 ## Architectural decisions
 - Mandatory execution path remains `Market Data → Validation → Market Intelligence → Scanner → Trade Type → Strategy → Probability/EV → RiskEngine → OMS → Execution`.
 - PostgreSQL is operational source of truth; ClickHouse analytics; Redis ephemeral/hot state; Parquet/object storage immutable research data.
 - Frontend and terminal APIs are observational/read-only and cannot invoke broker execution.
-- Terminal provider services may expose only authoritative, validated observations; unavailable or mismatched provider data fails closed and is never guessed.
-- Application composition accepts an explicit `TerminalSnapshotProvider`; no provider is created implicitly, preserving fail-closed behavior until an authoritative implementation exists.
+- Terminal provider services may expose only authoritative, validated observations; unavailable, mismatched, or expired provider data fails closed and is never guessed.
+- `ValidatedTerminalSnapshotStore` is a transport/lifecycle boundary, not a source of truth: only an upstream component that has already validated an observation may publish it.
+- Application composition accepts an explicit `TerminalSnapshotProvider`; no provider is created implicitly, preserving fail-closed behavior until authoritative wiring exists.
 - Frontend server routes may consume backend terminal contracts, but they must preserve `available`, `reason`, and `data=null` semantics on unavailable/error responses.
 - AI/HPC cannot bypass `RiskEngine → OMS`.
 
