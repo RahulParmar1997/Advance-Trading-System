@@ -20,6 +20,27 @@ class AsyncConnectionFactory(Protocol):
     async def __call__(self) -> AsyncConnection: ...
 
 
+class _PooledAsyncConnection:
+    """Adapter that returns an acquired asyncpg connection to its pool on close."""
+
+    def __init__(self, pool: Any, connection: Any) -> None:
+        self._pool = pool
+        self._connection = connection
+        self._released = False
+
+    async def execute(self, statement: str, *parameters: Any) -> Any:
+        return await self._connection.execute(statement, *parameters)
+
+    def transaction(self) -> Any:
+        return self._connection.transaction()
+
+    async def close(self) -> None:
+        if self._released:
+            return
+        await self._pool.release(self._connection)
+        self._released = True
+
+
 class PostgresOperationalStore:
     """Driver-neutral PostgreSQL adapter with explicit connection lifecycle."""
 
@@ -87,7 +108,8 @@ class AsyncpgConnectionFactory:
                 min_size=self._min_size,
                 max_size=self._max_size,
             )
-        return await self._pool.acquire()
+        connection = await self._pool.acquire()
+        return _PooledAsyncConnection(self._pool, connection)
 
     async def close(self) -> None:
         if self._pool is not None:
