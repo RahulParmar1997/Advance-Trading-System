@@ -20,6 +20,7 @@
 - [x] Corrected the persistent Ruff import-layout issue in the terminal API and verified it with GitHub Actions Run 582 (`35082009500`).
 - [x] Added an explicit application composition boundary for injecting a `TerminalSnapshotProvider` into the observability handler; the default application composition remains provider-free and therefore fail-closed.
 - [x] Added deterministic composition tests proving an injected provider is used and no-provider composition remains unavailable.
+- [x] Diagnosed and corrected a Ruff import-order failure in the new composition test (`backend/tests/unit/test_terminal_composition.py`).
 
 ## Pending work
 ### Frontend / terminal
@@ -31,10 +32,10 @@
 - [ ] Extend application-level integration coverage to additional concrete vendor adapter/factory implementations when those drivers are introduced.
 
 ## Current task
-The terminal composition boundary is now implemented and tested, but no concrete authoritative provider has been safely wired. The next task is to build or identify the concrete read-only provider that can consume validated authoritative observations (without synthetic values or execution authority), then compose it into the application.
+Verify the terminal composition implementation and corrected composition-test import order through GitHub Actions. Once green, the next implementation task is the concrete authoritative read-only provider that can consume validated market/account observations without synthetic values or execution authority.
 
 ## Latest verified CI state
-Run 582 (`35082009500`) on commit `d56c3ead4a343aeb11b52f8012a1cede7566fae8` completed successfully with Ruff, unit pytest, Compose validation, frontend install/contract/lint/typecheck/build, Docker Compose runtime smoke and cleanup. The two subsequent implementation commits (`37a9283b632a9fab127b3bb3482172506e258df0` and `eead42e57b3b45254a11e030efdc03ee3b3e60b4`) have not yet completed GitHub Actions verification.
+Run 582 (`35082009500`) on `d56c3ead4a343aeb11b52f8012a1cede7566fae8` was fully successful, including Ruff, unit pytest, Compose validation, frontend checks and Docker Compose runtime smoke. Run 586 (`35083495456`) on `2ad580a59862abed7d150685b6c59c02a4e2ff33` reached Ruff and failed with exactly one I001 import-order error in the newly added `test_terminal_composition.py`; pytest and later stages were skipped. Commit `81d741835a7f0acff7e1572e21aab16b63e61b42` corrects that import order. GitHub Actions verification of this correction and the following documentation update is pending.
 
 ## Architectural decisions
 - Mandatory execution path remains `Market Data → Validation → Market Intelligence → Scanner → Trade Type → Strategy → Probability/EV → RiskEngine → OMS → Execution`.
