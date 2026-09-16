@@ -52,6 +52,8 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 - `TerminalSnapshotIngress` now provides an explicit validation-before-publication lifecycle boundary. It requires an upstream validator to accept an observation before it reaches the snapshot store.
 - Snapshot publication is monotonic per view: older observations cannot replace newer state, identical same-timestamp observations are idempotent, and conflicting same-timestamp payloads are rejected.
 - Deterministic tests cover stale rollback rejection, same-observation idempotency, and same-timestamp conflict rejection.
+- Upstox instrument-master parsing now strictly validates required string fields and invokes the broker-neutral domain validator before records leave the adapter boundary.
+- Deterministic tests cover invalid identity types, blank symbols, and domain validation failures at the source boundary.
 
 ## Provider discovery
 - The repository contains a concrete `UpstoxAdapter` market-data adapter plus Upstox market-status/source components, but no existing application-level source that safely supplies all four terminal views from authoritative validated observations.
@@ -71,7 +73,7 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 - Do not claim CI green unless GitHub Actions actually confirms it.
 
 ## Current verification state
-Run 611 (`35089747079`) on `509af0706459faac7611ba8de0e315a9c599a29b` was fully successful, including Ruff, unit pytest, Compose validation, frontend checks and Docker Compose runtime smoke. Snapshot ordering-hardening commits after Run 611 require fresh GitHub Actions verification; no newer green run is being claimed until the final HEAD is verified.
+Run 619 (`35091319639`) on `961bfaf1f23b40d81792389b010c78c9f65d9d3c` was fully successful, including Ruff, unit pytest, Compose validation, frontend checks and Docker Compose runtime smoke. The Upstox instrument-source hardening commits after Run 619 require fresh GitHub Actions verification; no newer green run is being claimed until the final HEAD is verified.
 
 ## Next implementation rule
 When the user says **NEXT**, inspect current `main` and latest GitHub Actions state, implement the highest-priority unfinished task directly on `main`, add deterministic tests, update this file and `PROJECT_WORK_STATUS.md`, verify CI, and report the commit SHA and blockers.
