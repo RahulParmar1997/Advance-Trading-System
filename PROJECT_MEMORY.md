@@ -76,6 +76,7 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 - A deterministic Node UI-contract test verifies required panels, PAPER mode, disconnected-feed state and safety-boundary messaging.
 - Frontend CI now installs dependencies and runs UI contract tests, ESLint, TypeScript typecheck and a production build.
 - No live market values are fabricated; the terminal explicitly reports an unconnected feed until typed backend read-only endpoints exist.
+- Docker Compose runtime smoke now builds/starts the frontend service and verifies the served HTML contains the observational terminal title, PAPER mode indicator and RiskEngine → OMS boundary.
 
 ## Pending roadmap
 1. Typed read-only backend endpoints for the terminal's Market State, Scanner, Risk and Portfolio views.
@@ -97,4 +98,4 @@ When the user says **NEXT**, inspect the repository and implement the next unche
 - Do not claim CI is green unless the GitHub Actions result has actually been verified.
 
 ## CI note
-Run 527 (`35068304434`) on `b77b3f11f2e3b3ff78156ec165dcf152ebdecd30` was the last verified successful run before the frontend changes. The current frontend commits require a new GitHub Actions run before their tests/build can be considered verified.
+The frontend runtime smoke enhancement is committed on `main` as `5c0835d2aaf8cc0ecc92b4f8952863ff8cb6b8f8` and requires its new GitHub Actions run to complete successfully before this change is considered verified.
