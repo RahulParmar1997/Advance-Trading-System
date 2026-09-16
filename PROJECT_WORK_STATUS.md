@@ -23,11 +23,12 @@
 - [x] Hardened Prometheus target verification with an initial scrape window and a non-zero `lastScrape` requirement.
 - [x] Verified GitHub Actions Run 487 (`35062475086`) on commit `adfaba2be8ea07b4c35831910f5f47d6e7bb2958`: Ruff passed, Pytest passed (332 tests), Compose configuration validation passed, and the full Docker Compose runtime smoke test passed.
 - [x] Added `backend/tests/integration/test_storage_services.py` covering real PostgreSQL temporary-table write/read, ClickHouse query execution, and Redis set/get/delete operations against the Compose services.
+- [x] Isolated Docker-dependent integration tests from the normal unit pytest invocation with an explicit `integration` marker and CI `-m "not integration"` unit-suite selection.
 
 ## Pending work
 
 ### Infrastructure / operations
-- [ ] Fresh GitHub Actions verification of the new PostgreSQL/ClickHouse/Redis application storage integration test.
+- [ ] Fresh GitHub Actions verification of the integration-test isolation fix and full Docker Compose runtime smoke, including the explicit storage application integration test.
 - [ ] Runtime end-to-end monitoring validation outside CI against an actually running deployment environment, if a persistent environment is required. The CI smoke test provides real container execution on GitHub-hosted runners but is not a production deployment validation.
 - [ ] Extend application-level integration coverage to the concrete adapter/factory implementations where vendor drivers are introduced; current service integration verifies the deployed database/cache operations themselves.
 
@@ -47,7 +48,7 @@
 - Research compute must never place orders, mutate positions/balances or bypass RiskEngine → OMS.
 
 ## Current next task
-Run fresh GitHub Actions verification of the new application-level PostgreSQL/ClickHouse/Redis integration test. If it passes, retain the CI evidence and proceed to the next highest-priority persistence/application integration gap. Runtime deployment outside CI remains environment-dependent.
+Freshly verify the corrected CI test isolation and Docker Compose storage integration path. Run 492 (`35062956646`) on commit `bfd7fe0a6dcb347f5ae9cf8eb5f20b87f03bf7ef` exposed a test-contract defect: the Docker-dependent integration test was collected by the normal unit pytest step before Compose services and `POSTGRES_PASSWORD` were provisioned. The fix marks that test as `integration` and excludes integration tests from the unit suite; the runtime smoke explicitly runs the integration test after starting and validating PostgreSQL, ClickHouse and Redis. If the fresh run passes, proceed to the next persistence/application integration gap. Runtime deployment outside CI remains environment-dependent.
 
 ## CI note
-Run 487 (`35062475086`) on commit `adfaba2be8ea07b4c35831910f5f47d6e7bb2958` is verified successful: Ruff passed, Pytest passed (332 tests), Docker Compose configuration validation passed, and the Docker Compose runtime smoke test passed. The smoke reached healthy backend/PostgreSQL/ClickHouse/Redis/Prometheus services and verified the Prometheus backend scrape target after its initial scrape window. A new storage application integration test has now been added; its fresh Actions result is still required.
+Run 487 (`35062475086`) on `adfaba2be8ea07b4c35831910f5f47d6e7bb2958` is verified successful for Ruff, 332 unit tests, Compose configuration validation and Docker Compose runtime smoke. Run 492 (`35062956646`) on `bfd7fe0a6dcb347f5ae9cf8eb5f20b87f03bf7ef` failed at the normal pytest step with exactly 1 integration-test failure and 332 passing tests; the failure was caused by `docker compose exec` running before Compose services/environment were provisioned. This has been corrected by separating integration-test selection from the unit suite. A fresh Actions run is required before claiming the new storage integration path is verified.

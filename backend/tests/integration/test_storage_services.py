@@ -3,6 +3,8 @@ from __future__ import annotations
 import subprocess
 import uuid
 
+import pytest
+
 
 def run_compose(*args: str) -> str:
     result = subprocess.run(
@@ -14,6 +16,7 @@ def run_compose(*args: str) -> str:
     return result.stdout.strip()
 
 
+@pytest.mark.integration
 def test_postgres_clickhouse_and_redis_application_operations() -> None:
     marker = f"ats_ci_{uuid.uuid4().hex}"
 

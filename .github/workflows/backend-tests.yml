@@ -22,9 +22,9 @@ jobs:
       - name: Ruff lint
         working-directory: backend
         run: python -m ruff check src tests
-      - name: Pytest
+      - name: Pytest unit suite
         working-directory: backend
-        run: python -m pytest
+        run: python -m pytest -m "not integration"
       - name: Validate Docker Compose configuration
         env:
           POSTGRES_PASSWORD: ci-validation-password
