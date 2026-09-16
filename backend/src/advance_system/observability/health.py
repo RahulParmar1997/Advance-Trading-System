@@ -35,6 +35,8 @@ class HealthChecker:
 
     def check(self) -> HealthReport:
         results: list[DependencyStatus] = []
+        if not self._checks:
+            return HealthReport(HealthStatus.UNHEALTHY, ())
         for name in sorted(self._checks):
             try:
                 healthy = bool(self._checks[name]())
@@ -48,6 +50,4 @@ class HealthChecker:
 
     def readiness(self) -> HealthReport:
         """Return readiness; missing checks fail closed rather than implying production readiness."""
-        if not self._checks:
-            return HealthReport(HealthStatus.UNHEALTHY, ())
         return self.check()
