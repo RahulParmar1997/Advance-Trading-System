@@ -19,6 +19,8 @@
 - [x] Inspected GitHub Actions Run 461 (`35055898631`) on commit `654796c33f4ef5fac2f5200fdb6420891362c473`: Ruff and Pytest both completed successfully.
 - [x] Added deterministic deployment coverage confirming the backend container command starts `advance_system.observability.server` and that Compose supplies the expected metrics host/port contract.
 - [x] Inspected the backend image entrypoint and confirmed the metrics server is an actual runtime command, not a placeholder; runtime stack execution remains unverified in this environment.
+- [x] Added a backend Docker healthcheck that probes `GET /metrics` and made Prometheus wait for a healthy backend before startup; this preserves monitoring as an observational path while preventing Prometheus from being started against an unready metrics endpoint.
+- [x] Added deterministic deployment test coverage for the backend healthcheck and Prometheus health-gated dependency.
 - [x] Inspected GitHub Actions Run 451 (`34965141139`): Ruff passed and Pytest reported exactly 3 failures / 323 passes, all rooted in integer metric formatting; the failures were corrected directly on `main`.
 - [x] Verified GitHub Actions Run 444 on commit `25c7732d502b046df185c477cd3eb595ff4461df`: Ruff and Pytest both passed successfully.
 - [x] Corrected the remaining GitHub Actions Ruff import-order/spacing failures in `test_research_results.py` and pushed the fixes directly to `main`.
@@ -48,6 +50,7 @@
 ## Pending work
 
 ### Infrastructure / operations
+- [ ] Fresh GitHub Actions verification for the new backend health-gated monitoring commits.
 - [ ] Runtime end-to-end monitoring validation against an actually running Prometheus/backend stack. Repository wiring and GitHub Actions tests are verified; runtime deployment has not been executed in this environment.
 - [ ] Full deployment/integration validation against configured PostgreSQL, ClickHouse and Redis services.
 
@@ -67,7 +70,7 @@
 - Research compute must never place orders, mutate positions/balances or bypass RiskEngine → OMS.
 
 ## Current next task
-Validate the monitoring stack at runtime where execution infrastructure is available, then proceed to broader PostgreSQL/ClickHouse/Redis deployment integration validation. Until a real stack run is executed, do not claim runtime monitoring success.
+Verify the new monitoring health-gate changes through GitHub Actions, then continue toward runtime monitoring validation and broader PostgreSQL/ClickHouse/Redis deployment integration. Until a real stack run is executed, do not claim runtime monitoring success.
 
 ## CI note
-Run 456 (`34965510449`) on commit `8734d16a3d043083f4915a5a2b39dce43fb309f0` completed successfully: Ruff lint passed and Pytest passed. Run 459 (`35053144090`) on commit `f8f907205642a2761ec0270b40aad9ce55b0f663` failed at Ruff with exactly one I001 import-order error in `backend/tests/unit/test_monitoring_deployment.py`; commit `91ed0c3b219112e98941949ca929ffe36b78b2a4` fixed it. Run 461 (`35055898631`) on commit `654796c33f4ef5fac2f5200fdb6420891362c473` subsequently completed successfully with Ruff and Pytest passing. The new monitoring runtime-contract test is committed on `main` as `2796d636ca804d07f4b8eb534830cc58f15deda3`; its fresh CI verification is pending.
+Run 456 (`34965510449`) on commit `8734d16a3d043083f4915a5a2b39dce43fb309f0` completed successfully: Ruff lint passed and Pytest passed. Run 459 (`35053144090`) on commit `f8f907205642a2761ec0270b40aad9ce55b0f663` failed at Ruff with exactly one I001 import-order error in `backend/tests/unit/test_monitoring_deployment.py`; commit `91ed0c3b219112e98941949ca929ffe36b78b2a4` fixed it. Run 461 (`35055898631`) on commit `654796c33f4ef5fac2f5200fdb6420891362c473` subsequently completed successfully with Ruff and Pytest passing. The new monitoring runtime-contract and health-gate changes are now committed on `main`; fresh CI verification is pending.
