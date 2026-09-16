@@ -67,7 +67,8 @@ India-focused Market Intelligence + Quant Research + Automated Trading Platform.
 - `MigrationRunner` always closes/releases its acquired PostgreSQL migration connection, including migration failure paths.
 - `MigrationRunner` executes migration SQL and `schema_migrations` bookkeeping in one transaction so partial migration application rolls back atomically.
 - Migration tests cover commit, rollback, idempotency and connection cleanup.
-- The `ParquetStore` application protocol now matches the concrete immutable adapter's versioned dataset reference, manifest and dataset read/write API, with deterministic runtime conformance coverage.
+- The `ParquetStore` application protocol matches the concrete immutable adapter's versioned dataset reference, manifest and dataset read/write API, with deterministic runtime conformance coverage.
+- PostgreSQL, ClickHouse, Redis and Parquet storage protocols are runtime-checkable, with deterministic tests asserting that all concrete application adapters satisfy their corresponding boundaries.
 
 ## Pending roadmap
 1. Next.js/React/TypeScript trading terminal and dashboards.
@@ -87,4 +88,4 @@ When the user says **NEXT**, inspect the repository and implement the next unche
 - Do not claim CI is green unless the GitHub Actions result has actually been verified.
 
 ## CI note
-The latest implementation commits are on `main` and require fresh GitHub Actions verification. The prior latest verified successful run is Run 519 (`35067255577`) on `4522dc22ad55b1a65fbee262b1332d322ef5b45f`, which verified Ruff, unit pytest, Docker Compose configuration validation and full Docker Compose runtime smoke.
+Run 527 (`35068304434`) on `b77b3f11f2e3b3ff78156ec165dcf152ebdecd30` verified the Parquet/runtime-contract changes with Ruff, unit pytest, Docker Compose configuration validation and full Docker Compose runtime smoke all passing. The subsequent runtime-contract hardening is committed on `main` and requires fresh GitHub Actions verification.
