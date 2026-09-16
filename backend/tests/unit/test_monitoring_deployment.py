@@ -29,3 +29,11 @@ def test_backend_container_starts_metrics_server_with_expected_runtime_contract(
     assert "ATS_METRICS_HOST: 0.0.0.0" in compose
     assert "ATS_METRICS_PORT: 8000" in compose
     assert '"${ATS_METRICS_PORT:-8000}:8000"' in compose
+
+
+def test_backend_healthcheck_probes_metrics_endpoint_before_prometheus_starts() -> None:
+    compose = (REPOSITORY_ROOT / "docker-compose.yml").read_text(encoding="utf-8")
+
+    assert "healthcheck:" in compose
+    assert "http://127.0.0.1:8000/metrics" in compose
+    assert "condition: service_healthy" in compose
