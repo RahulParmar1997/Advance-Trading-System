@@ -1,6 +1,8 @@
+from datetime import datetime, timezone
+
 import pytest
 
-from advance_system.adapters.upstox.market_status import UpstoxMarketStatusConfig, UpstoxMarketStatusSource
+from advance_system.adapters.upstox.market_status import UpstoxMarketStatus, UpstoxMarketStatusConfig, UpstoxMarketStatusSource
 
 
 class FakeHttp:
@@ -28,8 +30,6 @@ async def test_market_status_source_maps_exchange_status_and_cas():
 
 
 def test_upstox_market_status_maps_to_validated_domain_status():
-    from advance_system.adapters.upstox.market_status import UpstoxMarketStatus
-
     result = UpstoxMarketStatus("NSE", "NORMAL_OPEN", 1705549500000).to_domain()
     assert result.exchange == "NSE"
     assert result.status == "NORMAL_OPEN"
@@ -38,9 +38,6 @@ def test_upstox_market_status_maps_to_validated_domain_status():
 
 
 def test_upstox_market_status_rejects_future_domain_observation():
-    from advance_system.adapters.upstox.market_status import UpstoxMarketStatus
-    from datetime import datetime, timezone
-
     future_ms = int(datetime.now(timezone.utc).timestamp() * 1000) + 60_000
     with pytest.raises(ValueError, match="cannot be in the future"):
         UpstoxMarketStatus("NSE", "NORMAL_OPEN", future_ms).to_domain()
