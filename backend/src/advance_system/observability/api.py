@@ -1,11 +1,11 @@
+import dataclasses
 import json
-from dataclasses import asdict, dataclass
 
 
 ViewName = str
 
 
-@dataclass(frozen=True, slots=True)
+@dataclasses.dataclass(frozen=True, slots=True)
 class TerminalViewResponse:
     """Stable read-only terminal contract; unavailable data is never synthesized."""
 
@@ -17,7 +17,7 @@ class TerminalViewResponse:
     data: object | None = None
 
     def to_json(self) -> bytes:
-        return json.dumps(asdict(self), separators=(",", ":"), sort_keys=True).encode("utf-8")
+        return json.dumps(dataclasses.asdict(self), separators=(",", ":"), sort_keys=True).encode("utf-8")
 
 
 def unavailable_view(view: ViewName) -> TerminalViewResponse:
